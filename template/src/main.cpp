@@ -9,12 +9,19 @@
 #include "physics_system.hpp"
 #include "render_system.hpp"
 #include "world_system.hpp"
+#include "turn_based_system/turn_based_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
 // Entry point
 int main()
 {
+
+	TurnBasedSystem turn_based;
+
+	turn_based.init();
+
+
 	// Global systems
 	WorldSystem world;
 	RenderSystem renderer;

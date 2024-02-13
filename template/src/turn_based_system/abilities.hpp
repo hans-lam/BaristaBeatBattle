@@ -1,5 +1,7 @@
-#include "character_system.hpp"
+#pragma once
 
+#include "character_system.hpp"
+#include <vector>
 #include <string>
 
 
@@ -12,7 +14,7 @@ public:
 	bool get_is_physical();
 	bool get_is_area_of_effect();
 
-	void process_ability(Character caller, Character callee);
+	//void process_ability(Character* caller, Character* callee);
 
 private:
 	int power;
@@ -22,6 +24,6 @@ private:
 };
 
 
-#define PHYSCIAL_BASIC_ATTACK_POWER = 5;
+const int PHYSCIAL_BASIC_ATTACK_POWER = 5;
 
-Ability generic_basic_attack = Ability(PHYSCIAL_BASIC_ATTACK_POWER, "Basic Attack", true, false);
+extern Ability* generic_basic_attack;
