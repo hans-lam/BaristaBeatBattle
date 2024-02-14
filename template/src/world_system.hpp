@@ -37,6 +37,12 @@ public:
 
 	// Should the game be over ?
 	bool is_over()const;
+
+	// check if player is in world bounds
+	bool player_in_bounds(Motion* motion, bool is_x);
+
+	// handle player movement
+	void handle_player_movement(int key, int action);
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
@@ -54,8 +60,10 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	float current_speed;
+	float player_speed;
 	float next_eagle_spawn;
 	float next_bug_spawn;
+	float next_enemy_spawn;
 	Entity player_chicken;
 
 	// music references
@@ -66,4 +74,5 @@ private:
 	// C++ random number generator
 	std::default_random_engine rng;
 	std::uniform_real_distribution<float> uniform_dist; // number between 0..1
+	std::uniform_real_distribution<float> wide_dist; // number between -1..1
 };
