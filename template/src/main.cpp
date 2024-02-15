@@ -19,7 +19,6 @@ int main()
 
 	TurnBasedSystem turn_based;
 
-	turn_based.init();
 
 
 	// Global systems
@@ -38,7 +37,9 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
-	world.init(&renderer);
+	turn_based.init();
+	world.init(&renderer, &turn_based);
+	
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -54,6 +55,7 @@ int main()
 
 		world.step(elapsed_ms);
 		physics.step(elapsed_ms);
+		turn_based.step(elapsed_ms);
 		world.handle_collisions();
 
 		renderer.draw();

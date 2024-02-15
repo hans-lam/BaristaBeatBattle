@@ -3,12 +3,12 @@
 
 Character* CharacterFactory::construct_chai() {
 	std::string name = "Chai";
-	unsigned int chai_max_health = 10;
-	unsigned int chai_strength = 1;
-	unsigned int chai_magic = 1;
-	unsigned int chai_defense = 1;
-	unsigned int chai_magic_resist = 1;
-	unsigned int chai_speed = 1;
+	unsigned int chai_max_health = 25;
+	unsigned int chai_strength = 10;
+	unsigned int chai_magic = 10;
+	unsigned int chai_defense = 10;
+	unsigned int chai_magic_resist = 10;
+	unsigned int chai_speed = 10;
 
 	CharacterStatSheet* character_stat = new CharacterStatSheet(chai_max_health, chai_strength, chai_magic, chai_defense, chai_magic_resist, chai_speed);
 
@@ -25,11 +25,11 @@ Character* CharacterFactory::construct_chai() {
 Character* CharacterFactory::construct_earl() {
 	std::string name = "Earl";
 	unsigned int earl_max_health = 10;
-	unsigned int earl_strength = 1;
-	unsigned int earl_magic = 1;
-	unsigned int earl_defense = 1;
-	unsigned int earl_magic_resist = 1;
-	unsigned int earl_speed = 1;
+	unsigned int earl_strength = 10;
+	unsigned int earl_magic = 10;
+	unsigned int earl_defense = 10;
+	unsigned int earl_magic_resist = 10;
+	unsigned int earl_speed = 10;
 
 	CharacterStatSheet* character_stat = new CharacterStatSheet(earl_max_health, earl_strength, earl_magic, earl_defense, earl_magic_resist, earl_speed);
 
@@ -45,11 +45,11 @@ Character* CharacterFactory::construct_earl() {
 Character* CharacterFactory::construct_americano() {
 	std::string name = "Americano";
 	unsigned int americano_max_health = 10;
-	unsigned int americano_strength = 1;
-	unsigned int americano_magic = 1;
-	unsigned int americano_defense = 1;
-	unsigned int americano_magic_resist = 1;
-	unsigned int americano_speed = 1;
+	unsigned int americano_strength = 10;
+	unsigned int americano_magic = 10;
+	unsigned int americano_defense = 10;
+	unsigned int americano_magic_resist = 10;
+	unsigned int americano_speed = 10;
 
 	CharacterStatSheet* character_stat = new CharacterStatSheet(americano_max_health, americano_strength, americano_magic, americano_defense, americano_magic_resist, americano_speed);
 

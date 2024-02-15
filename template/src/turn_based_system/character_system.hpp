@@ -23,12 +23,15 @@ public:
 
 	bool is_dead();
 
+	void deal_damage(unsigned int dmg) {
+		this->current_health_points -= dmg;
+	}
+
 
 private:
 	std::string character_name;
 	CharacterStatSheet* stats;
 	std::vector<Ability*> abilities;
-	std::vector<Character*> party_members;
 
 	unsigned int current_health_points;
 };
