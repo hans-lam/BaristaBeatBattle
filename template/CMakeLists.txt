@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(chicken)
+project(cafe)
 
 # Set c++11
 # https://stackoverflow.com/questions/10851247/how-to-activate-c-11-in-cmake
@@ -28,7 +28,36 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ext/project_path.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/ext/project_path.hpp")
 
 # You can switch to use the file GLOB for simplicity but at your own risk
-file(GLOB SOURCE_FILES src/*.cpp src/*.hpp)
+file(GLOB SOURCE_FILES src/*.cpp
+    src/*.hpp
+    src/turn_based_system/*.cpp
+    src/turn_based_system/*.hpp
+    src/turn_based_system/ability_factory/*.cpp
+    src/turn_based_system/ability_factory/*.hpp
+    src/turn_based_system/character_factory/*.cpp
+    src/turn_based_system/character_factory/*.hpp)
+
+
+#set(SOURCE_FILES 
+#    src/turn_based_system/abilities.cpp
+#    src/turn_based_system/character_system.cpp
+#    src/turn_based_system/turn_based_system.cpp
+#    src/turn_based_system/character_stat_sheet.cpp
+#
+#    src/turn_based_system/ability_factory/ability_factory.cpp
+#    src/turn_based_system/character_factory/character_factory.cpp
+#
+#
+#   src/turn_based_system/abilities.hpp
+#    src/turn_based_system/character_system.hpp
+#    src/turn_based_system/turn_based_system.hpp
+#    src/turn_based_system/character_stat_sheet.hpp
+#
+#    src/turn_based_system/ability_factory/ability_factory.hpp
+#    src/turn_based_system/character_factory/character_factory.hpp
+#
+#    src/main.cpp
+#    )
 
 #set(SOURCE_FILES
 #	src/main.cpp

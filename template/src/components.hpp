@@ -22,6 +22,12 @@ struct Eatable
 
 };
 
+// EnemyDrinks start fights if you talk/attack them
+struct EnemyDrink
+{
+
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
@@ -61,6 +67,12 @@ struct DebugComponent
 struct DeathTimer
 {
 	float counter_ms = 3000;
+};
+
+// A timer associated with an attacking drink
+struct AttackTimer
+{
+	float counter_ms = 700; // might change this number
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -113,7 +125,8 @@ struct Mesh
 enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
-	TEXTURE_COUNT = EAGLE + 1
+	ENEMYDRINK = EAGLE + 1,
+	TEXTURE_COUNT = ENEMYDRINK + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

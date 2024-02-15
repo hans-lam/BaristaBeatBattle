@@ -7,18 +7,22 @@
 #include <sstream>
 
 #include "physics_system.hpp"
+#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
 const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
+const size_t ENEMY_DELAY_MS = 2000 * 3;
 
 // Create the bug world
 WorldSystem::WorldSystem()
 	: points(0)
+	, player_speed(100.f)
 	, next_eagle_spawn(0.f)
-	, next_bug_spawn(0.f) {
+	, next_bug_spawn(0.f)
+	, next_enemy_spawn(0.f) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -113,8 +117,9 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg) {
 	this->renderer = renderer_arg;
+	this->turn_based = turn_based_arg;
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -148,13 +153,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// Spawning new eagles
-	next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
+	//// Spawning new eagles
+	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
+	//if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
+	//	// Reset timer
+	//	next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
+	//	// Create eagle with random initial position
+ //       createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
+	//}
+
+
+	// Spawning new enemy drinks
+	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
+	if (registry.deadlys.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
 		// Reset timer
-		next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
-		// Create eagle with random initial position
-        createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
+		next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		// Create enemy drink with random initial velocity, position
+		createEnemyDrink(renderer, 
+			// TODO: make negative velocity possible
+			vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+			// TODO: fix to spawn from only the edges
+			vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
 	}
 
 	// Spawning new bug
@@ -192,7 +211,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// reduce window brightness if any of the present chickens is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
-	// !!! TODO A1: update LightUp timers and remove if time drops below zero, similar to the death counter
+	// process attacks
+	float min_attack_counter_ms = 700.f;
+	for (Entity entity : registry.attackTimers.entities) {
+		// progress timer
+		AttackTimer& counter = registry.attackTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		if (counter.counter_ms < min_attack_counter_ms) {
+			min_attack_counter_ms = counter.counter_ms;
+		}
+
+		// handle attack
+		Motion& player_motion = registry.motions.get(entity);
+		player_motion.angle += M_PI / 12.0f;
+
+		// stop attack once timer expires
+		if (counter.counter_ms < 0) {
+			registry.attackTimers.remove(entity);
+			player_motion.angle = 0.f;
+			return true;
+		}
+	}
 
 	return true;
 }
@@ -244,30 +283,31 @@ void WorldSystem::handle_collisions() {
 
 		// For now, we are only interested in collisions that involve the chicken
 		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
 
-			// Checking Player - Deadly collisions
-			if (registry.deadlys.has(entity_other)) {
-				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity)) {
-					// Scream, reset timer, and make the chicken sink
-					registry.deathTimers.emplace(entity);
+			// Checking Player - Attack collisions
+			if (registry.enemyDrinks.has(entity_other)) {
+				// initiate fight if player is attacking
+				if (registry.attackTimers.has(entity)) {
+					// Scream. we can replace this with a diff sound later
 					Mix_PlayChannel(-1, chicken_dead_sound, 0);
 
-					// !!! TODO A1: change the chicken orientation and color on death
-				}
-			}
-			// Checking Player - Eatable collisions
-			else if (registry.eatables.has(entity_other)) {
-				if (!registry.deathTimers.has(entity)) {
-					// chew, count points, and set the LightUp timer
+					// potential problem: if we don't remove the enemy it might keep colliding and screaming
 					registry.remove_all_components_of(entity_other);
-					Mix_PlayChannel(-1, chicken_eat_sound, 0);
-					++points;
 
-					// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the chicken entity by modifying the ECS registry
+					// HANS TODO: start the fight
 				}
 			}
+			//// Checking Player - Eatable collisions
+			//else if (registry.eatables.has(entity_other)) {
+			//	if (!registry.deathTimers.has(entity)) {
+			//		// chew, count points, and set the LightUp timer
+			//		registry.remove_all_components_of(entity_other);
+			//		Mix_PlayChannel(-1, chicken_eat_sound, 0);
+			//		++points;
+
+			//		// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the chicken entity by modifying the ECS registry
+			//	}
+			//}
 		}
 	}
 
@@ -280,6 +320,88 @@ bool WorldSystem::is_over() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
+// check if player is in bounds, keep it in bounds if not
+bool WorldSystem::player_in_bounds(Motion* motion, bool is_x) {
+	bool in_bounds;
+	if (is_x) {
+		float x_pos = motion->position.x;
+		bool left = x_pos >= 50.f;
+		bool right = x_pos <= (window_width_px - 50.f);
+		in_bounds = left && right;
+
+		if (!left) motion->position.x = 50.f;
+		if (!right) motion->position.x = (window_width_px - 50.f);
+
+	}
+	else {
+		float y_pos = motion->position.y;
+		bool up = y_pos >= 50.f;
+		bool down = y_pos <= (window_height_px - 50.f);
+		in_bounds = up && down;
+
+		if (!up) motion->position.y = 50.f;
+		if (!down) motion->position.y = (window_height_px - 50.f);
+	}
+
+	return in_bounds;
+}
+
+// chicken movement helper
+void WorldSystem::handle_player_movement(int key, int action) {
+
+	for (uint i = 0; i < registry.players.size(); i++) {
+		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
+		// do not move player if it is dying
+		if (registry.deathTimers.has(registry.players.entities[i])) continue;
+		// check if player is in bounds
+		bool is_x = (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT);
+		if (!player_in_bounds(&player_motion, is_x)) {
+			action = GLFW_RELEASE;
+		}
+
+		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+			if (key == GLFW_KEY_UP) {
+				player_motion.velocity.y = -player_speed;
+			}
+			else if (key == GLFW_KEY_LEFT) {
+				player_motion.velocity.x = -player_speed;
+			}
+			else if (key == GLFW_KEY_DOWN) {
+				player_motion.velocity.y = player_speed;
+			}
+			else if (key == GLFW_KEY_RIGHT) {
+				player_motion.velocity.x = player_speed;
+			}
+
+		}
+		else if (action == GLFW_RELEASE) {
+			if (key == GLFW_KEY_UP) {
+				player_motion.velocity.y = 0.0f;
+			}
+			else if (key == GLFW_KEY_LEFT) {
+				player_motion.velocity.x = 0.0f;
+			}
+			else if (key == GLFW_KEY_DOWN) {
+				player_motion.velocity.y = 0.0f;
+			}
+			else if (key == GLFW_KEY_RIGHT) {
+				player_motion.velocity.x = 0.0f;
+			}
+		}
+	}
+
+
+}
+
+void player_attack() {
+	for (uint i = 0; i < registry.players.size(); i++) {
+		Entity entity = registry.players.entities[i];
+		if (!registry.attackTimers.has(entity)) {
+			registry.attackTimers.emplace(registry.players.entities[i]);
+		}
+	}
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -287,6 +409,40 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	// handle movement
+	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
+		handle_player_movement(key, action);
+	}
+
+	// player attack
+	if (action == GLFW_PRESS && key == GLFW_KEY_A) {
+		player_attack();
+	}
+
+	// turn based attack
+	if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+
+		if (!out_of_combat) {
+			turn_based->process_character_action(generic_basic_attack);
+		}
+
+	}
+
+	// turn based attack
+	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
+
+		if (out_of_combat) {
+			std::vector<Character*> enemies;
+			enemies.push_back(character_factory.construct_enemy(1));
+			enemies.push_back(character_factory.construct_enemy(2));
+
+			turn_based->start_encounter(enemies);
+		}
+
+	}
+
+
 
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
