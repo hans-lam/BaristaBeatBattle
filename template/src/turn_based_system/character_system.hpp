@@ -27,6 +27,8 @@ public:
 		this->current_health_points -= dmg;
 	}
 
+	std::string get_name();
+
 
 private:
 	std::string character_name;

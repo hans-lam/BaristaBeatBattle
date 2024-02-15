@@ -1,7 +1,6 @@
 // internal
 #include "render_system.hpp"
 #include <SDL.h>
-
 #include "tiny_ecs_registry.hpp"
 
 void RenderSystem::drawTexturedMesh(Entity entity,
@@ -17,8 +16,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	transform.rotate(motion.angle);
 
 	transform.scale(motion.scale);
-	// !!! TODO A1: add rotation to the chain of transformations, mind the order
-	// of transformations
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest &render_request = registry.renderRequests.get(entity);
@@ -226,6 +223,65 @@ void RenderSystem::draw()
 	drawToScreen();
 
 	// flicker-free display with a double buffer
+	glfwSwapBuffers(window);
+	gl_has_errors();
+}
+
+void RenderSystem::drawTurn()
+{
+	// Clear everything on screen 
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(1, 1, 1, 1.0);
+
+	// For now this part of the turn based rendering is exactly same as the "overworld"
+	// We will probably have to do some custom rendering here
+	// Start of dupe code
+	// Getting size of window
+	int w, h;
+	glfwGetFramebufferSize(window, &w, &h);
+
+	// First render to the custom framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+	gl_has_errors();
+	// Clearing backbuffer
+	glViewport(0, 0, w, h);
+	glDepthRange(0.00001, 10);
+	glClearColor(1.0, 1.0, 1.0, 1.0); // white
+	glClearDepth(10.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_DEPTH_TEST); // native OpenGL does not work with a depth buffer
+	// and alpha blending, one would have to sort
+	// sprites back to front
+	gl_has_errors();
+	mat3 projection_2D = createProjectionMatrix();
+	// Draw all textured meshes that have a position and size component
+	for (Entity entity : registry.renderRequests.entities)
+	{
+		if (!registry.motions.has(entity))
+			continue;
+		// Note, its not very efficient to access elements indirectly via the entity
+		// albeit iterating through all Sprites in sequence. A good point to optimize
+		drawTexturedMesh(entity, projection_2D);
+	}
+
+	// Truely render to the screen
+	drawToScreen();
+
+	// flicker-free display with a double buffer
+	glfwSwapBuffers(window);
+	gl_has_errors();
+	// end of dupe code
+}
+
+void RenderSystem::drawMini()
+{
+	// This just renders an empty screen for now
+	// Clear everything on screen 
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+
 	glfwSwapBuffers(window);
 	gl_has_errors();
 }
