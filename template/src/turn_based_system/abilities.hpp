@@ -7,9 +7,9 @@
 
 class Ability{
 public:
-	Ability(int power, std::string name, bool is_physical, bool is_area_of_effect);
+	Ability(unsigned int power, std::string name, bool is_physical, bool is_area_of_effect);
 
-	int get_power();
+	unsigned int get_power();
 	std::string get_ability_name();
 	bool get_is_physical();
 	bool get_is_area_of_effect();

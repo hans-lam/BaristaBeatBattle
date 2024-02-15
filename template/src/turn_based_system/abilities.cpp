@@ -1,7 +1,7 @@
 
 #include "abilities.hpp"
 
-Ability::Ability(int power, std::string ability_name, bool is_physical, bool is_area_of_effect) {
+Ability::Ability(unsigned int power, std::string ability_name, bool is_physical, bool is_area_of_effect) {
 	this->power = power;
 	this->ability_name = ability_name;
 	this->is_physical = is_physical;
@@ -16,7 +16,7 @@ void Ability::process_ability(Character* caller, Character* recipient) {
 */
 
 
-int Ability::get_power() {
+unsigned int Ability::get_power() {
 	return this->power;
 }
 std::string Ability::get_ability_name() {
