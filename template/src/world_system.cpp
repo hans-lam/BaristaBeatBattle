@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "physics_system.hpp"
+#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -116,8 +117,9 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg) {
 	this->renderer = renderer_arg;
+	this->turn_based = turn_based_arg;
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -417,6 +419,30 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_A) {
 		player_attack();
 	}
+
+	// turn based attack
+	if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+
+		if (!out_of_combat) {
+			turn_based->process_character_action(generic_basic_attack);
+		}
+
+	}
+
+	// turn based attack
+	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
+
+		if (out_of_combat) {
+			std::vector<Character*> enemies;
+			enemies.push_back(character_factory.construct_enemy(1));
+			enemies.push_back(character_factory.construct_enemy(2));
+
+			turn_based->start_encounter(enemies);
+		}
+
+	}
+
+
 
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
