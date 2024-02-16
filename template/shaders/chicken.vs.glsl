@@ -10,6 +10,7 @@ out vec2 vpos;
 // Application data
 uniform mat3 transform;
 uniform mat3 projection;
+uniform float time;
 
 void main()
 {
