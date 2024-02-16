@@ -321,30 +321,31 @@ bool WorldSystem::is_over() const {
 }
 
 // check if player is in bounds, keep it in bounds if not
-bool WorldSystem::player_in_bounds(Motion* motion, bool is_x) {
-	bool in_bounds;
-	if (is_x) {
-		float x_pos = motion->position.x;
-		bool left = x_pos >= 50.f;
-		bool right = x_pos <= (window_width_px - 50.f);
-		in_bounds = left && right;
-
-		if (!left) motion->position.x = 50.f;
-		if (!right) motion->position.x = (window_width_px - 50.f);
-
-	}
-	else {
-		float y_pos = motion->position.y;
-		bool up = y_pos >= 50.f;
-		bool down = y_pos <= (window_height_px - 50.f);
-		in_bounds = up && down;
-
-		if (!up) motion->position.y = 50.f;
-		if (!down) motion->position.y = (window_height_px - 50.f);
-	}
-
-	return in_bounds;
-}
+// not using this anymore, but might later on so will keep it commented
+//bool WorldSystem::player_in_bounds(Motion* motion, bool is_x) {
+//	bool in_bounds;
+//	if (is_x) {
+//		float x_pos = motion->position.x;
+//		bool left = x_pos >= 50.f;
+//		bool right = x_pos <= (window_width_px - 50.f);
+//		in_bounds = left && right;
+//
+//		if (!left) motion->position.x = 50.f;
+//		if (!right) motion->position.x = (window_width_px - 50.f);
+//
+//	}
+//	else {
+//		float y_pos = motion->position.y;
+//		bool up = y_pos >= 50.f;
+//		bool down = y_pos <= (window_height_px - 50.f);
+//		in_bounds = up && down;
+//
+//		if (!up) motion->position.y = 50.f;
+//		if (!down) motion->position.y = (window_height_px - 50.f);
+//	}
+//
+//	return in_bounds;
+//}
 
 // chicken movement helper
 void WorldSystem::handle_player_movement(int key, int action) {
@@ -355,9 +356,9 @@ void WorldSystem::handle_player_movement(int key, int action) {
 		if (registry.deathTimers.has(registry.players.entities[i])) continue;
 		// check if player is in bounds
 		bool is_x = (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT);
-		if (!player_in_bounds(&player_motion, is_x)) {
-			action = GLFW_RELEASE;
-		}
+		//if (!player_in_bounds(&player_motion, is_x)) {
+		//	action = GLFW_RELEASE;
+		//}
 
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
 			if (key == GLFW_KEY_UP) {
