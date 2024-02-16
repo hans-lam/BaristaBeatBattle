@@ -19,8 +19,6 @@ int main()
 
 	TurnBasedSystem turn_based;
 
-
-
 	// Global systems
 	WorldSystem world;
 	RenderSystem renderer;
@@ -58,7 +56,15 @@ int main()
 		turn_based.step(elapsed_ms);
 		world.handle_collisions();
 
-		renderer.draw();
+		if (world.get_stage() == 2) {
+			renderer.drawMini();
+		}
+		else if (world.get_stage() == 1) {
+			renderer.drawTurn();
+		}
+		else {
+			renderer.draw();
+		}
 	}
 
 	return EXIT_SUCCESS;

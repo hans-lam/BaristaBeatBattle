@@ -27,6 +27,10 @@ unsigned int Character::get_current_health_points() {
 	return this->current_health_points;
 }
 
+std::string Character::get_name() {
+	return this->character_name;
+}
+
 bool Character::is_dead() {
 	if (current_health_points <= 0) {
 		return true;

@@ -63,7 +63,7 @@ Character* CharacterFactory::construct_americano() {
 }
 
 Character* CharacterFactory::construct_enemy(int level) {
-	std::string name = "Level " + level;
+	std::string name = "Enemy " + std::to_string(level);
 	unsigned int enemy_max_health = 10 * level;
 	unsigned int enemy_strength = 1 * level;
 	unsigned int enemy_magic = 1 * level;
