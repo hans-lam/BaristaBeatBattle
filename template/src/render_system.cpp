@@ -119,6 +119,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	GLint currProgram;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
 	// Setting uniform values to the currently bound program
+	GLuint time_loc = glGetUniformLocation(currProgram, "time");
+	glUniform1f(time_loc, (float)(glfwGetTime() * 10.0f));
+
 	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
 	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float *)&transform.mat);
 	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
