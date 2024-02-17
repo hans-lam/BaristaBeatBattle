@@ -4,3 +4,5 @@
 
 /.vs
 /template/out/build/x64-Debug
+/template/ext
+/template/.vs
