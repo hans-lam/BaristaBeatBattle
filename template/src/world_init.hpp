@@ -9,9 +9,13 @@ const float BUG_BB_WIDTH = 0.6f * 165.f;
 const float BUG_BB_HEIGHT = 0.6f * 165.f;
 const float EAGLE_BB_WIDTH = 0.6f * 300.f;
 const float EAGLE_BB_HEIGHT = 0.8f * 202.f;
+const float MENU_WIDTH = 0.6f * 700.f;
+const float MENU_HEIGHT = 0.6f * 280.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
+// Menu 
+Entity createMenu(RenderSystem* renderer, vec2 pos);
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
 // the enemy

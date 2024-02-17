@@ -3,13 +3,18 @@
 
 #include "common.hpp"
 #include <algorithm>
+#include <cstdlib>
+#include <time.h>
 #include <iostream>
 
-const  unsigned int SPEED_REQUIRED_FOR_TURN = 100;
+const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
+const double HIT_CHANCE = 0.80;
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
-
+	// influence for random code
+	// https://www.geeksforgeeks.org/generate-a-random-number-between-0-and-1/
+	srand(time(0));
 }
 
 void TurnBasedSystem::init() {
@@ -108,20 +113,23 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 
 	unsigned int attack_amount = ability->get_power() + caller->get_character_stat_sheet()->get_strength();
 
-	for (Character* receiving_character : recipients) {
+	double chance_hit = ((double)rand()) / RAND_MAX;
+	if (chance_hit < HIT_CHANCE) {
+		for (Character* receiving_character : recipients) {
 
-		unsigned int defense_amount = receiving_character->get_character_stat_sheet()->get_defense();
-
-
-		unsigned int damage_amount = std::max(attack_amount - defense_amount, (unsigned int) 0);
-
-		receiving_character->deal_damage(damage_amount);
+			unsigned int defense_amount = receiving_character->get_character_stat_sheet()->get_defense();
 
 
+			unsigned int damage_amount = std::max(attack_amount - defense_amount, (unsigned int)0);
+
+			receiving_character->deal_damage(damage_amount);
+
+
+		}
 	}
 
 	// Prints out current character
-	std::cout << active_character->character->get_name() << '\n';
+	std::cout << "Current Character: " << active_character->character->get_name() << '\n';
 
 	active_character->placement -= 100;
 	active_character = nullptr;
