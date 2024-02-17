@@ -9,6 +9,7 @@
 struct Player
 {
 	Character* thisPlayer;
+
 };
 
 // Eagles have a hard shell
@@ -27,6 +28,19 @@ struct Eatable
 struct EnemyDrink
 {
 	Character* thisEnemy;
+};
+
+struct MenuOption
+{
+	bool active;
+	std::string option;
+};
+
+struct Menu
+{
+	Entity options[2] = {};
+	Character* currentPlayer;
+	Entity activeOption;
 };
 
 // All data relevant to the shape and motion of entities
@@ -127,7 +141,9 @@ enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
 	ENEMYDRINK = EAGLE + 1,
-	TEXTURE_COUNT = ENEMYDRINK + 1
+	ATTACKBUTTON = ENEMYDRINK + 1, 
+	ITEMBUTTON = ATTACKBUTTON + 1,
+	TEXTURE_COUNT = ITEMBUTTON + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

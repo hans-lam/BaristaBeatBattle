@@ -45,6 +45,9 @@ public:
 	// handle player movement
 	void handle_player_movement(int key, int action);
 
+	// handle option selection 
+	void handle_selection();
+
 	// get stage 
 	int get_stage();
 private:
@@ -78,6 +81,7 @@ private:
 	Mix_Music* minigame_music;
 	Mix_Chunk* chicken_dead_sound;
 	Mix_Chunk* chicken_eat_sound;
+	Mix_Chunk* attack_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
