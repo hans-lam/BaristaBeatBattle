@@ -4,6 +4,6 @@
 
 /.vs
 /template/out/build/x64-Debug
-
 /template/.vs
 /template/ext
+/template/ext/project_path.hpp
