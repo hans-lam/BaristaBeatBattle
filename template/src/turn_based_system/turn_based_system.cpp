@@ -3,8 +3,9 @@
 
 #include "common.hpp"
 #include <algorithm>
-#include <cstdlib> 
-#include <time.h> 
+#include <cstdlib>
+#include <time.h>
+#include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
 const double HIT_CHANCE = 0.80;
@@ -66,8 +67,6 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 	else {
 		waiting_for_player = true;
 	}
-
-
 }
 
 
@@ -128,6 +127,9 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 
 		}
 	}
+
+	// Prints out current character
+	std::cout << active_character->character->get_name() << '\n';
 
 	active_character->placement -= 100;
 	active_character = nullptr;

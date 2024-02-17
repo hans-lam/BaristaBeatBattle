@@ -3,11 +3,12 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Player component
 struct Player
 {
-
+	Character* thisPlayer;
 };
 
 // Eagles have a hard shell
@@ -25,7 +26,7 @@ struct Eatable
 // EnemyDrinks start fights if you talk/attack them
 struct EnemyDrink
 {
-
+	Character* thisEnemy;
 };
 
 // All data relevant to the shape and motion of entities

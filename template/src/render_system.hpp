@@ -73,6 +73,12 @@ public:
 	// Draw all entities
 	void draw();
 
+	// Draw Turn Based 
+	void drawTurn();
+
+	// Draw Mini Game
+	void drawMini();
+
 	mat3 createProjectionMatrix();
 
 private:

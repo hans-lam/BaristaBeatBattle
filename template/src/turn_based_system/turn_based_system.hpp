@@ -25,16 +25,23 @@ public:
 
 	bool is_game_over();
 
-private:
-	
-
 	std::vector<Character*> party_members;
 
 	std::vector<Character*> current_enemies;
 
-	void construct_party();
-
 	TurnCounter* active_character = nullptr;
+
+private:
+	
+	// Moved these to public so I can access them in world system; we can implement get functions if needed
+	// std::vector<Character*> party_members;
+
+	// std::vector<Character*> current_enemies;
+
+	void construct_party();
+	
+	// Same for active character
+	// TurnCounter* active_character = nullptr;
 
 	std::vector<TurnCounter*> turn_counter_list;
 
