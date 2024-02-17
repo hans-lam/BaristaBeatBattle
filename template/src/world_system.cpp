@@ -5,7 +5,7 @@
 // stlib
 #include <cassert>
 #include <sstream>
-
+#include <iostream>
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
 
@@ -19,10 +19,11 @@ const size_t ENEMY_DELAY_MS = 2000 * 3;
 // Create the bug world
 WorldSystem::WorldSystem()
 	: points(0)
-	, player_speed(100.f)
+	, player_speed(300.f)
 	, next_eagle_spawn(0.f)
 	, next_bug_spawn(0.f)
-	, next_enemy_spawn(0.f) {
+	, next_enemy_spawn(0.f)
+	, stage(0) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -103,12 +104,17 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
+	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
+	minigame_music = Mix_LoadMUS(audio_path("minigame.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
 
-	if (background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
+	if (background_music == nullptr || turn_based_music == nullptr || minigame_music == nullptr || 
+			chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
+			audio_path("turn_based.wav").c_str(),
+			audio_path("minigame.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
 			audio_path("chicken_eat.wav").c_str());
 		return nullptr;
@@ -132,7 +138,12 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
 	std::stringstream title_ss;
-	title_ss << "Points: " << points;
+	if (stage == 0)
+		title_ss << "OVERWORLD: Hit A to attack";
+	else if (stage == 1)
+		title_ss << "TURN-BASED: Hit S to start turn-based, X to attack, M to start minigame";
+	else if (stage == 2)
+		title_ss << "MINIGAME: Hit M again to go back to turn-based";
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
@@ -153,27 +164,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	//// Spawning new eagles
-	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
-	//if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
-	//	// Reset timer
-	//	next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
-	//	// Create eagle with random initial position
- //       createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
-	//}
-
-
 	// Spawning new enemy drinks
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.deadlys.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-		// Reset timer
-		next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-		// Create enemy drink with random initial velocity, position
-		createEnemyDrink(renderer, 
-			// TODO: make negative velocity possible
-			vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-			// TODO: fix to spawn from only the edges
-			vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
+	if (stage == 0) {
+		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+			// Reset timer
+			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+			// Create enemy drink with random initial velocity, position
+			createEnemyDrink(renderer,
+				// TODO: make negative velocity possible
+				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+				// TODO: fix to spawn from only the edges
+				vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
+		}
 	}
 
 	// Spawning new bug
@@ -182,10 +185,25 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG SPAWN HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Highlighting current char 
+	if (stage == 1) {
+		TurnCounter* currChar = turn_based->active_character;
+		if (currChar != nullptr) {
+			// setting player color 
+			for (Entity entity : registry.players.entities) {
+				Player& player = registry.players.get(entity); 
+				vec3& color = registry.colors.get(entity);
+				if (player.thisPlayer == currChar->character) {
+					// change current player character to red
+					color = { 1.0f, 0.f, 0.f };
+				}
+				else {
+					// return player character color to normal
+					color = { 1, 0.8f, 0.8f };
+				}
+			}
+		}
+	}
 
 	// Processing the chicken state
 	assert(registry.screenStates.components.size() <= 1);
@@ -245,6 +263,9 @@ void WorldSystem::restart_game() {
 	// Reset the game speed
 	current_speed = 1.f;
 
+	// Reset the stage
+	stage = 0;
+
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
@@ -294,7 +315,20 @@ void WorldSystem::handle_collisions() {
 					// potential problem: if we don't remove the enemy it might keep colliding and screaming
 					registry.remove_all_components_of(entity_other);
 
-					// HANS TODO: start the fight
+					// We also need to kill all other eagles
+					for (Entity enemies : registry.enemyDrinks.entities) {
+						registry.remove_all_components_of(enemies);
+					}
+
+					// Stage = 1 maps to turn based
+					stage = 1;
+					// Delete current player
+					registry.remove_all_components_of(entity);
+
+					// Play music
+					Mix_PlayMusic(turn_based_music, -1);
+					// max volume is at 128; this sets it to 75%
+					Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
 				}
 			}
 			//// Checking Player - Eatable collisions
@@ -405,45 +439,82 @@ void player_attack() {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE CHICKEN MOVEMENT HERE
-	// key is of 'type' GLFW_KEY_
-	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 	// handle movement
 	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-		handle_player_movement(key, action);
+		if (stage == 0)
+			handle_player_movement(key, action);
 	}
 
 	// player attack
 	if (action == GLFW_PRESS && key == GLFW_KEY_A) {
-		player_attack();
+		if (stage == 0)
+			player_attack();
 	}
 
 	// turn based attack
 	if (action == GLFW_PRESS && key == GLFW_KEY_X) {
-
-		if (!out_of_combat) {
-			turn_based->process_character_action(generic_basic_attack);
-		}
-
+		if (stage == 1)
+			if (!out_of_combat) {
+				turn_based->process_character_action(generic_basic_attack);
+			}
+		
 	}
 
-	// turn based attack
+	// start encounter
 	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
+		if (stage == 1)
+			if (out_of_combat) {
+				std::vector<Character*> enemies;
+				enemies.push_back(character_factory.construct_enemy(1));
+				enemies.push_back(character_factory.construct_enemy(2));
 
-		if (out_of_combat) {
-			std::vector<Character*> enemies;
-			enemies.push_back(character_factory.construct_enemy(1));
-			enemies.push_back(character_factory.construct_enemy(2));
+				// Adding enemies to ECS
+				for (int i = 0; i < enemies.size(); i++) {
+					// enemies shouldn't move during turn based
+					vec2 velocity = { 0.f, 0.f };
+					vec2 position = { window_width_px - 100, window_height_px - (i + 1) * 200};
+					Entity entity = createEnemyDrink(renderer, velocity, position);
 
-			turn_based->start_encounter(enemies);
-		}
+					// Placing character pointer in enemy component
+					EnemyDrink& enemy = registry.enemyDrinks.get(entity);
+					enemy.thisEnemy = enemies[i];
+				}
+				turn_based->start_encounter(enemies);
+
+				std::vector<Character*> party = turn_based->party_members;
+				// add party as players 
+				for (int j = 0; j < party.size(); j++) {
+					vec2 position = { 100, window_height_px - (j + 1) * 200 };
+					Entity entity = createChicken(renderer, position);
+					registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+					// Placing character pointer in player component
+					Player& player = registry.players.get(entity); 
+					player.thisPlayer = party[j];
+				}
+			}
 
 	}
 
-
+	// Going to Minigame encounter; can hook up with the attacks later once turn-based system
+	// has been fully integrated into ECS without issue 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		// set stage to 2, which is mini-game mapping
+		if (stage != 2) {
+			stage = 2;
+			// Play music
+			Mix_PlayMusic(minigame_music, -1);
+			// Anything else we need to set upon changing to mini-game mode should go here or in step
+		}
+		else {
+			stage = 1;
+			// Play music
+			Mix_PlayMusic(turn_based_music, -1);
+			// max volume is at 128; this sets it to 75%
+			Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
+			// Anything  we need to set upon changing back should go here or in step
+		}
+	}
 
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
@@ -451,6 +522,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		glfwGetWindowSize(window, &w, &h);
 
         restart_game();
+	}
+
+	// Exit game 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		glfwSetWindowShouldClose(window, true);
 	}
 
 	// Debugging
@@ -481,4 +557,8 @@ void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	(vec2)mouse_position; // dummy to avoid compiler warning
+}
+
+int WorldSystem::get_stage() {
+	return stage;
 }
