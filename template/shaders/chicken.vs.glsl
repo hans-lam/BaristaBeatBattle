@@ -10,6 +10,7 @@ out vec2 vpos;
 // Application data
 uniform mat3 transform;
 uniform mat3 projection;
+uniform float time;
 
 void main()
 {
@@ -17,4 +18,5 @@ void main()
 	vcolor = in_color;
 	vec3 pos = projection * transform * vec3(in_position.xy, 1.0); // why not simply *in_position.xyz ?
 	gl_Position = vec4(pos.xy, in_position.z, 1.0);
+	
 }

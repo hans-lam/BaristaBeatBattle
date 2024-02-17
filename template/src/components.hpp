@@ -3,10 +3,12 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Player component
 struct Player
 {
+	Character* thisPlayer;
 
 };
 
@@ -20,6 +22,25 @@ struct Deadly
 struct Eatable
 {
 
+};
+
+// EnemyDrinks start fights if you talk/attack them
+struct EnemyDrink
+{
+	Character* thisEnemy;
+};
+
+struct MenuOption
+{
+	bool active;
+	std::string option;
+};
+
+struct Menu
+{
+	Entity options[2] = {};
+	Character* currentPlayer;
+	Entity activeOption;
 };
 
 // All data relevant to the shape and motion of entities
@@ -61,6 +82,12 @@ struct DebugComponent
 struct DeathTimer
 {
 	float counter_ms = 3000;
+};
+
+// A timer associated with an attacking drink
+struct AttackTimer
+{
+	float counter_ms = 700; // might change this number
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -113,7 +140,12 @@ struct Mesh
 enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
-	TEXTURE_COUNT = EAGLE + 1
+	ENEMYDRINK = EAGLE + 1,
+	PLAYER = ENEMYDRINK PLAYER 1,
+	ATTACKBUTTON = ENEMYDRINK + 1,
+	ITEMBUTTON = ATTACKBUTTON + 1,
+	TEXTURE_COUNT = ITEMBUTTON + 1
+
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -129,7 +161,8 @@ const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
 	CHICKEN = 0,
-	SPRITE = CHICKEN + 1,
+	PLAYER = CHICKEN + 1,
+	SPRITE = PLAYER + 1, 
 	EGG = SPRITE + 1,
 	DEBUG_LINE = EGG + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,

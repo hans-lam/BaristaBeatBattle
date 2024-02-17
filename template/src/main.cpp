@@ -9,12 +9,16 @@
 #include "physics_system.hpp"
 #include "render_system.hpp"
 #include "world_system.hpp"
+#include "turn_based_system/turn_based_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
 // Entry point
 int main()
 {
+
+	TurnBasedSystem turn_based;
+
 	// Global systems
 	WorldSystem world;
 	RenderSystem renderer;
@@ -31,7 +35,9 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
-	world.init(&renderer);
+	turn_based.init();
+	world.init(&renderer, &turn_based);
+	
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -47,9 +53,18 @@ int main()
 
 		world.step(elapsed_ms);
 		physics.step(elapsed_ms);
+		turn_based.step(elapsed_ms);
 		world.handle_collisions();
 
-		renderer.draw();
+		if (world.get_stage() == 2) {
+			renderer.drawMini();
+		}
+		else if (world.get_stage() == 1) {
+			renderer.drawTurn();
+		}
+		else {
+			renderer.draw();
+		}
 	}
 
 	return EXIT_SUCCESS;
