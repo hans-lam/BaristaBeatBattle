@@ -37,6 +37,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(turn_based_music); 
 	if (minigame_music != nullptr)
 		Mix_FreeMusic(minigame_music); 
+	if (change_selection_effect != nullptr)
+		Mix_FreeChunk(change_selection_effect);
 	if (chicken_dead_sound != nullptr)
 		Mix_FreeChunk(chicken_dead_sound);
 	if (chicken_eat_sound != nullptr)
@@ -113,6 +115,7 @@ GLFWwindow* WorldSystem::create_window() {
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
 	minigame_music = Mix_LoadMUS(audio_path("minigame.wav").c_str());
+	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
 	attack_sound = Mix_LoadWAV(audio_path("attack.wav").c_str());
@@ -483,7 +486,7 @@ void WorldSystem::handle_player_movement(int key, int action) {
 
 }
 
-void handle_menu(int key, TurnBasedSystem* turn_based) {
+void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 	TurnCounter* currChar = turn_based->active_character;
 	if (currChar != nullptr) {
 		for (Entity entity : registry.menu.entities) {
@@ -499,6 +502,7 @@ void handle_menu(int key, TurnBasedSystem* turn_based) {
 		
 			if (menu.currentPlayer == currChar->character) {
 				if (key == GLFW_KEY_UP) {
+					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
 						menu.activeOption = menu.options[index - 1];
 					}
@@ -507,6 +511,7 @@ void handle_menu(int key, TurnBasedSystem* turn_based) {
 					}
 				}
 				else if (key == GLFW_KEY_DOWN) {
+					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index < (arrayLen - 1)) {
 						menu.activeOption = menu.options[index + 1];
 					}
