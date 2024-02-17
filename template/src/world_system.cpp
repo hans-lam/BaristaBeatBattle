@@ -110,7 +110,7 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
-	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
+	background_music = Mix_LoadMUS(audio_path("bg.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
 	minigame_music = Mix_LoadMUS(audio_path("minigame.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
@@ -120,7 +120,7 @@ GLFWwindow* WorldSystem::create_window() {
 	if (background_music == nullptr || turn_based_music == nullptr || minigame_music == nullptr || 
 			chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str(),
+			audio_path("bg.wav").c_str(),
 			audio_path("turn_based.wav").c_str(),
 			audio_path("minigame.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
@@ -148,7 +148,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
 	std::stringstream title_ss;
 	if (stage == 0)
-		title_ss << "OVERWORLD: Hit A to attack";
+		title_ss << "OVERWORLD: Hit A to attack, Use UP, DOWN, LEFT, RIGHT to move the character";
 	else if (stage == 1)
 		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
 	else if (stage == 2)
@@ -559,6 +559,8 @@ void player_attack() {
 		}
 	}
 }
+
+
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
