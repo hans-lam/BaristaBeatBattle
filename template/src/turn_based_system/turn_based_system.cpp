@@ -121,7 +121,7 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 	}
 
 	// Prints out current character
-	std::cout << active_character->character->get_name() << '\n';
+	std::cout << "Current Character: " << active_character->character->get_name() << '\n';
 
 	active_character->placement -= 100;
 	active_character = nullptr;

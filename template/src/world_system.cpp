@@ -6,6 +6,7 @@
 #include <cassert>
 #include <sstream>
 #include <iostream>
+#include <array>
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
 
@@ -32,10 +33,16 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (turn_based_music != nullptr)
+		Mix_FreeMusic(turn_based_music); 
+	if (minigame_music != nullptr)
+		Mix_FreeMusic(minigame_music); 
 	if (chicken_dead_sound != nullptr)
 		Mix_FreeChunk(chicken_dead_sound);
 	if (chicken_eat_sound != nullptr)
 		Mix_FreeChunk(chicken_eat_sound);
+	if (attack_sound != nullptr)
+		Mix_FreeChunk(attack_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -108,6 +115,7 @@ GLFWwindow* WorldSystem::create_window() {
 	minigame_music = Mix_LoadMUS(audio_path("minigame.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
+	attack_sound = Mix_LoadWAV(audio_path("attack.wav").c_str());
 
 	if (background_music == nullptr || turn_based_music == nullptr || minigame_music == nullptr || 
 			chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
@@ -116,7 +124,8 @@ GLFWwindow* WorldSystem::create_window() {
 			audio_path("turn_based.wav").c_str(),
 			audio_path("minigame.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
-			audio_path("chicken_eat.wav").c_str());
+			audio_path("chicken_eat.wav").c_str(), 
+			audio_path("attack.wav").c_str());
 		return nullptr;
 	}
 
@@ -141,7 +150,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (stage == 0)
 		title_ss << "OVERWORLD: Hit A to attack";
 	else if (stage == 1)
-		title_ss << "TURN-BASED: Hit S to start turn-based, X to attack, M to start minigame";
+		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
 	else if (stage == 2)
 		title_ss << "MINIGAME: Hit M again to go back to turn-based";
 	glfwSetWindowTitle(window, title_ss.str().c_str());
@@ -200,6 +209,52 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				else {
 					// return player character color to normal
 					color = { 1, 0.8f, 0.8f };
+				}
+			}
+
+			// Setting menu's active 
+			for (Entity entity : registry.menu.entities) {
+				Menu& menu = registry.menu.get(entity); 
+				Entity attack = menu.options[0];
+				Entity item = menu.options[1];
+				MenuOption& atk = registry.menuOptions.get(attack);
+				MenuOption& itm = registry.menuOptions.get(item);
+
+				if (menu.currentPlayer == currChar->character) {
+					if (!registry.renderRequests.has(attack)) {
+						registry.renderRequests.insert(
+							attack,
+							{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							EFFECT_ASSET_ID::TEXTURED,
+							GEOMETRY_BUFFER_ID::SPRITE });
+					}
+					if (!registry.renderRequests.has(item)) {
+						registry.renderRequests.insert(
+							item,
+							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							EFFECT_ASSET_ID::TEXTURED,
+							GEOMETRY_BUFFER_ID::SPRITE });
+					}
+				}
+				else {
+					if (registry.renderRequests.has(attack)) {
+						registry.renderRequests.remove(attack);
+					}
+					if (registry.renderRequests.has(item)) {
+						registry.renderRequests.remove(item);
+					}
+				}
+
+				// handle color change of option 
+				for (Entity entity : menu.options) {
+					vec3& color = registry.colors.get(entity);
+
+					if (entity == menu.activeOption) {
+						color.x = 0.8f;
+					}
+					else {
+						color.x = 1;
+					}
 				}
 			}
 		}
@@ -428,6 +483,74 @@ void WorldSystem::handle_player_movement(int key, int action) {
 
 }
 
+void handle_menu(int key, TurnBasedSystem* turn_based) {
+	TurnCounter* currChar = turn_based->active_character;
+	if (currChar != nullptr) {
+		for (Entity entity : registry.menu.entities) {
+			Menu& menu = registry.menu.get(entity);
+			int arrayLen = std::end(menu.options) - std::begin(menu.options);
+			int index = -1;
+			for (int i = 0; i < arrayLen; i++) {
+				if (menu.activeOption == menu.options[i]) {
+					index = i; 
+					break;
+				}
+			}
+		
+			if (menu.currentPlayer == currChar->character) {
+				if (key == GLFW_KEY_UP) {
+					if (index > 0) {
+						menu.activeOption = menu.options[index - 1];
+					}
+					else {
+						menu.activeOption = menu.options[(arrayLen - 1)];
+					}
+				}
+				else if (key == GLFW_KEY_DOWN) {
+					if (index < (arrayLen - 1)) {
+						menu.activeOption = menu.options[index + 1];
+					}
+					else {
+						menu.activeOption = menu.options[0];
+					}
+				}
+				break;
+			}
+		}
+	}
+}
+
+void WorldSystem::handle_selection() {
+	TurnCounter* currChar = turn_based->active_character;
+	if (currChar != nullptr) {
+		// Get active option
+		for (Entity entity : registry.menu.entities) {
+			Menu& menu = registry.menu.get(entity); 
+			// found correct menu
+			if (menu.currentPlayer == currChar->character) {
+				Entity correctOption = menu.activeOption; 
+				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
+
+				if (opComponent.option == "attack") {
+					if (!out_of_combat) {
+						Mix_PlayChannel(-1, attack_sound, 0);
+						turn_based->process_character_action(generic_basic_attack);
+					}
+				}
+				else if (opComponent.option == "item") {
+					// set stage to 2, which is mini-game mapping
+					if (stage != 2) {
+						stage = 2;
+						// Play music
+						Mix_PlayMusic(minigame_music, -1);
+						// Anything else we need to set upon changing to mini-game mode should go here or in step
+					}
+				}
+			}
+		}
+	}
+}
+
 void player_attack() {
 	for (uint i = 0; i < registry.players.size(); i++) {
 		Entity entity = registry.players.entities[i];
@@ -441,8 +564,14 @@ void player_attack() {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// handle movement
 	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-		if (stage == 0)
+		if (stage == 0) {
 			handle_player_movement(key, action);
+		}
+		else if (stage == 1) {
+			if (action == GLFW_RELEASE) {
+				handle_menu(key, turn_based);
+			}
+		}
 	}
 
 	// player attack
@@ -451,13 +580,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			player_attack();
 	}
 
-	// turn based attack
-	if (action == GLFW_PRESS && key == GLFW_KEY_X) {
+	// turn based option
+	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
 		if (stage == 1)
-			if (!out_of_combat) {
-				turn_based->process_character_action(generic_basic_attack);
-			}
-		
+			handle_selection();
 	}
 
 	// start encounter
@@ -484,20 +610,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				std::vector<Character*> party = turn_based->party_members;
 				// add party as players 
 				for (int j = 0; j < party.size(); j++) {
-					vec2 position = { 100, window_height_px - (j + 1) * 200 };
+					int x_base = 100;
+					vec2 position = { x_base, window_height_px - (j + 1) * 200 };
 					Entity entity = createChicken(renderer, position);
 					registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
 					// Placing character pointer in player component
 					Player& player = registry.players.get(entity); 
 					player.thisPlayer = party[j];
+
+					// Creating Menu entity 
+					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 }; 
+					Entity menuEnt = createMenu(renderer, menu_pos);
+					Menu& menu = registry.menu.get(menuEnt); 
+					menu.currentPlayer = party[j];
 				}
 			}
 
 	}
 
-	// Going to Minigame encounter; can hook up with the attacks later once turn-based system
-	// has been fully integrated into ECS without issue 
+	// Going to Minigame encounter manually
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
 		// set stage to 2, which is mini-game mapping
 		if (stage != 2) {
