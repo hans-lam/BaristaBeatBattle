@@ -424,7 +424,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_X) {
 
 		if (!out_of_combat) {
-			turn_based->process_character_action(generic_basic_attack);
+			//turn_based->process_character_action(generic_basic_attack);
 		}
 
 	}
@@ -433,11 +433,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
 
 		if (out_of_combat) {
-			std::vector<Character*> enemies;
-			enemies.push_back(character_factory.construct_enemy(1));
-			enemies.push_back(character_factory.construct_enemy(2));
+		
+			character_factory.construct_enemy(1);
+			character_factory.construct_enemy(2);
 
-			turn_based->start_encounter(enemies);
+			turn_based->start_encounter();
 		}
 
 	}

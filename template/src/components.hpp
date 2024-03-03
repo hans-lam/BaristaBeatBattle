@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include "turn_based_system/character_system.hpp"
 
 // Player component
 struct Player
@@ -26,6 +27,23 @@ struct Eatable
 struct EnemyDrink
 {
 
+};
+
+struct CharacterData {
+	Character* characterData;
+};
+
+struct PartyMember {
+	
+};
+
+struct TurnBasedEnemy {
+	
+};
+
+struct TurnCounter {
+	int placement = 0;
+	int speed_value = 0;
 };
 
 // All data relevant to the shape and motion of entities

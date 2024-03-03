@@ -1,18 +1,19 @@
 #pragma once
 
 #include "../character_system.hpp"
-
+#include "../../tiny_ecs_registry.hpp"
+#include "../ability_factory/ability_factory.hpp"
 
 class CharacterFactory {
 
 public:
-	Character* construct_chai();
+	Entity construct_chai();
 
-	Character* construct_earl();
+	Entity construct_earl();
 
-	Character* construct_americano();
+	Entity construct_americano();
 
-	Character* construct_enemy(int level);
+	Entity construct_enemy(int level);
 };
 
 extern CharacterFactory character_factory;

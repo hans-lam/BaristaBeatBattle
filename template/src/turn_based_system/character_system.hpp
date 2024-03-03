@@ -24,7 +24,13 @@ public:
 	bool is_dead();
 
 	void deal_damage(unsigned int dmg) {
-		this->current_health_points -= dmg;
+		unsigned int dmg_amount = std::max(current_health_points - dmg, (unsigned int)0);
+		this->current_health_points -= dmg_amount;
+	}
+
+	void heal_amount(unsigned int heal) {
+		unsigned int heal_amount = std::min(current_health_points + heal, stats->get_max_health());
+		this->current_health_points += heal_amount;
 	}
 
 

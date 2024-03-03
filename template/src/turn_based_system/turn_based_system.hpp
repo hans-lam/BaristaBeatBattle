@@ -4,9 +4,8 @@
 #include <map>
 #include "character_system.hpp"
 #include "abilities.hpp"
-
-
-class TurnCounter;
+#include "../tiny_ecs_registry.hpp"
+#include "../tiny_ecs.hpp"
 
 class TurnBasedSystem {
 	
@@ -18,38 +17,22 @@ public:
 
 	void step(float elapsed_ms_since_last_update);
 
-	void start_encounter(std::vector<Character*> enemies);
+	void start_encounter();
 
 	void process_character_action(Ability* ability);
 	void process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
 
-	bool is_game_over();
+	bool all_allies_defeated();
+	bool all_enenmies_defeated();
 
 private:
-	
-
-	std::vector<Character*> party_members;
-
-	std::vector<Character*> current_enemies;
 
 	void construct_party();
 
-	TurnCounter* active_character = nullptr;
-
-	std::vector<TurnCounter*> turn_counter_list;
-
+	Entity* active_character = nullptr;
+	
 	bool waiting_for_player = false;
 
-};
-
-
-class TurnCounter {
-public:
-	TurnCounter();
-
-	Character * character;
-	int placement = 0;
-	int speed_value = 0;
 };
 
 extern bool out_of_combat;
