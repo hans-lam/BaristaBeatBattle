@@ -2,10 +2,11 @@
 #include "tiny_ecs_registry.hpp"
 #include <iostream>
 
-Entity createChicken(RenderSystem* renderer, vec2 pos)
+Entity createChicken(RenderSystem* renderer, vec2 pos) {
+	createChicken(renderer, pos, Entity())
+}
+Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
 {
-	auto entity = Entity();
-
 	// Store a reference to the potentially re-used mesh object
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -86,9 +87,12 @@ Entity createEagle(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
-Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
+
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position) {
+	createEnemyDrink(renderer, velocity, position, Entity());
+}
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity)
 {
-	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -118,25 +122,25 @@ Entity createMenu(RenderSystem* renderer, vec2 pos)
 {
 	auto menuEnt = Entity();
 	auto attack = Entity();
-	auto item = Entity();
+	auto rest = Entity();
 
 	// Store a reference to the potentially re-used mesh object
 	Mesh& atkMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(attack, &atkMesh);
-	Mesh& itemMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(item, &itemMesh);
+	Mesh& restMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(rest, &restMesh);
 
 	MenuOption& attackOp = registry.menuOptions.emplace(attack); 
 	registry.colors.insert(attack, { 1, 0.8f, 0.8f });
 	attackOp.option = "attack";
-	MenuOption& itemOp = registry.menuOptions.emplace(item);
-	registry.colors.insert(item, { 1, 0.8f, 0.8f });
-	itemOp.option = "item";
+	MenuOption& restOp = registry.menuOptions.emplace(rest);
+	registry.colors.insert(rest, { 1, 0.8f, 0.8f });
+	restOp.option = "rest";
 
 	Menu& menu = registry.menu.emplace(menuEnt);
-	menu.currentPlayer = nullptr;
+	//menu.currentPlayer = nullptr;
 	menu.options[0] = attack;
-	menu.options[1] = item;
+	menu.options[1] = rest;
 	menu.activeOption = attack;
 
 	vec2 menuPos = pos;
@@ -148,11 +152,11 @@ Entity createMenu(RenderSystem* renderer, vec2 pos)
 	atkMotion.position = { menuPos.x, menuPos.y - 54.f };
 	atkMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
-	auto& itemMotion = registry.motions.emplace(item);
-	itemMotion.angle = 0.f;
-	itemMotion.velocity = { 0, 0 };
-	itemMotion.position = menuPos;
-	itemMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+	auto& restMotion = registry.motions.emplace(rest);
+	restMotion.angle = 0.f;
+	restMotion.velocity = { 0, 0 };
+	restMotion.position = menuPos;
+	restMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
 	return menuEnt;
 }

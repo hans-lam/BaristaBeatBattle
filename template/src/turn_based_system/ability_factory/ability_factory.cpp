@@ -17,7 +17,7 @@ Ability* AbilityFactory::construct_basic_attack() {
 
 Ability* AbilityFactory::construct_rest() {
 
-	Ability* rest = new SupportAbility(10, "rest", true, false);
+	Ability* rest = new SupportAbility(10, "Rest", true, false);
 	return rest;
 }
 

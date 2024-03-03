@@ -25,6 +25,10 @@ public:
 	bool all_allies_defeated();
 	bool all_enenmies_defeated();
 
+	Entity* get_active_character() {
+		return active_character;
+	}
+
 private:
 
 	void construct_party();

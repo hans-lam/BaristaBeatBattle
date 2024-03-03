@@ -9,8 +9,7 @@
 // Player component
 struct Player
 {
-	Character* thisPlayer;
-
+	//Character* thisPlayer;
 };
 
 // Eagles have a hard shell
@@ -40,7 +39,7 @@ struct MenuOption
 struct Menu
 {
 	Entity options[2] = {};
-	Character* currentPlayer;
+	//Character* currentPlayer;
 	Entity activeOption;
 };
 

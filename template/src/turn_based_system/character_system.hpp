@@ -35,6 +35,18 @@ public:
 
 	std::string get_name();
 
+	Ability* get_ability_by_name(std::string name) {
+
+		for (Ability* ability : abilities) {
+
+			if (ability->get_ability_name() == name) {
+				return ability;
+			}
+		}
+
+		return nullptr;
+	}
+
 
 private:
 	std::string character_name;

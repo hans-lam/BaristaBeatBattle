@@ -46,7 +46,7 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 			tc->placement += tc->speed_value;
 
-			if (highest == 0 || highest->placement < tc->placement) {
+			if (highest == nullptr || highest->placement < tc->placement) {
 				highest = tc;
 				highest_entity_number = turnCounterEntity;
 			}
@@ -105,7 +105,7 @@ void TurnBasedSystem::start_encounter() {
 }
 
 void TurnBasedSystem::process_character_action(Ability* ability) {
-	//process_character_action(ability, active_character->character, current_enemies);
+	//process_character_action(ability, registry.players.get(active_character), current_enemies);
 }
 
 void TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
@@ -118,7 +118,6 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);
-
 
 		}
 	}

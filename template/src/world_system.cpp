@@ -199,13 +199,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Highlighting current char 
 	if (stage == 1) {
-		TurnCounter* currChar = turn_based->active_character;
-		if (currChar != nullptr) {
+
+		Entity* active_char_entity = turn_based->get_active_character();
+		
+		if (active_char_entity != nullptr) {
+
+			Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+
 			// setting player color 
-			for (Entity entity : registry.players.entities) {
-				Player& player = registry.players.get(entity); 
+			for (Entity entity : registry.partyMembers.entities) {
 				vec3& color = registry.colors.get(entity);
-				if (player.thisPlayer == currChar->character) {
+				
+				if (entity == *active_char_entity) {
 					// change current player character to red
 					color = { 1.0f, 0.f, 0.f };
 				}
@@ -216,14 +221,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 
 			// Setting menu's active 
-			for (Entity entity : registry.menu.entities) {
-				Menu& menu = registry.menu.get(entity); 
+			for (Entity menu_entity : registry.menu.entities) {
+				Menu& menu = registry.menu.get(menu_entity);
 				Entity attack = menu.options[0];
-				Entity item = menu.options[1];
+				Entity rest = menu.options[1];
 				MenuOption& atk = registry.menuOptions.get(attack);
-				MenuOption& itm = registry.menuOptions.get(item);
+				MenuOption& rst = registry.menuOptions.get(rest);
 
-				if (menu.currentPlayer == currChar->character) {
+				if (menu_entity == *active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
 						registry.renderRequests.insert(
 							attack,
@@ -231,9 +236,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
-					if (!registry.renderRequests.has(item)) {
+					if (!registry.renderRequests.has(rest)) {
 						registry.renderRequests.insert(
-							item,
+							rest,
 							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
@@ -243,8 +248,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					if (registry.renderRequests.has(attack)) {
 						registry.renderRequests.remove(attack);
 					}
-					if (registry.renderRequests.has(item)) {
-						registry.renderRequests.remove(item);
+					if (registry.renderRequests.has(rest)) {
+						registry.renderRequests.remove(rest);
 					}
 				}
 
@@ -487,10 +492,15 @@ void WorldSystem::handle_player_movement(int key, int action) {
 }
 
 void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
-	TurnCounter* currChar = turn_based->active_character;
-	if (currChar != nullptr) {
-		for (Entity entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(entity);
+
+	Entity* active_char_entity = turn_based->get_active_character();
+
+	if (active_char_entity != nullptr) {
+
+		Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+		
+		for (Entity menu_entity : registry.menu.entities) {
+			Menu& menu = registry.menu.get(menu_entity);
 			int arrayLen = std::end(menu.options) - std::begin(menu.options);
 			int index = -1;
 			for (int i = 0; i < arrayLen; i++) {
@@ -500,7 +510,7 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 				}
 			}
 		
-			if (menu.currentPlayer == currChar->character) {
+			if (menu_entity == *active_char_entity) {
 				if (key == GLFW_KEY_UP) {
 					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
@@ -526,23 +536,33 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 }
 
 void WorldSystem::handle_selection() {
-	TurnCounter* currChar = turn_based->active_character;
-	if (currChar != nullptr) {
+	Entity* active_char_entity = turn_based->get_active_character();
+	if (active_char_entity != nullptr) {
+
+		Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+
 		// Get active option
-		for (Entity entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(entity); 
+		for (Entity menu_entity : registry.menu.entities) {
+			Menu& menu = registry.menu.get(menu_entity);
 			// found correct menu
-			if (menu.currentPlayer == currChar->character) {
+			if (menu_entity == *active_char_entity) {
 				Entity correctOption = menu.activeOption; 
 				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
 
 				if (opComponent.option == "attack") {
 					if (!out_of_combat) {
 						Mix_PlayChannel(-1, attack_sound, 0);
-						turn_based->process_character_action(generic_basic_attack);
+
+						Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
+						Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
+
+						turn_based->process_character_action(active_char->get_ability_by_name("Basic Attack"), active_char, {enemy_target});
 					}
 				}
-				else if (opComponent.option == "item") {
+				else if (opComponent.option == "rest") {
+
+					// TODO USE REST ABILITY
+
 					// set stage to 2, which is mini-game mapping
 					if (stage != 2) {
 						stage = 2;
@@ -596,40 +616,35 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (stage == 1)
 			if (out_of_combat) {
 				
+
+				// enemies are created and added to turnBasedEnemy ecs
 				character_factory.construct_enemy(1);
 				character_factory.construct_enemy(2);
 
-				// Adding enemies to ECS
-				for (int i = 0; i < enemies.size(); i++) {
-					// enemies shouldn't move during turn based
+				int i = 0;
+				for (Entity enemy_entity : registry.turnBasedEnemies.entities) {
 					vec2 velocity = { 0.f, 0.f };
-					vec2 position = { window_width_px - 100, window_height_px - (i + 1) * 200};
-					Entity entity = createEnemyDrink(renderer, velocity, position);
-
-					// Placing character pointer in enemy component
-					EnemyDrink& enemy = registry.enemyDrinks.get(entity);
-					enemy.thisEnemy = enemies[i];
+					vec2 position = { window_width_px - 100, window_height_px - (i + 1) * 200 };
+					Entity entity = createEnemyDrink(renderer, velocity, position, enemy_entity);
+					i++;
 				}
-				turn_based->start_encounter();
 
-				std::vector<Character*> party = turn_based->party_members;
-				// add party as players 
-				for (int j = 0; j < party.size(); j++) {
+				int j = 0;
+				for (Entity party_member_entity : registry.partyMembers.entities) {
 					int x_base = 100;
 					vec2 position = { x_base, window_height_px - (j + 1) * 200 };
-					Entity entity = createChicken(renderer, position);
+					Entity entity = createChicken(renderer, position, party_member_entity);
 					registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
-					// Placing character pointer in player component
-					Player& player = registry.players.get(entity); 
-					player.thisPlayer = party[j];
-
 					// Creating Menu entity 
-					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 }; 
+					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
 					Entity menuEnt = createMenu(renderer, menu_pos);
-					Menu& menu = registry.menu.get(menuEnt); 
-					menu.currentPlayer = party[j];
+					Menu& menu = registry.menu.get(menuEnt);
+
+					j++;
 				}
+
+				turn_based->start_encounter();
 			}
 
 	}
