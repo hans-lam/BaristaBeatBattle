@@ -4,10 +4,12 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 #include "turn_based_system/character_system.hpp"
+#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Player component
 struct Player
 {
+	Character* thisPlayer;
 
 };
 
@@ -26,7 +28,20 @@ struct Eatable
 // EnemyDrinks start fights if you talk/attack them
 struct EnemyDrink
 {
+	Character* thisEnemy;
+};
 
+struct MenuOption
+{
+	bool active;
+	std::string option;
+};
+
+struct Menu
+{
+	Entity options[2] = {};
+	Character* currentPlayer;
+	Entity activeOption;
 };
 
 struct CharacterData {
@@ -144,7 +159,9 @@ enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
 	ENEMYDRINK = EAGLE + 1,
-	TEXTURE_COUNT = ENEMYDRINK + 1
+	ATTACKBUTTON = ENEMYDRINK + 1, 
+	ITEMBUTTON = ATTACKBUTTON + 1,
+	TEXTURE_COUNT = ITEMBUTTON + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

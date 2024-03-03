@@ -44,6 +44,14 @@ public:
 
 	// handle player movement
 	void handle_player_movement(int key, int action);
+
+	void handle_menu(int key, TurnBasedSystem* turn_based);
+
+	// handle option selection 
+	void handle_selection();
+
+	// get stage 
+	int get_stage();
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
@@ -67,11 +75,16 @@ private:
 	float next_bug_spawn;
 	float next_enemy_spawn;
 	Entity player_chicken;
+	int stage;
 
 	// music references
 	Mix_Music* background_music;
+	Mix_Music* turn_based_music;
+	Mix_Music* minigame_music;
+	Mix_Chunk* change_selection_effect;
 	Mix_Chunk* chicken_dead_sound;
 	Mix_Chunk* chicken_eat_sound;
+	Mix_Chunk* attack_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;

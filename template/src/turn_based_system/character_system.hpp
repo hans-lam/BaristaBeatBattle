@@ -33,6 +33,8 @@ public:
 		this->current_health_points += heal_amount;
 	}
 
+	std::string get_name();
+
 
 private:
 	std::string character_name;

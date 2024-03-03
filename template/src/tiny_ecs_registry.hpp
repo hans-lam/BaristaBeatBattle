@@ -24,6 +24,8 @@ public:
 	ComponentContainer<EnemyDrink> enemyDrinks;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
+	ComponentContainer<Menu> menu;
+	ComponentContainer<MenuOption> menuOptions;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -54,6 +56,8 @@ public:
 		registry_list.push_back(&turnBasedEnemies);
 		registry_list.push_back(&partyMembers);
 		registry_list.push_back(&turnCounter);
+		registry_list.push_back(&menu);
+		registry_list.push_back(&menuOptions);
 	}
 
 	void clear_all_components() {

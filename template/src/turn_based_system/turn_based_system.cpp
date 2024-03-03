@@ -4,12 +4,18 @@
 
 #include "common.hpp"
 #include <algorithm>
+#include <cstdlib>
+#include <time.h>
+#include <iostream>
 
-const  unsigned int SPEED_REQUIRED_FOR_TURN = 100;
+const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
+const double HIT_CHANCE = 0.80;
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
-
+	// influence for random code
+	// https://www.geeksforgeeks.org/generate-a-random-number-between-0-and-1/
+	srand(time(0));
 }
 
 void TurnBasedSystem::init() {
@@ -63,7 +69,6 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		// AI
 		//process_character_action(generic_basic_attack, active_character->character, party_members);
 	}
-
 }
 
 
@@ -105,14 +110,22 @@ void TurnBasedSystem::process_character_action(Ability* ability) {
 
 void TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
 
-	for (Character* receiving_character : recipients) {
+	std::cout << "Current Character: " << caller->get_name() << '\n';
 		
 		//ability->process_ability(caller, receiving_character);
+	double chance_hit = ((double)rand()) / RAND_MAX;
+	if (chance_hit < HIT_CHANCE) {
+		for (Character* receiving_character : recipients) {
 
+			ability->process_ability(caller, receiving_character);
+
+
+		}
 	}
 
 	TurnCounter* turn_counter = registry.turnCounter.get(*active_character);
 	turn_counter->placement -= 100;
+
 	active_character = nullptr;
 	waiting_for_player = false;
 

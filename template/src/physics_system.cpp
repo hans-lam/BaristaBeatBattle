@@ -1,6 +1,7 @@
 // internal
 #include "physics_system.hpp"
 #include "world_init.hpp"
+#include "common.hpp"
 
 // Returns the local bounding coordinates scaled by the current size of the entity
 vec2 get_bounding_box(const Motion& motion)
@@ -36,11 +37,12 @@ void PhysicsSystem::step(float elapsed_ms)
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
 		float step_seconds = elapsed_ms / 1000.f;
-		//if (registry.players.has(entity)) {
-		//	float x_pos = motion.position.x + motion.velocity.x * step_seconds;
-		//	float y_pos = motion.position.y + motion.velocity.y * step_seconds;
-		//	if (x_pos < )
-		//}
+		if (registry.players.has(entity)) {
+			float x_pos = motion.position.x + (motion.velocity.x * step_seconds);
+			float y_pos = motion.position.y + (motion.velocity.y * step_seconds);
+			if (x_pos <= 0.0 || x_pos >= window_width_px) motion.velocity.x = 0.f;
+			if (y_pos <= 0.0 || y_pos >= window_height_px) motion.velocity.y = 0.f;
+		}
 		//motion.position.x += motion.velocity.x * step_seconds;
 		//motion.position.y += motion.velocity.y * step_seconds;
 		motion.position += motion.velocity * step_seconds;
