@@ -27,6 +27,8 @@ public:
 	ComponentContainer<vec3> colors;
 	ComponentContainer<Menu> menu;
 	ComponentContainer<MenuOption> menuOptions;
+	ComponentContainer<Minigame> miniGame;
+	ComponentContainer<MiniGameTimer> miniGameTimer;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -48,6 +50,8 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&menu);
 		registry_list.push_back(&menuOptions);
+		registry_list.push_back(&miniGame);
+		registry_list.push_back(&miniGameTimer);
 	}
 
 	void clear_all_components() {

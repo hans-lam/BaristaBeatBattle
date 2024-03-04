@@ -43,6 +43,11 @@ struct Menu
 	Entity activeOption;
 };
 
+struct Minigame
+{
+	int score = 0;
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
@@ -88,6 +93,11 @@ struct DeathTimer
 struct AttackTimer
 {
 	float counter_ms = 700; // might change this number
+};
+
+struct MiniGameTimer
+{
+	float counter_ms = 10000;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -143,7 +153,9 @@ enum class TEXTURE_ASSET_ID {
 	ENEMYDRINK = EAGLE + 1,
 	ATTACKBUTTON = ENEMYDRINK + 1, 
 	ITEMBUTTON = ATTACKBUTTON + 1,
-	TEXTURE_COUNT = ITEMBUTTON + 1
+	MINIGAMECUP = ITEMBUTTON + 1, 
+	MINIGAMEINTER = MINIGAMECUP + 1,
+	TEXTURE_COUNT = MINIGAMEINTER + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -171,5 +183,6 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool shown = true;
 };
 

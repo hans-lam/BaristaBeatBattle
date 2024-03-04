@@ -58,6 +58,35 @@ Entity createBug(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
+Entity createCup(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity(); 
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE); 
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+
+	// Place in minigame
+	registry.miniGame.emplace(entity);
+	// Place in minigame timer for ryhthym calcs 
+	registry.miniGameTimer.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MINIGAMECUP,
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE }
+	);
+
+	return entity;
+}
+
+
 Entity createEagle(RenderSystem* renderer, vec2 position)
 {
 	auto entity = Entity();
