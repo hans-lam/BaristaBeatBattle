@@ -7,6 +7,7 @@
 #include "../tiny_ecs_registry.hpp"
 #include "../tiny_ecs.hpp"
 
+
 class TurnBasedSystem {
 	
 public:
@@ -25,7 +26,7 @@ public:
 	bool all_allies_defeated();
 	bool all_enenmies_defeated();
 
-	Entity* get_active_character() {
+	Entity get_active_character() {
 		return active_character;
 	}
 
@@ -33,7 +34,7 @@ private:
 
 	void construct_party();
 
-	Entity* active_character = nullptr;
+	Entity active_character = emptyEntity;
 	
 	bool waiting_for_player = false;
 

@@ -34,9 +34,9 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 	if (out_of_combat || waiting_for_player) return;
 
 
-	if (active_character == nullptr) {
+	if (active_character == emptyEntity) {
 
-		TurnCounter* highest = nullptr;
+		TurnCounter* highest = NULL;
 		Entity highest_entity_number;
 
 
@@ -46,7 +46,7 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 			tc->placement += tc->speed_value;
 
-			if (highest == nullptr || highest->placement < tc->placement) {
+			if (highest == NULL || highest->placement < tc->placement) {
 				highest = tc;
 				highest_entity_number = turnCounterEntity;
 			}
@@ -55,13 +55,13 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		if (highest->placement < SPEED_REQUIRED_FOR_TURN) return;
 
-		active_character = &highest_entity_number;
+		active_character = highest_entity_number;
 		highest->placement -= 100;
 
 	}
 
 
-	if (registry.partyMembers.has(*active_character)) {
+	if (registry.partyMembers.has(active_character)) {
 		waiting_for_player = true;
 		
 	}
@@ -122,10 +122,10 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 		}
 	}
 
-	TurnCounter* turn_counter = registry.turnCounter.get(*active_character);
-	turn_counter->placement -= 100;
+	//TurnCounter* turn_counter = registry.turnCounter.get(active_character);
+	//turn_counter->placement -= 100;
 
-	active_character = nullptr;
+	active_character = emptyEntity;
 	waiting_for_player = false;
 
 

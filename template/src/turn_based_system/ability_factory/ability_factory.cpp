@@ -1,3 +1,4 @@
+#pragma once
 #include "ability_factory.hpp"
 
 const int PHYSCIAL_BASIC_ATTACK_POWER = 5;

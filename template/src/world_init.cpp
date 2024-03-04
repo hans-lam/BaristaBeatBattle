@@ -3,7 +3,7 @@
 #include <iostream>
 
 Entity createChicken(RenderSystem* renderer, vec2 pos) {
-	createChicken(renderer, pos, Entity())
+	return createChicken(renderer, pos, Entity());
 }
 Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
 {
@@ -89,7 +89,7 @@ Entity createEagle(RenderSystem* renderer, vec2 position)
 
 
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position) {
-	createEnemyDrink(renderer, velocity, position, Entity());
+	return createEnemyDrink(renderer, velocity, position, Entity());
 }
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity)
 {

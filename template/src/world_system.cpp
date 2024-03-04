@@ -200,17 +200,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Highlighting current char 
 	if (stage == 1) {
 
-		Entity* active_char_entity = turn_based->get_active_character();
+		Entity active_char_entity = turn_based->get_active_character();
 		
-		if (active_char_entity != nullptr) {
+		if (active_char_entity != emptyEntity) {
 
-			Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+
+			Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
 
 			// setting player color 
 			for (Entity entity : registry.partyMembers.entities) {
 				vec3& color = registry.colors.get(entity);
 				
-				if (entity == *active_char_entity) {
+				if (entity == active_char_entity) {
 					// change current player character to red
 					color = { 1.0f, 0.f, 0.f };
 				}
@@ -228,7 +229,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
 
-				if (menu_entity == *active_char_entity) {
+				if (menu_entity == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
 						registry.renderRequests.insert(
 							attack,
@@ -493,11 +494,11 @@ void WorldSystem::handle_player_movement(int key, int action) {
 
 void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 
-	Entity* active_char_entity = turn_based->get_active_character();
+	Entity active_char_entity = turn_based->get_active_character();
 
-	if (active_char_entity != nullptr) {
+	if (active_char_entity != emptyEntity) {
 
-		Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
 		
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
@@ -510,7 +511,7 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 				}
 			}
 		
-			if (menu_entity == *active_char_entity) {
+			if (menu_entity == active_char_entity) {
 				if (key == GLFW_KEY_UP) {
 					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
@@ -536,16 +537,16 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 }
 
 void WorldSystem::handle_selection() {
-	Entity* active_char_entity = turn_based->get_active_character();
-	if (active_char_entity != nullptr) {
+	Entity active_char_entity = turn_based->get_active_character();
+	if (active_char_entity != emptyEntity) {
 
-		Character* active_char = registry.characterDatas.get(*active_char_entity).characterData;
+		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
 
 		// Get active option
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
 			// found correct menu
-			if (menu_entity == *active_char_entity) {
+			if (menu_entity == active_char_entity) {
 				Entity correctOption = menu.activeOption; 
 				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
 

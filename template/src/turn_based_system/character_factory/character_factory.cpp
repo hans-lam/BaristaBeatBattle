@@ -120,8 +120,6 @@ Entity CharacterFactory::construct_enemy(int level) {
 	Character* enemy_character_obj = new Character(name, character_stat);
 	enemy_character_obj->add_ability(basic_attack);
 
-	TurnBasedEnemy enemyComponent = TurnBasedEnemy();
-
 	Entity enemyEntity = Entity();
 
 	TurnBasedEnemy tbe = TurnBasedEnemy();

@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 #include "turn_based_system/character_system.hpp"
-#include "turn_based_system/character_factory/character_factory.hpp"
 
 // Player component
 struct Player

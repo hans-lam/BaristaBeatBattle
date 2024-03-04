@@ -4,13 +4,14 @@
 #include "character_stat_sheet.hpp"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 // Have to forward declare Ability for some reason.
 class Ability;
 
 class Character {
 public:
-	
+
 	Character(std::string name, CharacterStatSheet* stats);
 
 	void add_ability(Ability* ability);
@@ -23,29 +24,13 @@ public:
 
 	bool is_dead();
 
-	void deal_damage(unsigned int dmg) {
-		unsigned int dmg_amount = std::max(current_health_points - dmg, (unsigned int)0);
-		this->current_health_points -= dmg_amount;
-	}
+	void deal_damage(unsigned int dmg);
 
-	void heal_amount(unsigned int heal) {
-		unsigned int heal_amount = std::min(current_health_points + heal, stats->get_max_health());
-		this->current_health_points += heal_amount;
-	}
+	void heal_amount(unsigned int heal);
 
 	std::string get_name();
 
-	Ability* get_ability_by_name(std::string name) {
-
-		for (Ability* ability : abilities) {
-
-			if (ability->get_ability_name() == name) {
-				return ability;
-			}
-		}
-
-		return nullptr;
-	}
+	Ability* get_ability_by_name(std::string name);
 
 
 private:
