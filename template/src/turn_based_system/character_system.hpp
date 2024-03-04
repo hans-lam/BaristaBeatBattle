@@ -39,4 +39,4 @@ private:
 	std::vector<Ability*> abilities;
 
 	unsigned int current_health_points;
-};
+};	

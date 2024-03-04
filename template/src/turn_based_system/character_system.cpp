@@ -39,13 +39,13 @@ bool Character::is_dead() {
 
 
 void Character::deal_damage(unsigned int dmg) {
-	unsigned int dmg_amount = std::max(current_health_points - dmg, (unsigned int)0);
-	this->current_health_points -= dmg_amount;
+	unsigned int new_health_amount = std::max(current_health_points - dmg, (unsigned int)0);
+	this->current_health_points = new_health_amount;
 }
 
 void Character::heal_amount(unsigned int heal) {
 	unsigned int heal_amount = std::min(current_health_points + heal, stats->get_max_health());
-	this->current_health_points += heal_amount;
+	this->current_health_points = heal_amount;
 }
 
 Ability* Character::get_ability_by_name(std::string name) {

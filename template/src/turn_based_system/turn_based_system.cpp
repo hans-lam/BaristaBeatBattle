@@ -66,8 +66,25 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		
 	}
 	else {
-		// AI
-		//process_character_action(generic_basic_attack, active_character->character, party_members);
+		unsigned int lowest_health;
+		Entity lowest_health_party_member = emptyEntity;
+		Character* character_data;
+
+		for (Entity party_member_entity : registry.partyMembers.entities) {
+			character_data = registry.characterDatas.get(party_member_entity).characterData;
+			unsigned int curr_health_points = character_data->get_current_health_points();
+
+			if (lowest_health_party_member == emptyEntity || lowest_health > curr_health_points ) {
+				lowest_health_party_member = party_member_entity;
+				lowest_health = curr_health_points;
+			}
+
+		}
+
+		Character* ai_character = registry.characterDatas.get(active_character).characterData;
+		Character* target_character = registry.characterDatas.get(lowest_health_party_member).characterData;
+
+		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
 	}
 }
 
