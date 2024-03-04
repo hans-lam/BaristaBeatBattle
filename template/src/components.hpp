@@ -98,7 +98,10 @@ struct AttackTimer
 struct MiniGameTimer
 {
 	float counter_ms = 10000;
+	float inter_timer = 500;
+	bool inter_state = false;
 };
+
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex

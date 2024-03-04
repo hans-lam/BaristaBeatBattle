@@ -314,6 +314,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				minigame_timer_counter_ms = counter.counter_ms;
 			}
 
+			if (counter.inter_state) {
+				counter.inter_timer -= elapsed_ms_since_last_update;
+
+				if (counter.inter_timer < 0) {
+					registry.renderRequests.remove(entity); 
+					registry.renderRequests.insert(
+						entity,
+						{ TEXTURE_ASSET_ID::MINIGAMECUP,
+						EFFECT_ASSET_ID::TEXTURED,
+						GEOMETRY_BUFFER_ID::SPRITE }
+					);
+
+					counter.inter_state = false;
+					counter.inter_timer = 500.f;
+				}
+			}
+
 			// stop minigame once timer expires 
 			if (counter.counter_ms < 0) {
 				// Change turn-based values here to deal damage based on score
@@ -559,7 +576,7 @@ void WorldSystem::handle_selection() {
 void WorldSystem::handle_mini(int bpm) { 
 	// Assuming that the bpm is based on quarter notes and it's 4/4
 	for (Entity entity : registry.miniGameTimer.entities) {
-		MiniGameTimer timer = registry.miniGameTimer.get(entity); 
+		MiniGameTimer& timer = registry.miniGameTimer.get(entity); 
 		Minigame& minigame = registry.miniGame.get(entity);
 
 		std::cout << timer.counter_ms << '\n';
@@ -576,14 +593,25 @@ void WorldSystem::handle_mini(int bpm) {
 		// trying to hit every first beat
 		if (modded <= beat_error && !(timer.counter_ms < 0 + beat_error)) {
 			std::cout << "YOU HIT IT early" << '\n';
-			minigame.score += 1;
 		}
 		else if (modded >= (measure_duration - beat_error)) {
 			std::cout << "YOU HIT IT late" << '\n';
-			minigame.score += 1;
 		}
 		else {
 			std::cout << "YOU FUCKED IT" << '\n';
+			return;
+		}
+
+		minigame.score += 1;
+		if (!(timer.inter_state)) {
+			registry.renderRequests.remove(entity);
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMEINTER,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
+			timer.inter_state = true;
 		}
 	}
 }
@@ -599,7 +627,7 @@ void player_attack() {
 
 void WorldSystem::change_stage(int level) {
 	if (level == 0) {
-
+		return;
 	} 
 	else if (level == 1) {
 		stage = 1;
