@@ -102,6 +102,10 @@ struct MiniGameTimer
 	bool inter_state = false;
 };
 
+struct MiniGameResTimer
+{
+	float counter_ms = 250;
+};
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex
@@ -158,7 +162,9 @@ enum class TEXTURE_ASSET_ID {
 	ITEMBUTTON = ATTACKBUTTON + 1,
 	MINIGAMECUP = ITEMBUTTON + 1, 
 	MINIGAMEINTER = MINIGAMECUP + 1,
-	TEXTURE_COUNT = MINIGAMEINTER + 1
+	MINIGAMESUCCESS = MINIGAMEINTER + 1, 
+	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	TEXTURE_COUNT = MINIGAMEFAIL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

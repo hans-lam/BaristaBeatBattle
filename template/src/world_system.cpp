@@ -305,6 +305,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Countdown minigame for ending
 	if (stage == 2) {
+		bool ended = false;
 		float minigame_timer_counter_ms = 10000.f;
 		for (Entity entity : registry.miniGameTimer.entities) {
 			// progress timer 
@@ -338,7 +339,25 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				std::cout << "SCORE: " << minigame.score << '\n';
 
 				registry.remove_all_components_of(entity);
-				change_stage(1); 
+				ended = true;
+			}
+		}
+
+		for (Entity entity : registry.miniGameResTimer.entities) {
+			if (ended) {
+				registry.remove_all_components_of(entity);
+				change_stage(1);
+				break;
+			}
+			
+			if (registry.renderRequests.has(entity)) {
+				MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
+				counter.counter_ms -= elapsed_ms_since_last_update;
+
+				if (counter.counter_ms < 0) {
+					registry.renderRequests.remove(entity);
+					counter.counter_ms = 250.f;
+				}
 			}
 		}
 	}
@@ -574,6 +593,7 @@ void WorldSystem::handle_selection() {
 }
 
 void WorldSystem::handle_mini(int bpm) { 
+	bool hit = false;
 	// Assuming that the bpm is based on quarter notes and it's 4/4
 	for (Entity entity : registry.miniGameTimer.entities) {
 		MiniGameTimer& timer = registry.miniGameTimer.get(entity); 
@@ -599,10 +619,11 @@ void WorldSystem::handle_mini(int bpm) {
 		}
 		else {
 			std::cout << "YOU FUCKED IT" << '\n';
-			return;
+			break;
 		}
 
 		minigame.score += 1;
+		// changing cup's texture
 		if (!(timer.inter_state)) {
 			registry.renderRequests.remove(entity);
 			registry.renderRequests.insert(
@@ -612,6 +633,29 @@ void WorldSystem::handle_mini(int bpm) {
 				GEOMETRY_BUFFER_ID::SPRITE }
 			);
 			timer.inter_state = true;
+		} 
+		hit = true;
+	}
+
+	// Changing the result value 
+	for (Entity entity : registry.miniGameResTimer.entities) {
+		registry.renderRequests.remove(entity); 
+
+		if (hit) {
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMESUCCESS,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
+		} 
+		else {
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
 		}
 	}
 }
@@ -661,6 +705,7 @@ void WorldSystem::change_stage(int level) {
 			}
 		}
 		createCup(renderer, { window_width_px / 2, window_height_px / 2 });
+		createMiniResult(renderer, { window_width_px / 4, window_height_px / 2 });
 	}
 }
 

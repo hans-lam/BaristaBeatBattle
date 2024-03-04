@@ -84,8 +84,31 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	);
 
 	return entity;
-}
+} 
 
+Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity(); 
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+	// place in minigame result
+	registry.miniGameResTimer.emplace(entity);
+	RenderRequest& render = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE }
+	);
+	render.shown = false;
+	return entity;
+}
 
 Entity createEagle(RenderSystem* renderer, vec2 position)
 {

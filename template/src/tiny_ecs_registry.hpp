@@ -29,6 +29,7 @@ public:
 	ComponentContainer<MenuOption> menuOptions;
 	ComponentContainer<Minigame> miniGame;
 	ComponentContainer<MiniGameTimer> miniGameTimer;
+	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -52,6 +53,7 @@ public:
 		registry_list.push_back(&menuOptions);
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
+		registry_list.push_back(&miniGameResTimer);
 	}
 
 	void clear_all_components() {
