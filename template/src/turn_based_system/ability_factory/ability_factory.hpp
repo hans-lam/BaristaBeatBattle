@@ -3,7 +3,11 @@
 #include "../abilities.hpp"
 
 class AbilityFactory {
-	void construct_pour_it();
+public:
+	Ability* construct_pour_it();
+	Ability* construct_basic_attack();
+	Ability* construct_rest();
 };
 
-AbilityFactory ability_factory;
+extern AbilityFactory* ability_factory;
+

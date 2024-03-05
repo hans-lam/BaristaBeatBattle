@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+// I HAVE TO FORWARD DELCARE THIS FOR SOME REASON???? I AM SO CONFUSED
+class Character;
 
 class Ability{
 public:
@@ -14,7 +16,9 @@ public:
 	bool get_is_physical();
 	bool get_is_area_of_effect();
 
-	//void process_ability(Character* caller, Character* callee);
+	void process_ability(Character* caller, Character* target);
+
+	
 
 private:
 	int power;
@@ -24,6 +28,50 @@ private:
 };
 
 
-const int PHYSCIAL_BASIC_ATTACK_POWER = 5;
+class SupportAbility : public Ability {
+public:
+	SupportAbility(unsigned int potency, std::string ability_name, bool is_healing, bool is_area_of_effect);
 
-extern Ability* generic_basic_attack;
+	void process_ability(Character* caller, Character* target);
+
+	unsigned get_potency();
+	bool get_is_healing();
+
+private:
+	unsigned int potency;
+	bool is_healing;
+};
+
+
+enum BeatScore
+{
+	BEAT_PERFECT = 2, BEAT_HIT = 1, BEAT_MISS = 0
+};
+
+class BeatInstance {
+public:
+
+	BeatInstance(int potency, int multiplier) {
+		this->potency = potency;
+		this->multiplier = multiplier;
+	}
+
+	int potency;
+	int multiplier;
+	BeatScore beat_score;
+};
+
+
+class BeatAbility : public Ability {
+
+public:
+	BeatAbility(std::string name, bool is_physical, bool is_area_of_effect, std::vector<BeatInstance> beats);
+	std::vector<BeatInstance> get_beats();
+
+	void process_ability(Character* caller, Character* target);
+
+private: 
+	std::vector<BeatInstance> beats;
+};
+
+

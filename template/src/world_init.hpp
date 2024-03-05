@@ -16,8 +16,9 @@ const float CUP_HEIGHT = 0.6f * 550.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
+Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity);
 // Menu 
-Entity createMenu(RenderSystem* renderer, vec2 pos);
+Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character);
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
@@ -28,6 +29,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos);
 Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 // a egg

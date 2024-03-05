@@ -11,7 +11,6 @@ class ECSRegistry
 
 public:
 	// Manually created list of all components this game has
-	// TODO: A1 add a LightUp component
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<AttackTimer> attackTimers;
 	ComponentContainer<Motion> motions;
@@ -31,6 +30,12 @@ public:
 	ComponentContainer<MiniGameTimer> miniGameTimer;
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 
+	// TURN BASED COMPONENTS
+	ComponentContainer<CharacterData> characterDatas;
+	ComponentContainer<TurnBasedEnemy> turnBasedEnemies;
+	ComponentContainer<PartyMember> partyMembers;
+	ComponentContainer<TurnCounter*> turnCounter;
+
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry()
@@ -49,6 +54,11 @@ public:
 		registry_list.push_back(&enemyDrinks);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
+
+		registry_list.push_back(&characterDatas);
+		registry_list.push_back(&turnBasedEnemies);
+		registry_list.push_back(&partyMembers);
+		registry_list.push_back(&turnCounter);
 		registry_list.push_back(&menu);
 		registry_list.push_back(&menuOptions);
 		registry_list.push_back(&miniGame);
