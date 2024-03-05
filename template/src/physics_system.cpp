@@ -188,6 +188,19 @@ bool do_intersect(vec2 p1, vec2 q1, vec2 p2, vec2 q2) {
 	return false; // Doesn't fall in any of the above cases
 }
 
+bool is_inside_bounding_box(vec2 p, float xmin, float xmax, float ymin, float ymax) {
+	return p.x >= xmin && p.x <= xmax && p.y >= ymin && p.y <= ymax;
+}
+
+bool convex_hull_inside_box(std::vector<vec2> convexHull, float xmin, float xmax, float ymin, float ymax) {
+	for (const vec2& p : convexHull) {
+		if (!is_inside_bounding_box(p, xmin, xmax, ymin, ymax)) {
+			return false; // If any point is outside, return false
+		}
+	}
+	return true; // All points are inside the bounding box
+}
+
 // Function to check collision between convex hull and a bounding box
 bool is_collision(std::vector<vec2>& convexHull, float xmin, float xmax, float ymin, float ymax) {
 	int n = convexHull.size();
@@ -201,7 +214,8 @@ bool is_collision(std::vector<vec2>& convexHull, float xmin, float xmax, float y
 			return true;
 		}
 	}
-	return false;
+	// just need to check if convex hull is entirely inside box
+	return convex_hull_inside_box(convexHull, xmin, xmax, ymin, ymax);
 }
 
 // for debugging each side of convex hull
@@ -272,27 +286,29 @@ bool player_mesh_collides(const Entity& player, const Entity& box) {
 // REQUIRES: entities passed must have a motion
 bool collides(const Entity& entity1, const Entity& entity2)
 {
-	Motion motion1 = registry.motions.get(entity1);
-	Motion motion2 = registry.motions.get(entity2);
-
-	vec2 dp = motion1.position - motion2.position;
-	float dist_squared = dot(dp,dp);
-	const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
-	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
-	const vec2 my_bonding_box = get_bounding_box(motion2) / 2.f;
-	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
-	const float r_squared = max(other_r_squared, my_r_squared);
-
 	if (registry.players.has(entity1) && !registry.players.has(entity2)) {
 		return player_mesh_collides(entity1, entity2);
 	}
 	else if (registry.players.has(entity2) && !registry.players.has(entity1)) {
 		return player_mesh_collides(entity2, entity1);
 	}
-	
-	if (dist_squared < r_squared) {
-		//check for mesh-based collision here
-		return true;
+	else {
+		// box-box collision
+		Motion motion1 = registry.motions.get(entity1);
+		Motion motion2 = registry.motions.get(entity2);
+
+		vec2 dp = motion1.position - motion2.position;
+		float dist_squared = dot(dp, dp);
+		const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
+		const float other_r_squared = dot(other_bonding_box, other_bonding_box);
+		const vec2 my_bonding_box = get_bounding_box(motion2) / 2.f;
+		const float my_r_squared = dot(my_bonding_box, my_bonding_box);
+		const float r_squared = max(other_r_squared, my_r_squared);
+
+
+		if (dist_squared < r_squared) {
+			return true;
+		}
 	}
 	return false;
 }
