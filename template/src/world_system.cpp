@@ -669,9 +669,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Debugging
 	if (key == GLFW_KEY_D) {
 		if (action == GLFW_RELEASE)
-			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
+			debugging.in_debug_mode = !debugging.in_debug_mode;
 	}
 
 	// Control the current speed with `<` `>`
