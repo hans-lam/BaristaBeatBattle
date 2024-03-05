@@ -186,6 +186,7 @@ elseif (IS_OS_WINDOWS)
     )
 endif()
 
+######
 # Add FreeType - Windows-specific; not tested on Linux or macOS
 set (FREETYPE_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")
 set (FREETYPE_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/release static/vs2015-2022/win64/freetype.lib")
@@ -206,7 +207,8 @@ if(TARGET Freetype AND NOT TARGET Freetype::Freetype)
      # or create the target correctly (see cmakes newer FindFreetype.cmake)
      message(FATAL_ERROR "Can't find FreeType (fonts)." )
  endif()
- # target_link_libraries(mylib PRIVATE Freetype::Freetype)
+ target_link_libraries(cafe PRIVATE Freetype::Freetype)
+#####
 
 # Can't find the include and lib. Quit.
 if (NOT GLFW_FOUND OR NOT SDL2_FOUND)
