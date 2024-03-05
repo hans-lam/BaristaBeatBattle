@@ -171,7 +171,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
 	    Motion& motion = motions_registry.components[i];
 		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
+			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
@@ -187,7 +187,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// TODO: make negative velocity possible
 				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
 				// TODO: fix to spawn from only the edges
-				vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
+				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
 		}
 	}
 
@@ -386,14 +386,17 @@ void WorldSystem::restart_game() {
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
+		registry.remove_all_components_of(registry.motions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+	// create new background
+	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
+
 	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
-	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
+	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
+	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
 }
 
 // Compute collisions between entities
@@ -417,6 +420,11 @@ void WorldSystem::handle_collisions() {
 
 					// potential problem: if we don't remove the enemy it might keep colliding and screaming
 					registry.remove_all_components_of(entity_other);
+
+					// remove all overworld bgs
+					for (uint i = 0; i < registry.backgrounds.entities.size(); i++) {
+						registry.remove_all_components_of(registry.backgrounds.entities[i]);
+					}
 
 					// We also need to kill all other eagles
 					for (Entity enemies : registry.enemyDrinks.entities) {

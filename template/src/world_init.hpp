@@ -13,6 +13,8 @@ const float MENU_WIDTH = 0.6f * 700.f;
 const float MENU_HEIGHT = 0.6f * 280.f;
 const float CUP_WIDTH = 0.6f * 700.f;
 const float CUP_HEIGHT = 0.6f * 550.f;
+const float BG_WIDTH = 2000.f;
+const float BG_HEIGHT = 350.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
@@ -30,6 +32,8 @@ Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity);
+// the background scroller
+Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 // a egg

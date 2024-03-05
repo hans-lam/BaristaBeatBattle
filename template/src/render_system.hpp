@@ -38,7 +38,8 @@ class RenderSystem {
 			textures_path("minigamecup.png"),
 			textures_path("minigameinter.png"), 
 			textures_path("minigamesuccess.png"), 
-			textures_path("minigamefail.png")
+			textures_path("minigamefail.png"),
+			textures_path("bg.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
