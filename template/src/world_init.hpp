@@ -11,6 +11,8 @@ const float EAGLE_BB_WIDTH = 0.6f * 300.f;
 const float EAGLE_BB_HEIGHT = 0.6f * 202.f;
 const float MENU_WIDTH = 0.6f * 700.f; 
 const float MENU_HEIGHT = 0.6f * 280.f;
+const float CUP_WIDTH = 0.6f * 700.f;
+const float CUP_HEIGHT = 0.6f * 550.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
@@ -19,6 +21,10 @@ Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity);
 Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character);
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
+// minigame
+Entity createCup(RenderSystem* renderer, vec2 pos);
+// minigame result 
+Entity createMiniResult(RenderSystem* renderer, vec2 pos);
 // the enemy
 Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy

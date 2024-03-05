@@ -47,6 +47,8 @@ public:
 
 	void handle_menu(int key, TurnBasedSystem* turn_based);
 
+	void handle_mini(int bpm);
+
 	// handle option selection 
 	void handle_selection();
 
@@ -59,6 +61,9 @@ private:
 
 	// restart level
 	void restart_game();
+
+	// change stage 
+	void change_stage(int level);
 
 	// OpenGL window handle
 	GLFWwindow* window;

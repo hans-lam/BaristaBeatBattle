@@ -42,6 +42,11 @@ struct Menu
 	Entity activeOption;
 };
 
+struct Minigame
+{
+	int score = 0;
+};
+
 struct CharacterData {
 	Character* characterData;
 };
@@ -106,6 +111,18 @@ struct AttackTimer
 	float counter_ms = 700; // might change this number
 };
 
+struct MiniGameTimer
+{
+	float counter_ms = 10000;
+	float inter_timer = 500;
+	bool inter_state = false;
+};
+
+struct MiniGameResTimer
+{
+	float counter_ms = 250;
+};
+
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex
 {
@@ -159,7 +176,11 @@ enum class TEXTURE_ASSET_ID {
 	ENEMYDRINK = EAGLE + 1,
 	ATTACKBUTTON = ENEMYDRINK + 1, 
 	ITEMBUTTON = ATTACKBUTTON + 1,
-	TEXTURE_COUNT = ITEMBUTTON + 1
+	MINIGAMECUP = ITEMBUTTON + 1, 
+	MINIGAMEINTER = MINIGAMECUP + 1,
+	MINIGAMESUCCESS = MINIGAMEINTER + 1, 
+	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	TEXTURE_COUNT = MINIGAMEFAIL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -187,5 +208,6 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool shown = true;
 };
 

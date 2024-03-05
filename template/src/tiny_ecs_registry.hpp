@@ -26,6 +26,9 @@ public:
 	ComponentContainer<vec3> colors;
 	ComponentContainer<Menu> menu;
 	ComponentContainer<MenuOption> menuOptions;
+	ComponentContainer<Minigame> miniGame;
+	ComponentContainer<MiniGameTimer> miniGameTimer;
+	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -58,6 +61,9 @@ public:
 		registry_list.push_back(&turnCounter);
 		registry_list.push_back(&menu);
 		registry_list.push_back(&menuOptions);
+		registry_list.push_back(&miniGame);
+		registry_list.push_back(&miniGameTimer);
+		registry_list.push_back(&miniGameResTimer);
 	}
 
 	void clear_all_components() {

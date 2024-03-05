@@ -114,7 +114,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
-	minigame_music = Mix_LoadMUS(audio_path("minigame.wav").c_str());
+	minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
@@ -125,7 +125,7 @@ GLFWwindow* WorldSystem::create_window() {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("turn_based.wav").c_str(),
-			audio_path("minigame.wav").c_str(),
+			audio_path("metronome.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
 			audio_path("chicken_eat.wav").c_str(), 
 			audio_path("attack.wav").c_str());
@@ -189,12 +189,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// TODO: fix to spawn from only the edges
 				vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
 		}
-	}
-
-	// Spawning new bug
-	next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
-		// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
 	}
 
 	// Highlighting current char 
@@ -315,6 +309,65 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Countdown minigame for ending
+	if (stage == 2) {
+		bool ended = false;
+		float minigame_timer_counter_ms = 10000.f;
+		for (Entity entity : registry.miniGameTimer.entities) {
+			// progress timer 
+			MiniGameTimer& counter = registry.miniGameTimer.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			if (counter.counter_ms < minigame_timer_counter_ms) {
+				minigame_timer_counter_ms = counter.counter_ms;
+			}
+
+			if (counter.inter_state) {
+				counter.inter_timer -= elapsed_ms_since_last_update;
+
+				if (counter.inter_timer < 0) {
+					registry.renderRequests.remove(entity); 
+					registry.renderRequests.insert(
+						entity,
+						{ TEXTURE_ASSET_ID::MINIGAMECUP,
+						EFFECT_ASSET_ID::TEXTURED,
+						GEOMETRY_BUFFER_ID::SPRITE }
+					);
+
+					counter.inter_state = false;
+					counter.inter_timer = 500.f;
+				}
+			}
+
+			// stop minigame once timer expires 
+			if (counter.counter_ms < 0) {
+				// Change turn-based values here to deal damage based on score
+				Minigame& minigame = registry.miniGame.get(entity); 
+				std::cout << "SCORE: " << minigame.score << '\n';
+
+				registry.remove_all_components_of(entity);
+				ended = true;
+			}
+		}
+
+		for (Entity entity : registry.miniGameResTimer.entities) {
+			if (ended) {
+				registry.remove_all_components_of(entity);
+				change_stage(1);
+				break;
+			}
+			
+			if (registry.renderRequests.has(entity)) {
+				MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
+				counter.counter_ms -= elapsed_ms_since_last_update;
+
+				if (counter.counter_ms < 0) {
+					registry.renderRequests.remove(entity);
+					counter.counter_ms = 250.f;
+				}
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -341,20 +394,6 @@ void WorldSystem::restart_game() {
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
 	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
-
-	// !! TODO A2: Enable static eggs on the ground, for reference
-	// Create eggs on the floor, use this for reference
-	/*
-	for (uint i = 0; i < 20; i++) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity egg = createEgg({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
-			         { radius, radius });
-		float brightness = uniform_dist(rng) * 0.5 + 0.5;
-		registry.colors.insert(egg, { brightness, brightness, brightness});
-	}
-	*/
 }
 
 // Compute collisions between entities
@@ -566,13 +605,78 @@ void WorldSystem::handle_selection() {
 
 					// set stage to 2, which is mini-game mapping
 					if (stage != 2) {
-						stage = 2;
-						// Play music
-						Mix_PlayMusic(minigame_music, -1);
-						// Anything else we need to set upon changing to mini-game mode should go here or in step
+						change_stage(2);
 					}
 				}
 			}
+		}
+	}
+}
+
+void WorldSystem::handle_mini(int bpm) { 
+	bool hit = false;
+	// Assuming that the bpm is based on quarter notes and it's 4/4
+	for (Entity entity : registry.miniGameTimer.entities) {
+		MiniGameTimer& timer = registry.miniGameTimer.get(entity); 
+		Minigame& minigame = registry.miniGame.get(entity);
+
+		std::cout << timer.counter_ms << '\n';
+
+		// measure duration is in ms 
+		int beat_duration = (60000 / bpm);
+		int measure_duration = beat_duration * 4;
+		float beat_error = beat_duration / 2;
+
+		float modded = (int) timer.counter_ms % measure_duration;
+
+		std::cout << modded << '\n';
+
+		// trying to hit every first beat
+		if (modded <= beat_error && !(timer.counter_ms < 0 + beat_error)) {
+			std::cout << "YOU HIT IT early" << '\n';
+		}
+		else if (modded >= (measure_duration - beat_error)) {
+			std::cout << "YOU HIT IT late" << '\n';
+		}
+		else {
+			std::cout << "YOU FUCKED IT" << '\n';
+			break;
+		}
+
+		minigame.score += 1;
+		// changing cup's texture
+		if (!(timer.inter_state)) {
+			registry.renderRequests.remove(entity);
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMEINTER,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
+			timer.inter_state = true;
+		} 
+		hit = true;
+	}
+
+	// Changing the result value 
+	for (Entity entity : registry.miniGameResTimer.entities) {
+		registry.renderRequests.remove(entity); 
+
+		if (hit) {
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMESUCCESS,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
+		} 
+		else {
+			registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
 		}
 	}
 }
@@ -583,6 +687,46 @@ void player_attack() {
 		if (!registry.attackTimers.has(entity)) {
 			registry.attackTimers.emplace(registry.players.entities[i]);
 		}
+	}
+}
+
+void WorldSystem::change_stage(int level) {
+	if (level == 0) {
+		return;
+	} 
+	else if (level == 1) {
+		stage = 1;
+		// Play music
+		Mix_PlayMusic(turn_based_music, -1);
+		// max volume is at 128; this sets it to 75%
+		Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
+		// Anything  we need to set upon changing back should go here or in step
+		// Remove all minigame entities 
+		for (Entity entity : registry.miniGame.entities) {
+			registry.remove_all_components_of(entity);
+		}
+		// Replace all previous entities from render requests
+		for (Entity entity : registry.motions.entities) {
+			if (registry.renderRequests.has(entity)) {
+				RenderRequest& render = registry.renderRequests.get(entity);
+				render.shown = true;
+			}
+		}
+	}
+	else if (level == 2) {
+		stage = 2;
+		// Play music
+		Mix_PlayMusic(minigame_music, -1);
+		// Anything else we need to set upon changing to mini-game mode should go here or in step
+		// Remove all previous entities from render requests
+		for (Entity entity : registry.motions.entities) {
+			if (registry.renderRequests.has(entity)) {
+				RenderRequest& render = registry.renderRequests.get(entity);
+				render.shown = false;
+			}
+		}
+		createCup(renderer, { window_width_px / 2, window_height_px / 2 });
+		createMiniResult(renderer, { window_width_px / 4, window_height_px / 2 });
 	}
 }
 
@@ -610,6 +754,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
 		if (stage == 1)
 			handle_selection();
+	}
+
+	// Minigame 
+	if (action == GLFW_PRESS && key == GLFW_KEY_D) {
+		if (stage == 2)
+			handle_mini(120);
 	}
 
 	// start encounter
@@ -654,18 +804,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
 		// set stage to 2, which is mini-game mapping
 		if (stage != 2) {
-			stage = 2;
-			// Play music
-			Mix_PlayMusic(minigame_music, -1);
-			// Anything else we need to set upon changing to mini-game mode should go here or in step
+			change_stage(2);
 		}
 		else {
-			stage = 1;
-			// Play music
-			Mix_PlayMusic(turn_based_music, -1);
-			// max volume is at 128; this sets it to 75%
-			Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
-			// Anything  we need to set upon changing back should go here or in step
+			change_stage(1);
 		}
 	}
 
