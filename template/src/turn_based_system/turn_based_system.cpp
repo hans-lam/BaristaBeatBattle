@@ -16,9 +16,11 @@ TurnBasedSystem::TurnBasedSystem() {
 	// influence for random code
 	// https://www.geeksforgeeks.org/generate-a-random-number-between-0-and-1/
 	srand(time(0));
+	
 }
 
-void TurnBasedSystem::init() {
+void TurnBasedSystem::init(AISystem* ai_system) {
+	this->ai_system = ai_system;
 	construct_party();
 }
 
@@ -66,23 +68,9 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		
 	}
 	else {
-		unsigned int lowest_health;
-		Entity lowest_health_party_member = emptyEntity;
-		Character* character_data;
-
-		for (Entity party_member_entity : registry.partyMembers.entities) {
-			character_data = registry.characterDatas.get(party_member_entity).characterData;
-			unsigned int curr_health_points = character_data->get_current_health_points();
-
-			if (lowest_health_party_member == emptyEntity || lowest_health > curr_health_points ) {
-				lowest_health_party_member = party_member_entity;
-				lowest_health = curr_health_points;
-			}
-
-		}
-
+		
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
-		Character* target_character = registry.characterDatas.get(lowest_health_party_member).characterData;
+		Character* target_character = ai_system->ai_find_target();
 
 		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
 	}
@@ -121,10 +109,6 @@ void TurnBasedSystem::start_encounter() {
 	out_of_combat = false;
 }
 
-void TurnBasedSystem::process_character_action(Ability* ability) {
-	//process_character_action(ability, registry.players.get(active_character), current_enemies);
-}
-
 void TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
 
 	std::cout << "Current Character: " << caller->get_name() << '\n';
@@ -136,7 +120,14 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 
 			ability->process_ability(caller, receiving_character);
 
+			if (receiving_character->is_dead()) {
+				process_death(emptyEntity);
+			}
+
 		}
+	}
+	else {
+		std::cout << caller->get_name() << " Missed!" << '\n';
 	}
 
 	//TurnCounter* turn_counter = registry.turnCounter.get(active_character);
@@ -148,20 +139,17 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 
 	if (all_allies_defeated()) {
 		out_of_combat = true;
-		printf("Game Over! You won the fight!!");
+		printf("Game Over! You lost :(");
 
 		// TODO TRANSITION TO OVERWORLD WITH FIGHT GREYED OUT
-
 	}
 
 	if (all_enenmies_defeated()) {
 		out_of_combat = true;
-		printf("Game Over! You lost :(");
-
+		printf("Game Over! You won the fight!!");
+		
 		// TODO TRANSTION TO OVERWORLD AND PLAYER HAS TO DO FIGHT AGAIN
-
 	}
-
 }
 
 
@@ -185,6 +173,14 @@ bool TurnBasedSystem::all_enenmies_defeated() {
 		}
 	}
 	return true;
+}
+
+void TurnBasedSystem::process_death(Entity o7)
+{
+
+	registry.turnCounter.remove(o7);
+
+
 }
 
 

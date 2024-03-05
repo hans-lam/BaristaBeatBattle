@@ -18,6 +18,8 @@ public:
 
 	void process_ability(Character* caller, Character* target);
 
+	
+
 private:
 	int power;
 	std::string ability_name;
@@ -40,15 +42,36 @@ private:
 	bool is_healing;
 };
 
-/*
+
 enum BeatScore
 {
 	BEAT_PERFECT = 2, BEAT_HIT = 1, BEAT_MISS = 0
 };
 
 class BeatInstance {
-public: 
+public:
+
+	BeatInstance(int potency, int multiplier) {
+		this->potency = potency;
+		this->multiplier = multiplier;
+	}
+
 	int potency;
+	int multiplier;
 	BeatScore beat_score;
 };
-*/
+
+
+class BeatAbility : public Ability {
+
+public:
+	BeatAbility(std::string name, bool is_physical, bool is_area_of_effect, std::vector<BeatInstance> beats);
+	std::vector<BeatInstance> get_beats();
+
+	void process_ability(Character* caller, Character* target);
+
+private: 
+	std::vector<BeatInstance> beats;
+};
+
+

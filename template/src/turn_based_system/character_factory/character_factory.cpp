@@ -110,7 +110,7 @@ Entity CharacterFactory::construct_enemy(int level) {
 	unsigned int enemy_magic = 1 * level;
 	unsigned int enemy_defense = 1 * level;
 	unsigned int enemy_magic_resist = 1 * level;
-	unsigned int enemy_speed = 1 * level;
+	unsigned int enemy_speed = 2 * level;
 
 	CharacterStatSheet* character_stat = new CharacterStatSheet(enemy_max_health, enemy_strength, enemy_magic, enemy_defense, enemy_magic_resist, enemy_speed);
 

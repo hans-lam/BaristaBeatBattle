@@ -18,15 +18,15 @@ public:
 
 	void restore_health_to_full();
 
-	unsigned int get_current_health_points();
+	int get_current_health_points();
 
 	CharacterStatSheet* get_character_stat_sheet();
 
 	bool is_dead();
 
-	void deal_damage(unsigned int dmg);
+	void deal_damage(int dmg);
 
-	void heal_amount(unsigned int heal);
+	void heal_amount(int heal);
 
 	std::string get_name();
 
@@ -38,5 +38,5 @@ private:
 	CharacterStatSheet* stats;
 	std::vector<Ability*> abilities;
 
-	unsigned int current_health_points;
+	int current_health_points;
 };	

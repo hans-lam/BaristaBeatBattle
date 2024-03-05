@@ -1,5 +1,7 @@
 
 #include "abilities.hpp"
+#include <iostream>
+
 
 Ability::Ability(unsigned int power, std::string ability_name, bool is_physical, bool is_area_of_effect) {
 	this->power = power;
@@ -39,7 +41,10 @@ void Ability::process_ability(Character* caller, Character* target) {
 
 	unsigned int damage_amount = std::max(attack_amount - defense_amount, (unsigned int)0);
 
+	std::cout << caller->get_name() << " dealt " << damage_amount << " to " << target->get_name() << " using " << this->ability_name << '\n';
+
 	target->deal_damage(damage_amount);
+
 }
 
 
@@ -62,5 +67,42 @@ void SupportAbility::process_ability(Character* caller, Character* target) {
 
 	unsigned int heal_amount = get_potency() + caller_stat_sheet->get_magic();
 
+	std::cout << caller->get_name() << " healed " << heal_amount << " to " << target->get_name() << " using " << this->get_ability_name() << '\n';
+
 	target->heal_amount(heal_amount);
+}
+
+
+BeatAbility::BeatAbility(std::string name, bool is_physical, bool is_area_of_effect, std::vector<BeatInstance> beats) : Ability(0, name, is_physical, is_area_of_effect) {
+	this->beats = beats;
+}
+
+std::vector<BeatInstance> BeatAbility::get_beats() {
+	return this->beats;
+}
+
+void BeatAbility::process_ability(Character* caller, Character* target) {
+	CharacterStatSheet* caller_stat_sheet = caller->get_character_stat_sheet();
+	CharacterStatSheet* target_stat_sheet = target->get_character_stat_sheet();
+
+	for (BeatInstance beat : this->beats) {
+
+		int dmg_amount;
+
+		switch (beat.beat_score) {
+		case BEAT_PERFECT:
+			dmg_amount = beat.potency * beat.multiplier;
+			break;
+		case BEAT_HIT:
+			dmg_amount = beat.potency;
+			break;
+		default:
+			dmg_amount = 0;
+			break;
+		}
+
+		std::cout << caller->get_name() << " dealt " << dmg_amount << " to " << target->get_name() << " using " << this->get_ability_name() << '\n';
+
+		target->deal_damage(dmg_amount);
+	}
 }

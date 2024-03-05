@@ -17,6 +17,7 @@ using Clock = std::chrono::high_resolution_clock;
 int main()
 {
 
+	AISystem ai_system;
 	TurnBasedSystem turn_based;
 
 	// Global systems
@@ -35,7 +36,7 @@ int main()
 
 	// initialize the main systems
 	renderer.init(window);
-	turn_based.init();
+	turn_based.init(&ai_system);
 	world.init(&renderer, &turn_based);
 	
 

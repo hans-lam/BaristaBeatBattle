@@ -6,6 +6,7 @@
 #include "abilities.hpp"
 #include "../tiny_ecs_registry.hpp"
 #include "../tiny_ecs.hpp"
+#include "../ai_system.hpp"
 
 
 class TurnBasedSystem {
@@ -14,17 +15,18 @@ public:
 
 	TurnBasedSystem();
 
-	void init();
+	void init(AISystem* ai_system);
 
 	void step(float elapsed_ms_since_last_update);
 
 	void start_encounter();
 
-	void process_character_action(Ability* ability);
 	void process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
 
 	bool all_allies_defeated();
 	bool all_enenmies_defeated();
+
+	void process_death(Entity o7);
 
 	Entity get_active_character() {
 		return active_character;
@@ -37,6 +39,8 @@ private:
 	Entity active_character = emptyEntity;
 	
 	bool waiting_for_player = false;
+
+	AISystem* ai_system;
 
 };
 
