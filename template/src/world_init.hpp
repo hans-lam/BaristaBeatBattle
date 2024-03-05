@@ -16,7 +16,7 @@ const float MENU_HEIGHT = 0.6f * 280.f;
 Entity createChicken(RenderSystem* renderer, vec2 pos);
 Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity);
 // Menu 
-Entity createMenu(RenderSystem* renderer, vec2 pos);
+Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character);
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
 // the enemy

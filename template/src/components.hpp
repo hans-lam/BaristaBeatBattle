@@ -38,7 +38,7 @@ struct MenuOption
 struct Menu
 {
 	Entity options[2] = {};
-	//Character* currentPlayer;
+	Entity assoicated_character;
 	Entity activeOption;
 };
 

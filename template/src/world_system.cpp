@@ -229,7 +229,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
 
-				if (menu_entity == active_char_entity) {
+				if (menu.assoicated_character == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
 						registry.renderRequests.insert(
 							attack,
@@ -511,7 +511,7 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 				}
 			}
 		
-			if (menu_entity == active_char_entity) {
+			if (menu.assoicated_character == active_char_entity) {
 				if (key == GLFW_KEY_UP) {
 					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
@@ -639,7 +639,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 					// Creating Menu entity 
 					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
-					Entity menuEnt = createMenu(renderer, menu_pos);
+					Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
 					Menu& menu = registry.menu.get(menuEnt);
 
 					j++;
