@@ -158,6 +158,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		title_ss << "MINIGAME: Hit M again to go back to turn-based";
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
+
+	printf("%zd\n", registry.debugComponents.entities.size());
+
+
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
@@ -669,9 +673,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Debugging
 	if (key == GLFW_KEY_D) {
 		if (action == GLFW_RELEASE)
-			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
+			debugging.in_debug_mode = !debugging.in_debug_mode;
 	}
 
 	// Control the current speed with `<` `>`

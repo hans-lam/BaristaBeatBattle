@@ -23,7 +23,8 @@ Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
 // a red line for debugging purposes
-Entity createLine(vec2 position, vec2 size);
+Entity createLine(vec2 position, vec2 size); 
+Entity createLine(vec2 position, vec2 scale, float angle);
 // a egg
 Entity createEgg(vec2 pos, vec2 size);
 
