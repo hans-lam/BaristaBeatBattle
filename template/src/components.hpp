@@ -3,13 +3,12 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
-#include "turn_based_system/character_factory/character_factory.hpp"
+#include "turn_based_system/character_system.hpp"
 
 // Player component
 struct Player
 {
-	Character* thisPlayer;
-
+	//Character* thisPlayer;
 };
 
 // Eagles have a hard shell
@@ -39,8 +38,25 @@ struct MenuOption
 struct Menu
 {
 	Entity options[2] = {};
-	Character* currentPlayer;
+	Entity assoicated_character;
 	Entity activeOption;
+};
+
+struct CharacterData {
+	Character* characterData;
+};
+
+struct PartyMember {
+	
+};
+
+struct TurnBasedEnemy {
+	
+};
+
+struct TurnCounter {
+	int placement = 0;
+	int speed_value = 0;
 };
 
 // All data relevant to the shape and motion of entities

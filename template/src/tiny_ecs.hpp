@@ -135,3 +135,6 @@ public:
 			map_entity_componentID[entities[i]] = i;
 	}
 };
+
+
+extern Entity emptyEntity;
