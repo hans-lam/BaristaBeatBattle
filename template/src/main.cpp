@@ -50,7 +50,7 @@ int main()
 	while (!world.is_over()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
-		renderer.renderText("test", -0.6f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
+		//renderer.renderText("test", -0.6f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();

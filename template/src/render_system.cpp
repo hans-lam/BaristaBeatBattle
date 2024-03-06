@@ -83,33 +83,59 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN || render_request.used_effect == EFFECT_ASSET_ID::EGG)
+	else if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
 
+		GLint curr_frame_uloc = glGetUniformLocation(program, "curr_frame");
+
+
+		// determine whether idle, walking +x, -x, attacking
+		if (registry.attackTimers.has(entity)) {
+			glUniform1i(curr_frame_uloc, 1);	// attacking
+		}
+		else {
+			vec2 player_velocity = registry.motions.get(entity).velocity;
+			if (player_velocity == vec2(0.0, 0.0)) {
+				glUniform1i(curr_frame_uloc, 0);	// idle
+			}
+			else if (player_velocity.x > 0.f) {
+				glUniform1i(curr_frame_uloc, 4);	// moving right
+			}
+			else if (player_velocity.x < 0.f) {
+				glUniform1i(curr_frame_uloc, 6);	// moving left
+			}
+			else {
+				glUniform1i(curr_frame_uloc, 0);	// idle
+			}
+		}
+
+		gl_has_errors();
+
 		glEnableVertexAttribArray(in_position_loc);
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(ColoredVertex), (void *)0);
+							  sizeof(TexturedVertex), (void *)0);
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_color_loc);
 		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(ColoredVertex), (void *)sizeof(vec3));
+							  sizeof(TexturedVertex), (void *)sizeof(vec3));
 		gl_has_errors();
 
-		//if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
-		//{
-		//	// Light up?
-		//	GLint light_up_uloc = glGetUniformLocation(program, "light_up");
-		//	assert(light_up_uloc >= 0);
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
 
-		//	// !!! TODO A1: set the light_up shader variable using glUniform1i,
-		//	// similar to the glUniform1f call below. The 1f or 1i specified the type, here a single int.
-		//	gl_has_errors();
-		//}
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id =
+			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		glUniform1i(glGetUniformLocation(program, "sprite_sheet"), 0);
+
+		gl_has_errors();
 
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::BACKGROUND || render_request.used_effect == EFFECT_ASSET_ID::FOREGROUND ||
@@ -123,7 +149,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		float rel_x = (registry.motions.get(registry.players.entities[0]).position.x - (window_width_px/2.f));
 		//std::cout << "curr pos" << rel_x << std::endl;
 
-		glUniform1f(player_pos_uloc, rel_x); // -registry.motions.get(registry.players.entities[0]).velocity.x / 3.f);
+		glUniform1f(player_pos_uloc, rel_x);
 
 		//glGenVertexArrays(1, &dummy_VAO);
 		glBindVertexArray(dummy_VAO);
