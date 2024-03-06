@@ -756,28 +756,41 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
-Entity createTutorialWindow(RenderSystem* renderer, vec2 position) {
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 	auto entity = Entity();
 
-	// Assuming SPRITE is the generic geometry buffer ID for 2D textures
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// Initialize the position, scale, and other motion properties as needed
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = position;
-	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2}); // Set to your desired window size
-	motion.angle = 0.f; // No rotation
-	motion.velocity = { 0.f, 0.f }; // Static window
+	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
+	motion.angle = 0.f; 
+	motion.velocity = { 0.f, 0.f }; 
 
-	// Specify the texture to use for the tutorial window
-	// Assuming TUTORIAL_IMAGE is the ID for your tutorial image idn the texture asset enum
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::TUTORIALBOARD, // Use the actual texture ID for your image
-		  EFFECT_ASSET_ID::TEXTURED,       // Assuming a basic textured effect
-		  GEOMETRY_BUFFER_ID::SPRITE });   // Use the sprite geometry for 2D images
+	if (window == 1) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
 
+	} else if (window == 2) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::BATTLEBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	}
+	
 	return entity;
 }
 
@@ -797,14 +810,22 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
 
-		if (stage == 1 && tutorialOn == false) {
-			tutorial = createTutorialWindow(renderer, vec2(window_width_px/2, window_height_px/2));
-			tutorialOn = true;
+		if (tutorialOn == false) {
+			if (stage == 0) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
+				tutorialOn = true;
+			}
+			else if (stage == 1) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+				tutorialOn = true;
+			}
+
 		}
-		else {
+		else if (tutorialOn == true) {
 			registry.renderRequests.remove(tutorial);
 			tutorialOn = false;
 		}
+
 	}
 
 	// player attack
