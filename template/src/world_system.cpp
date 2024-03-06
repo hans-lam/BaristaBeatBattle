@@ -9,6 +9,7 @@
 #include <array>
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
+#include <chrono>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -16,6 +17,9 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
+int frames_since_prev_second = 0;
+int fps = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -149,13 +153,29 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
+	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
+	frames_since_prev_second++;
+
+	if (elapsed_seconds.count() >= 0.5f) {
+		fps = frames_since_prev_second;
+		frames_since_prev_second = 0;
+		last_frame_time = current_time;
+	}
+
 	std::stringstream title_ss;
+
+	title_ss << "FPS: " << fps << " | ";
+	
+	/*
 	if (stage == 0)
 		title_ss << "OVERWORLD: Hit A to attack";
 	else if (stage == 1)
 		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
 	else if (stage == 2)
 		title_ss << "MINIGAME: Hit M again to go back to turn-based";
+	*/
+	
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
