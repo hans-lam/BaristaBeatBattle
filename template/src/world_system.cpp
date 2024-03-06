@@ -9,6 +9,7 @@
 #include <array>
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
+#include <chrono>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -16,6 +17,12 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+
+bool tutorialOn = false;
+Entity tutorial;
+std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
+int frames_since_prev_second = 0;
+int fps = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -113,8 +120,9 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
-	minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
+	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str());
+	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
+	//minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
@@ -125,7 +133,8 @@ GLFWwindow* WorldSystem::create_window() {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("turn_based.wav").c_str(),
-			audio_path("metronome.wav").c_str(),
+			audio_path("120bpmwithmetronome.wav").c_str(),
+			// audio_path("metronome.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
 			audio_path("chicken_eat.wav").c_str(), 
 			audio_path("attack.wav").c_str());
@@ -149,13 +158,29 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
+	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
+	frames_since_prev_second++;
+
+	if (elapsed_seconds.count() >= 0.5f) {
+		fps = frames_since_prev_second;
+		frames_since_prev_second = 0;
+		last_frame_time = current_time;
+	}
+
 	std::stringstream title_ss;
+
+	title_ss << "FPS: " << fps << " | ";
+	
+	/*
 	if (stage == 0)
 		title_ss << "OVERWORLD: Hit A to attack";
 	else if (stage == 1)
 		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
 	else if (stage == 2)
 		title_ss << "MINIGAME: Hit M again to go back to turn-based";
+	*/
+	
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
@@ -238,7 +263,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					if (!registry.renderRequests.has(rest)) {
 						registry.renderRequests.insert(
 							rest,
-							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
@@ -414,7 +439,7 @@ void WorldSystem::restart_game() {
 	// create new background
 	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
 	
-	// create new foreground (and lights)
+	// create new foreground (with lights)
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT + (FG_HEIGHT / 2) }, false);
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
@@ -793,6 +818,44 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
+	motion.angle = 0.f; 
+	motion.velocity = { 0.f, 0.f }; 
+
+	if (window == 1) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else if (window == 2) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::BATTLEBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	}
+	
+	return entity;
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// handle movement
@@ -805,6 +868,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				handle_menu(key, turn_based);
 			}
 		}
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+
+		if (tutorialOn == false) {
+			if (stage == 0) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
+				tutorialOn = true;
+			}
+			else if (stage == 1) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+				tutorialOn = true;
+			}
+
+		}
+		else if (tutorialOn == true) {
+			registry.renderRequests.remove(tutorial);
+			tutorialOn = false;
+		}
+
 	}
 
 	// player attack
@@ -827,6 +910,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// start encounter
 	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
+		
+		// Justin: This is very bad code, I am using this function I wrote just to render the pokemon screen 
+		// Justin 40 minutes later: I had plans to put a temp screen but i went and did other parts of the project sorry
+		// createTutorialWindow
+		
 		if (stage == 1)
 			if (out_of_combat) {
 				//render battle background
@@ -890,10 +978,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
-		if (action == GLFW_RELEASE)
+		if (action == GLFW_RELEASE && stage == 0) {
+			debugging.in_debug_mode = !debugging.in_debug_mode;
+		}
+		else {
 			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
+		}
 	}
 
 	// Control the current speed with `<` `>`

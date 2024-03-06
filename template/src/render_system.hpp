@@ -43,7 +43,8 @@ class RenderSystem {
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
 	{
-		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::CHICKEN, mesh_path("player.obj"))
+		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::CHICKEN, mesh_path("chicken.obj")),
+		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::PLAYER, mesh_path("player.obj"))
 		  // specify meshes of other assets here
 	};
 
@@ -52,8 +53,12 @@ class RenderSystem {
 			textures_path("bug.png"),
 			textures_path("eagle.png"),
 			textures_path("enemydrink.png"), 
+			textures_path("battle_tutorial.png"),
+			textures_path("overworld_tutorial.png"),
+			textures_path("gameover_screen.png"),
 			textures_path("attackbutton.png"),
 			textures_path("itembutton.png"),
+			textures_path("restbutton.png"),
 			textures_path("minigamecup.png"),
 			textures_path("minigameinter.png"), 
 			textures_path("minigamesuccess.png"), 
@@ -62,6 +67,8 @@ class RenderSystem {
 			textures_path("fg.png"),
 			textures_path("fglight.png"),
 			textures_path("bg_battle.png"),
+			textures_path("spritesheet.png")
+
 	};
 
 	std::array<GLuint, effect_count> effects;

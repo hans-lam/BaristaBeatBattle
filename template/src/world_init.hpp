@@ -42,7 +42,8 @@ Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLi
 Entity createBackgroundBattle(RenderSystem* renderer, vec2 position);
 
 // a red line for debugging purposes
-Entity createLine(vec2 position, vec2 size);
+Entity createLine(vec2 position, vec2 size); 
+Entity createLine(vec2 position, vec2 scale, float angle);
 // a egg
 Entity createEgg(vec2 pos, vec2 size);
 
