@@ -49,7 +49,7 @@ struct MenuOption
 
 struct Menu
 {
-	Entity options[2] = {};
+	Entity options[3] = {};
 	Entity associated_character;
 	Entity activeOption;
 };

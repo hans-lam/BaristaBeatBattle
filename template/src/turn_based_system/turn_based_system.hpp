@@ -21,7 +21,9 @@ public:
 
 	void start_encounter();
 
-	void process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
+	int process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
+
+	Entity get_entity_given_character(Character* receiving_character);
 
 	bool all_allies_defeated();
 	bool all_enenmies_defeated();
