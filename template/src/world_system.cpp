@@ -120,8 +120,9 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str()); 
-	minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
+	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str());
+	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
+	//minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
@@ -132,7 +133,8 @@ GLFWwindow* WorldSystem::create_window() {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("turn_based.wav").c_str(),
-			audio_path("metronome.wav").c_str(),
+			audio_path("120bpmwithmetronome.wav").c_str(),
+			// audio_path("metronome.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
 			audio_path("chicken_eat.wav").c_str(), 
 			audio_path("attack.wav").c_str());
@@ -259,7 +261,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					if (!registry.renderRequests.has(rest)) {
 						registry.renderRequests.insert(
 							rest,
-							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
@@ -903,6 +905,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// start encounter
 	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
+		
+		// Justin: This is very bad code, I am using this function I wrote just to render the pokemon screen 
+		// Justin 40 minutes later: I had plans to put a temp screen but i went and did other parts of the project sorry
+		// createTutorialWindow
+		
 		if (stage == 1)
 			if (out_of_combat) {
 				

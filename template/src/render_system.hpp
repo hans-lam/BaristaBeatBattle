@@ -57,6 +57,7 @@ class RenderSystem {
 			textures_path("gameover_screen.png"),
 			textures_path("attackbutton.png"),
 			textures_path("itembutton.png"),
+			textures_path("restbutton.png"),
 			textures_path("minigamecup.png"),
 			textures_path("minigameinter.png"), 
 			textures_path("minigamesuccess.png"), 
