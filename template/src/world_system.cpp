@@ -437,7 +437,7 @@ void WorldSystem::restart_game() {
 	// create new background
 	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
 	
-	// create new foreground (and lights)
+	// create new foreground (with lights)
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT + (FG_HEIGHT / 2) }, false);
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
@@ -971,10 +971,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
-		if (action == GLFW_RELEASE)
+		if (action == GLFW_RELEASE && stage == 0) {
+			debugging.in_debug_mode = !debugging.in_debug_mode;
+		}
+		else {
 			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
+		}
 	}
 
 	// Control the current speed with `<` `>`

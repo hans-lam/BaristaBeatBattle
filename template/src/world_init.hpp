@@ -39,7 +39,8 @@ Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 // the foreground scoller(s)
 Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight);
 // a red line for debugging purposes
-Entity createLine(vec2 position, vec2 size);
+Entity createLine(vec2 position, vec2 size); 
+Entity createLine(vec2 position, vec2 scale, float angle);
 // a egg
 Entity createEgg(vec2 pos, vec2 size);
 

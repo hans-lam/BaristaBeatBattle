@@ -23,9 +23,9 @@ Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
 	registry.players.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN,
-			GEOMETRY_BUFFER_ID::CHICKEN });
+		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
 
 	return entity;
 }
@@ -308,6 +308,28 @@ Entity createLine(vec2 position, vec2 scale)
 	// Create motion
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = position;
+	motion.scale = scale;
+
+	registry.debugComponents.emplace(entity);
+	return entity;
+}
+
+Entity createLine(vec2 position, vec2 scale, float angle)
+{
+	Entity entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+		 EFFECT_ASSET_ID::EGG,
+		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+
+	// Create motion
+	Motion& motion = registry.motions.emplace(entity);
+	motion.angle = angle;
 	motion.velocity = { 0, 0 };
 	motion.position = position;
 	motion.scale = scale;
