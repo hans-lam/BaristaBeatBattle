@@ -25,7 +25,6 @@ void main()
 	// get tecture coordinates
 	tex_coords = vec2((in_position.x + 1.0) * 0.5, (in_position.y + 1.0) * 0.5); // scale [0,1]
     tex_coords.x = tex_coords.x * sprite_width + dx;
-	tex_coords = vec2(0.0, 0.0);
 
 	vpos = in_position.xy; // local coordinated before transform
 	vcolor = in_color;

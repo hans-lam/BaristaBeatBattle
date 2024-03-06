@@ -91,8 +91,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		GLint curr_frame_uloc = glGetUniformLocation(program, "curr_frame");
 
-
 		// determine whether idle, walking +x, -x, attacking
+		// fix this later
 		if (registry.attackTimers.has(entity)) {
 			glUniform1i(curr_frame_uloc, 1);	// attacking
 		}
@@ -114,16 +114,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		gl_has_errors();
 
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(TexturedVertex), (void *)0);
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_color_loc);
-		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(TexturedVertex), (void *)sizeof(vec3));
-		gl_has_errors();
-
 		// Enabling and binding texture to slot 0
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
@@ -135,6 +125,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		glUniform1i(glGetUniformLocation(program, "sprite_sheet"), 0);
 
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_color_loc);
+		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
 	}

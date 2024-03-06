@@ -24,8 +24,8 @@ Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
 
 	return entity;
 }
