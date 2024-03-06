@@ -435,7 +435,7 @@ void WorldSystem::restart_game() {
 	// create new background
 	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
 	
-	// create new foreground (and lights)
+	// create new foreground (with lights)
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT + (FG_HEIGHT / 2) }, false);
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
