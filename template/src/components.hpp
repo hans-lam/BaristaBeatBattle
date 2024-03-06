@@ -38,7 +38,7 @@ struct MenuOption
 struct Menu
 {
 	Entity options[2] = {};
-	Entity assoicated_character;
+	Entity associated_character;
 	Entity activeOption;
 };
 
