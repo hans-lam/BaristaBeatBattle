@@ -65,7 +65,3 @@ Ability* Character::get_ability_by_name(std::string name) {
 CharacterStatSheet* Character::get_character_stat_sheet() {
 	return this->stats;
 }
-
-
-
-

@@ -9,6 +9,7 @@
 #include <array>
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
+#include <chrono>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -16,6 +17,12 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+
+bool tutorialOn = false;
+Entity tutorial;
+std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
+int frames_since_prev_second = 0;
+int fps = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -149,13 +156,29 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
+	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
+	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
+	frames_since_prev_second++;
+
+	if (elapsed_seconds.count() >= 0.5f) {
+		fps = frames_since_prev_second;
+		frames_since_prev_second = 0;
+		last_frame_time = current_time;
+	}
+
 	std::stringstream title_ss;
+
+	title_ss << "FPS: " << fps << " | ";
+	
+	/*
 	if (stage == 0)
 		title_ss << "OVERWORLD: Hit A to attack";
 	else if (stage == 1)
 		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
 	else if (stage == 2)
 		title_ss << "MINIGAME: Hit M again to go back to turn-based";
+	*/
+	
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
@@ -220,8 +243,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Menu& menu = registry.menu.get(menu_entity);
 				Entity attack = menu.options[0];
 				Entity rest = menu.options[1];
+				Entity pourIt = menu.options[2];
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
+				MenuOption& prt = registry.menuOptions.get(pourIt);
 
 				if (menu.associated_character == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
@@ -238,6 +263,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
+					if (!registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.insert(
+							pourIt,
+							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							EFFECT_ASSET_ID::TEXTURED,
+							GEOMETRY_BUFFER_ID::SPRITE });
+					}
+
 				}
 				else {
 					if (registry.renderRequests.has(attack)) {
@@ -245,6 +278,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					}
 					if (registry.renderRequests.has(rest)) {
 						registry.renderRequests.remove(rest);
+					}
+					if (registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.remove(pourIt);
 					}
 				}
 
@@ -602,11 +638,25 @@ void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) 
 	if (!out_of_combat) {
 		Mix_PlayChannel(-1, attack_sound, 0);
 
-		Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-		Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
+		Character* target;
 
-		turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { enemy_target });
+		if (ability == "rest") {
+			target = registry.characterDatas.get(active_char_entity).characterData;
+		}
+		else {
+			Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
+			target = registry.characterDatas.get(enemy_target_entity).characterData;
+		}
+
+
+		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
+
+		if (is_game_over != 0) {
+			restart_game();
+		}
 	}
+
+
 }
 
 void WorldSystem::handle_selection() {
@@ -628,7 +678,14 @@ void WorldSystem::handle_selection() {
 					// TODO USE REST ABILITY
 
 					// set stage to 2, which is mini-game mapping
-					if (stage != 2) {
+
+					handle_attack(active_char_entity, "rest");
+					
+				}
+				else if (opComponent.option == "pour it") {
+					handle_mini(120);
+
+					if (stage == 1) {
 						change_stage(2);
 					}
 				}
@@ -754,6 +811,44 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
+	motion.angle = 0.f; 
+	motion.velocity = { 0.f, 0.f }; 
+
+	if (window == 1) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else if (window == 2) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::BATTLEBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	}
+	
+	return entity;
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// handle movement
@@ -766,6 +861,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				handle_menu(key, turn_based);
 			}
 		}
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+
+		if (tutorialOn == false) {
+			if (stage == 0) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
+				tutorialOn = true;
+			}
+			else if (stage == 1) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+				tutorialOn = true;
+			}
+
+		}
+		else if (tutorialOn == true) {
+			registry.renderRequests.remove(tutorial);
+			tutorialOn = false;
+		}
+
 	}
 
 	// player attack
@@ -791,7 +906,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (stage == 1)
 			if (out_of_combat) {
 				
-
 				// enemies are created and added to turnBasedEnemy ecs
 				character_factory.construct_enemy(1);
 				character_factory.construct_enemy(2);
@@ -850,10 +964,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
-		if (action == GLFW_RELEASE)
+		if (action == GLFW_RELEASE && stage == 0) {
+			debugging.in_debug_mode = !debugging.in_debug_mode;
+		}
+		else {
 			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
+		}
 	}
 
 	// Control the current speed with `<` `>`

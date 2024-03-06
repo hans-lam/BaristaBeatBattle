@@ -105,7 +105,7 @@ Entity CharacterFactory::construct_americano() {
 
 Entity CharacterFactory::construct_enemy(int level) {
 	std::string name = "Enemy " + std::to_string(level);
-	unsigned int enemy_max_health = 5 * level;
+	unsigned int enemy_max_health = 30 * level;
 	unsigned int enemy_strength = 1 * level;
 	unsigned int enemy_magic = 1 * level;
 	unsigned int enemy_defense = 1 * level;

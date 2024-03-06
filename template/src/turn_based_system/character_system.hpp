@@ -40,3 +40,17 @@ private:
 
 	int current_health_points;
 };	
+
+
+//Entity get_entity_given_character(Character* char_data) {
+//
+//	for (int i = 0; i < registry.characterDatas.size(); i++) {
+//
+//		if (registry.characterDatas.components.at(i).characterData == char_data) {
+//			return registry.characterDatas.entities.at(i);
+//		}
+//
+//	}
+//
+//	return emptyEntity;
+//}

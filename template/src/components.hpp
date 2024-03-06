@@ -49,7 +49,7 @@ struct MenuOption
 
 struct Menu
 {
-	Entity options[2] = {};
+	Entity options[3] = {};
 	Entity associated_character;
 	Entity activeOption;
 };
@@ -186,7 +186,11 @@ enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
 	ENEMYDRINK = EAGLE + 1,
-	ATTACKBUTTON = ENEMYDRINK + 1,
+
+	BATTLEBOARD = ENEMYDRINK + 1,
+	TUTORIALBOARD = BATTLEBOARD + 1,
+	GAMEOVERBOARD = TUTORIALBOARD + 1,
+	ATTACKBUTTON = GAMEOVERBOARD + 1,
 	ITEMBUTTON = ATTACKBUTTON + 1,
 	MINIGAMECUP = ITEMBUTTON + 1,
 	MINIGAMEINTER = MINIGAMECUP + 1,
