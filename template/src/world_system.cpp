@@ -190,6 +190,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
 
+	
+
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
 	// (the containers exchange the last element with the current)
@@ -789,12 +791,15 @@ void WorldSystem::change_stage(int level) {
 			registry.remove_all_components_of(entity);
 		}
 		// Replace all previous entities from render requests
+
 		for (Entity entity : registry.motions.entities) {
 			if (registry.renderRequests.has(entity)) {
 				RenderRequest& render = registry.renderRequests.get(entity);
 				render.shown = true;
 			}
 		}
+		
+		
 	}
 	else if (level == 2) {
 		stage = 2;
@@ -912,7 +917,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		
 		if (stage == 1)
 			if (out_of_combat) {
-				
+				//render battle background
+				createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
+
 				// enemies are created and added to turnBasedEnemy ecs
 				character_factory.construct_enemy(1);
 				character_factory.construct_enemy(2);
