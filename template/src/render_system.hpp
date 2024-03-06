@@ -60,7 +60,8 @@ class RenderSystem {
 			textures_path("minigamefail.png"),
 			textures_path("bg.png"),
 			textures_path("fg.png"),
-			textures_path("fglight.png")
+			textures_path("fglight.png"),
+			textures_path("bg_battle.png"),
 	};
 
 	std::array<GLuint, effect_count> effects;

@@ -38,6 +38,9 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, En
 Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 // the foreground scoller(s)
 Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight);
+// minigame background 
+Entity createBackgroundBattle(RenderSystem* renderer, vec2 position);
+
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 // a egg
