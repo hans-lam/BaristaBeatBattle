@@ -18,9 +18,9 @@
 #include <iostream>
 #include <sstream>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+
 #include <map>
+#include "../ext/freetype/include/freetype/freetype.h"
 
 const char* fontVertexShaderSource =
 "#version 330 core\n"
