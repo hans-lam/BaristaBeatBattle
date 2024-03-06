@@ -647,7 +647,7 @@ void WorldSystem::handle_mini(int bpm) {
 			std::cout << "YOU HIT IT late" << '\n';
 		}
 		else {
-			std::cout << "YOU FUCKED IT" << '\n';
+			std::cout << "YOU MISSED IT" << '\n';
 			break;
 		}
 
