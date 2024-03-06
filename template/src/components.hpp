@@ -23,8 +23,14 @@ struct Eatable
 
 };
 
-// Scerolling background
+// Scrolling background
 struct Background
+{
+
+};
+
+// Scrolling foreground
+struct Foreground
 {
 
 };
@@ -187,7 +193,9 @@ enum class TEXTURE_ASSET_ID {
 	MINIGAMESUCCESS = MINIGAMEINTER + 1,
 	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
 	BGSCROLL = MINIGAMEFAIL + 1,
-	TEXTURE_COUNT = BGSCROLL + 1
+	FGSCROLL = BGSCROLL + 1,
+	FGLIGHT = FGSCROLL + 1,
+	TEXTURE_COUNT = FGLIGHT + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -197,7 +205,10 @@ enum class EFFECT_ASSET_ID {
 	CHICKEN = EGG + 1,
 	TEXTURED = CHICKEN + 1,
 	WIND = TEXTURED + 1,
-	EFFECT_COUNT = WIND + 1
+	BACKGROUND = WIND + 1,
+	FOREGROUND = BACKGROUND + 1,
+	LIGHTS = FOREGROUND + 1,
+	EFFECT_COUNT = LIGHTS + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

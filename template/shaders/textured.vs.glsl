@@ -17,7 +17,7 @@ void main()
 	texcoord = in_texcoord;
 
 	// temporarily turned the wind off
-    float displacement = 0; //0.3 * sin(time * 0.5);
+    float displacement = 0; // 0.3 * sin(time * 0.5);
     
     vec3 displacedPosition = in_position + vec3(0.0, displacement, 0.0);
 	vec3 pos = projection * transform * vec3(displacedPosition.xy, 1.0);

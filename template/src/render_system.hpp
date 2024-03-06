@@ -58,7 +58,9 @@ class RenderSystem {
 			textures_path("minigameinter.png"), 
 			textures_path("minigamesuccess.png"), 
 			textures_path("minigamefail.png"),
-			textures_path("bg.png")
+			textures_path("bg.png"),
+			textures_path("fg.png"),
+			textures_path("fglight.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -68,7 +70,11 @@ class RenderSystem {
 		shader_path("egg"),
 		shader_path("chicken"),
 		shader_path("textured"),
-		shader_path("wind") };
+		shader_path("wind"),
+		shader_path("background"),
+		shader_path("foreground"),
+		shader_path("lights"),
+	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;

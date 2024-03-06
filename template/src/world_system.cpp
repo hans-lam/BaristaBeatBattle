@@ -171,7 +171,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
 	    Motion& motion = motions_registry.components[i];
 		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player
+			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
@@ -393,6 +393,10 @@ void WorldSystem::restart_game() {
 
 	// create new background
 	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
+	
+	// create new foreground (and lights)
+	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT + (FG_HEIGHT / 2) }, false);
+	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
@@ -424,6 +428,10 @@ void WorldSystem::handle_collisions() {
 					// remove all overworld bgs
 					for (uint i = 0; i < registry.backgrounds.entities.size(); i++) {
 						registry.remove_all_components_of(registry.backgrounds.entities[i]);
+					}
+
+					for (Entity foregrounds : registry.foregrounds.entities) {
+						registry.remove_all_components_of(foregrounds);
 					}
 
 					// We also need to kill all other eagles

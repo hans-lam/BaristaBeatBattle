@@ -7,6 +7,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+// stlib
+#include <iostream>
+#include <sstream>
+
 
 void RenderSystem::drawTexturedMesh(Entity entity,
 									const mat3 &projection)
@@ -95,16 +99,56 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 							  sizeof(ColoredVertex), (void *)sizeof(vec3));
 		gl_has_errors();
 
-		if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
-		{
-			// Light up?
-			GLint light_up_uloc = glGetUniformLocation(program, "light_up");
-			assert(light_up_uloc >= 0);
+		//if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
+		//{
+		//	// Light up?
+		//	GLint light_up_uloc = glGetUniformLocation(program, "light_up");
+		//	assert(light_up_uloc >= 0);
 
-			// !!! TODO A1: set the light_up shader variable using glUniform1i,
-			// similar to the glUniform1f call below. The 1f or 1i specified the type, here a single int.
-			gl_has_errors();
-		}
+		//	// !!! TODO A1: set the light_up shader variable using glUniform1i,
+		//	// similar to the glUniform1f call below. The 1f or 1i specified the type, here a single int.
+		//	gl_has_errors();
+		//}
+
+
+	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::BACKGROUND || render_request.used_effect == EFFECT_ASSET_ID::FOREGROUND ||
+		render_request.used_effect == EFFECT_ASSET_ID::LIGHTS) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+
+		GLint player_pos_uloc = glGetUniformLocation(program, "player_pos");
+		float rel_x = (registry.motions.get(registry.players.entities[0]).position.x - (window_width_px/2.f));
+		//std::cout << "curr pos" << rel_x << std::endl;
+
+		glUniform1f(player_pos_uloc, rel_x); // -registry.motions.get(registry.players.entities[0]).velocity.x / 3.f);
+
+		//glGenVertexArrays(1, &dummy_VAO);
+		glBindVertexArray(dummy_VAO);
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(
+			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+			(void*)sizeof(
+				vec3)); // note the stride to skip the preceeding vertex position
+
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id =
+			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
 	}
 	else
 	{

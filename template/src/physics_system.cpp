@@ -44,9 +44,6 @@ void PhysicsSystem::step(float elapsed_ms)
 			// need to make a variable for the player size once mesh is done
 			if (x_pos <= 20.0 || x_pos >= window_width_px - 20.0) motion.velocity.x = 0.f;
 			if (y_pos <= BG_HEIGHT || y_pos >= window_height_px - 20.0) motion.velocity.y = 0.f;
-			for (uint j = 0; j < registry.backgrounds.components.size(); j++) {
-				motion_registry.components[j].velocity.x = -motion.velocity.x / 3.f;
-			}
 		}
 
 		if (registry.enemyDrinks.has(entity)) {

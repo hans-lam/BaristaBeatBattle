@@ -236,8 +236,48 @@ Entity createBackgroundScroller(RenderSystem* renderer, vec2 position) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGSCROLL,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BACKGROUND,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.foregrounds.emplace(entity);
+
+	if (isLight) {
+		// scale the background
+		motion.scale = vec2({ BG_WIDTH, BG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGLIGHT,
+			 EFFECT_ASSET_ID::LIGHTS,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	else {
+		// scale the background
+		motion.scale = vec2({ FG_WIDTH, FG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGSCROLL,
+			 EFFECT_ASSET_ID::FOREGROUND,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	
+	
 
 	return entity;
 }

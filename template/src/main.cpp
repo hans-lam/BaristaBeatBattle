@@ -72,7 +72,8 @@ int main()
 		else {
 			renderer.draw();
 			// DOES NOT WORK!!! heck if i know why
-			//renderer.renderText("test", -0.6f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
+
+			//renderer.renderText("HELOOOOO", 200.f, 200.f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
 
 		}
 	}
