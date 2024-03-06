@@ -109,7 +109,15 @@ void TurnBasedSystem::start_encounter() {
 	out_of_combat = false;
 }
 
-void TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
+/*
+
+0 = normal return state
+1 = allies win
+2 = enemies win
+
+*/
+
+int TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
 
 	std::cout << "Current Character: " << caller->get_name() << '\n';
 		
@@ -121,7 +129,11 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 			ability->process_ability(caller, receiving_character);
 
 			if (receiving_character->is_dead()) {
-				process_death(emptyEntity);
+
+				
+				process_death(get_entity_given_character(receiving_character));
+				
+
 			}
 
 		}
@@ -129,9 +141,6 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 	else {
 		std::cout << caller->get_name() << " Missed!" << '\n';
 	}
-
-	//TurnCounter* turn_counter = registry.turnCounter.get(active_character);
-	//turn_counter->placement -= 100;
 
 	active_character = emptyEntity;
 	waiting_for_player = false;
@@ -141,16 +150,22 @@ void TurnBasedSystem::process_character_action(Ability* ability, Character* call
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
 
-		// TODO TRANSITION TO OVERWORLD WITH FIGHT GREYED OUT
+		
+		return 2;
+
 	}
 
 	if (all_enenmies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You won the fight!!");
 		
-		// TODO TRANSTION TO OVERWORLD AND PLAYER HAS TO DO FIGHT AGAIN
+		return 1;
 	}
+
+	return 0;
 }
+
+
 
 
 bool TurnBasedSystem::all_allies_defeated() {
@@ -178,9 +193,26 @@ bool TurnBasedSystem::all_enenmies_defeated() {
 void TurnBasedSystem::process_death(Entity o7)
 {
 
+	if (registry.turnBasedEnemies.has(o7)) {
+		registry.turnBasedEnemies.remove(o7);
+	}
+
 	registry.turnCounter.remove(o7);
 
 
+}
+
+Entity TurnBasedSystem::get_entity_given_character(Character* receiving_character)
+{
+
+	for (int i = 0; i < registry.characterDatas.size(); i++) {
+
+		if (registry.characterDatas.components.at(i).characterData == receiving_character) {
+			return registry.characterDatas.entities.at(i);
+		}
+
+	}
+	return emptyEntity;
 }
 
 

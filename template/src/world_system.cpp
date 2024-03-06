@@ -220,8 +220,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Menu& menu = registry.menu.get(menu_entity);
 				Entity attack = menu.options[0];
 				Entity rest = menu.options[1];
+				Entity pourIt = menu.options[2];
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
+				MenuOption& prt = registry.menuOptions.get(pourIt);
 
 				if (menu.associated_character == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
@@ -238,6 +240,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
+					if (!registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.insert(
+							pourIt,
+							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							EFFECT_ASSET_ID::TEXTURED,
+							GEOMETRY_BUFFER_ID::SPRITE });
+					}
+
 				}
 				else {
 					if (registry.renderRequests.has(attack)) {
@@ -245,6 +255,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					}
 					if (registry.renderRequests.has(rest)) {
 						registry.renderRequests.remove(rest);
+					}
+					if (registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.remove(pourIt);
 					}
 				}
 
@@ -586,11 +599,25 @@ void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) 
 	if (!out_of_combat) {
 		Mix_PlayChannel(-1, attack_sound, 0);
 
-		Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-		Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
+		Character* target;
 
-		turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { enemy_target });
+		if (ability == "rest") {
+			target = registry.characterDatas.get(active_char_entity).characterData;
+		}
+		else {
+			Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
+			target = registry.characterDatas.get(enemy_target_entity).characterData;
+		}
+
+
+		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
+
+		if (is_game_over != 0) {
+			restart_game();
+		}
 	}
+
+
 }
 
 void WorldSystem::handle_selection() {
@@ -612,7 +639,14 @@ void WorldSystem::handle_selection() {
 					// TODO USE REST ABILITY
 
 					// set stage to 2, which is mini-game mapping
-					if (stage != 2) {
+
+					handle_attack(active_char_entity, "rest");
+					
+				}
+				else if (opComponent.option == "pour it") {
+					handle_mini(120);
+
+					if (stage == 1) {
 						change_stage(2);
 					}
 				}
@@ -775,7 +809,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (stage == 1)
 			if (out_of_combat) {
 				
-
 				// enemies are created and added to turnBasedEnemy ecs
 				character_factory.construct_enemy(1);
 				character_factory.construct_enemy(2);

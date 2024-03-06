@@ -175,30 +175,42 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 	auto menuEnt = Entity();
 	auto attack = Entity();
 	auto rest = Entity();
+	auto pourIt = Entity();
 
 	// Store a reference to the potentially re-used mesh object
 	Mesh& atkMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(attack, &atkMesh);
 	Mesh& restMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(rest, &restMesh);
+	Mesh& pourItMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(pourIt, &pourItMesh);
 
+	MenuOption& pourItOp = registry.menuOptions.emplace(pourIt);
+	registry.colors.insert(pourIt, { 1, 0.8f, 0.8f });
+	pourItOp.option = "pour it";
 	MenuOption& attackOp = registry.menuOptions.emplace(attack); 
 	registry.colors.insert(attack, { 1, 0.8f, 0.8f });
 	attackOp.option = "attack";
 	MenuOption& restOp = registry.menuOptions.emplace(rest);
 	registry.colors.insert(rest, { 1, 0.8f, 0.8f });
 	restOp.option = "rest";
-
+	
 	Menu& menu = registry.menu.emplace(menuEnt);
-	//menu.currentPlayer = nullptr;
 	menu.options[0] = attack;
 	menu.options[1] = rest;
+	menu.options[2] = pourIt;
 	menu.activeOption = attack;
 
 	menu.associated_character = associated_character;
 
 	vec2 menuPos = pos;
 	// Initialize the position, scale, and physics components
+	auto& pourItMotion = registry.motions.emplace(pourIt);
+	pourItMotion.angle = 0.f;
+	pourItMotion.velocity = { 0, 0 };
+	pourItMotion.position = { menuPos.x, menuPos.y - 108.f };
+	pourItMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
 	auto& atkMotion = registry.motions.emplace(attack);
 	atkMotion.angle = 0.f;
 	atkMotion.velocity = { 0, 0 };
