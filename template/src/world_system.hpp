@@ -65,6 +65,9 @@ private:
 	// change stage 
 	void change_stage(int level);
 
+	// handle attack for turn-based
+	void handle_attack(Entity active_char_entity, std::string ability);
+
 	// OpenGL window handle
 	GLFWwindow* window;
 

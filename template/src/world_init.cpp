@@ -170,35 +170,47 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, En
 	return entity;
 }
 
-Entity createMenu(RenderSystem* renderer, vec2 pos, Entity assoicated_character)
+Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 {
 	auto menuEnt = Entity();
 	auto attack = Entity();
 	auto rest = Entity();
+	auto pourIt = Entity();
 
 	// Store a reference to the potentially re-used mesh object
 	Mesh& atkMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(attack, &atkMesh);
 	Mesh& restMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(rest, &restMesh);
+	Mesh& pourItMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(pourIt, &pourItMesh);
 
+	MenuOption& pourItOp = registry.menuOptions.emplace(pourIt);
+	registry.colors.insert(pourIt, { 1, 0.8f, 0.8f });
+	pourItOp.option = "pour it";
 	MenuOption& attackOp = registry.menuOptions.emplace(attack); 
 	registry.colors.insert(attack, { 1, 0.8f, 0.8f });
 	attackOp.option = "attack";
 	MenuOption& restOp = registry.menuOptions.emplace(rest);
 	registry.colors.insert(rest, { 1, 0.8f, 0.8f });
 	restOp.option = "rest";
-
+	
 	Menu& menu = registry.menu.emplace(menuEnt);
-	//menu.currentPlayer = nullptr;
 	menu.options[0] = attack;
 	menu.options[1] = rest;
+	menu.options[2] = pourIt;
 	menu.activeOption = attack;
 
-	menu.assoicated_character = assoicated_character;
+	menu.associated_character = associated_character;
 
 	vec2 menuPos = pos;
 	// Initialize the position, scale, and physics components
+	auto& pourItMotion = registry.motions.emplace(pourIt);
+	pourItMotion.angle = 0.f;
+	pourItMotion.velocity = { 0, 0 };
+	pourItMotion.position = { menuPos.x, menuPos.y - 108.f };
+	pourItMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
 	auto& atkMotion = registry.motions.emplace(attack);
 	atkMotion.angle = 0.f;
 	atkMotion.velocity = { 0, 0 };
@@ -213,6 +225,73 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity assoicated_character)
 	restMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
 	return menuEnt;
+}
+
+Entity createBackgroundScroller(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// scale the background
+	motion.scale = vec2({ BG_WIDTH, BG_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.backgrounds.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::BGSCROLL,
+		 EFFECT_ASSET_ID::BACKGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.foregrounds.emplace(entity);
+
+	if (isLight) {
+		// scale the background
+		motion.scale = vec2({ BG_WIDTH, BG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGLIGHT,
+			 EFFECT_ASSET_ID::LIGHTS,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	else {
+		// scale the background
+		motion.scale = vec2({ FG_WIDTH, FG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGSCROLL,
+			 EFFECT_ASSET_ID::FOREGROUND,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	
+	
+
+	return entity;
 }
 
 Entity createLine(vec2 position, vec2 scale)

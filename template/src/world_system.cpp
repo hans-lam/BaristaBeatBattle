@@ -171,7 +171,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
 	    Motion& motion = motions_registry.components[i];
 		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
+			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
 				registry.remove_all_components_of(motions_registry.entities[i]);
 		}
 	}
@@ -187,7 +187,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// TODO: make negative velocity possible
 				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
 				// TODO: fix to spawn from only the edges
-				vec2(uniform_dist(rng) * (window_width_px - 100.f), uniform_dist(rng) * (window_height_px - 100.f)));
+				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
 		}
 	}
 
@@ -220,10 +220,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Menu& menu = registry.menu.get(menu_entity);
 				Entity attack = menu.options[0];
 				Entity rest = menu.options[1];
+				Entity pourIt = menu.options[2];
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
+				MenuOption& prt = registry.menuOptions.get(pourIt);
 
-				if (menu.assoicated_character == active_char_entity) {
+				if (menu.associated_character == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
 						registry.renderRequests.insert(
 							attack,
@@ -238,6 +240,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 							EFFECT_ASSET_ID::TEXTURED,
 							GEOMETRY_BUFFER_ID::SPRITE });
 					}
+					if (!registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.insert(
+							pourIt,
+							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+							EFFECT_ASSET_ID::TEXTURED,
+							GEOMETRY_BUFFER_ID::SPRITE });
+					}
+
 				}
 				else {
 					if (registry.renderRequests.has(attack)) {
@@ -245,6 +255,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					}
 					if (registry.renderRequests.has(rest)) {
 						registry.renderRequests.remove(rest);
+					}
+					if (registry.renderRequests.has(pourIt)) {
+						registry.renderRequests.remove(pourIt);
 					}
 				}
 
@@ -346,6 +359,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 				registry.remove_all_components_of(entity);
 				ended = true;
+
+				// Assign score to ability 
+				Entity active_char_entity = turn_based->get_active_character(); 
+				// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
+				handle_attack(active_char_entity, "Basic Attack");
 			}
 		}
 
@@ -386,14 +404,21 @@ void WorldSystem::restart_game() {
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
+		registry.remove_all_components_of(registry.motions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+	// create new background
+	createBackgroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 });
+	
+	// create new foreground (and lights)
+	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT + (FG_HEIGHT / 2) }, false);
+	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
+
 	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
-	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
+	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
+	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
 }
 
 // Compute collisions between entities
@@ -417,6 +442,15 @@ void WorldSystem::handle_collisions() {
 
 					// potential problem: if we don't remove the enemy it might keep colliding and screaming
 					registry.remove_all_components_of(entity_other);
+
+					// remove all overworld bgs
+					for (uint i = 0; i < registry.backgrounds.entities.size(); i++) {
+						registry.remove_all_components_of(registry.backgrounds.entities[i]);
+					}
+
+					for (Entity foregrounds : registry.foregrounds.entities) {
+						registry.remove_all_components_of(foregrounds);
+					}
 
 					// We also need to kill all other eagles
 					for (Entity enemies : registry.enemyDrinks.entities) {
@@ -550,7 +584,7 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 				}
 			}
 		
-			if (menu.assoicated_character == active_char_entity) {
+			if (menu.associated_character == active_char_entity) {
 				if (key == GLFW_KEY_UP) {
 					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
@@ -575,36 +609,60 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 	}
 }
 
+void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) {
+	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
+
+	if (!out_of_combat) {
+		Mix_PlayChannel(-1, attack_sound, 0);
+
+		Character* target;
+
+		if (ability == "rest") {
+			target = registry.characterDatas.get(active_char_entity).characterData;
+		}
+		else {
+			Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
+			target = registry.characterDatas.get(enemy_target_entity).characterData;
+		}
+
+
+		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
+
+		if (is_game_over != 0) {
+			restart_game();
+		}
+	}
+
+
+}
+
 void WorldSystem::handle_selection() {
 	Entity active_char_entity = turn_based->get_active_character();
 	if (active_char_entity != emptyEntity) {
-
-		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
 		// Get active option
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
+
 			// found correct menu
-			if (menu_entity == active_char_entity) {
+			if (menu.associated_character == active_char_entity) {
 				Entity correctOption = menu.activeOption; 
 				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
 
 				if (opComponent.option == "attack") {
-					if (!out_of_combat) {
-						Mix_PlayChannel(-1, attack_sound, 0);
-
-						Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-						Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
-
-						turn_based->process_character_action(active_char->get_ability_by_name("Basic Attack"), active_char, {enemy_target});
-					}
+					handle_attack(active_char_entity, "Basic Attack");
 				}
 				else if (opComponent.option == "rest") {
-
 					// TODO USE REST ABILITY
 
 					// set stage to 2, which is mini-game mapping
-					if (stage != 2) {
+
+					handle_attack(active_char_entity, "rest");
+					
+				}
+				else if (opComponent.option == "pour it") {
+					handle_mini(120);
+
+					if (stage == 1) {
 						change_stage(2);
 					}
 				}
@@ -639,7 +697,7 @@ void WorldSystem::handle_mini(int bpm) {
 			std::cout << "YOU HIT IT late" << '\n';
 		}
 		else {
-			std::cout << "YOU FUCKED IT" << '\n';
+			std::cout << "Not quite my tempo." << '\n';
 			break;
 		}
 
@@ -767,7 +825,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (stage == 1)
 			if (out_of_combat) {
 				
-
 				// enemies are created and added to turnBasedEnemy ecs
 				character_factory.construct_enemy(1);
 				character_factory.construct_enemy(2);

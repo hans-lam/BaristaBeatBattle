@@ -38,13 +38,19 @@ int main()
 	renderer.init(window);
 	turn_based.init(&ai_system);
 	world.init(&renderer, &turn_based);
-	
+
+	// setup fonts 
+	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+	unsigned int font_default_size = 48;
+	renderer.fontInit(font_filename, font_default_size);
+
 
 	// variable timestep loop
 	auto t = Clock::now();
 	while (!world.is_over()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
+		renderer.renderText("test", -0.6f, 0.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
@@ -62,9 +68,14 @@ int main()
 		}
 		else if (world.get_stage() == 1) {
 			renderer.drawTurn();
+			
 		}
 		else {
 			renderer.draw();
+			// DOES NOT WORK!!! heck if i know why
+
+			//renderer.renderText("HELOOOOO", 200.f, 200.f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f));
+
 		}
 	}
 

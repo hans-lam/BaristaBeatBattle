@@ -18,6 +18,11 @@
 #include <glm/mat3x3.hpp>           // mat3
 using namespace glm;
 
+// fonts
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <map>
+
 #include "tiny_ecs.hpp"
 
 // Simple utility functions to avoid mistyping directory name
