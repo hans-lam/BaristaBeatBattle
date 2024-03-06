@@ -14,8 +14,11 @@ layout(location = 0) out vec4 color;
 
 void main()
 {
-	color = vec4(fcolor * vcolor, 1.0);
-	//color = texture(sprite_sheet, tex_coords);
+	//color = vec4(fcolor * vcolor, 1.0);
+	
+	color = texture(sprite_sheet, tex_coords);
+	color.xyz *= vcolor;
+	color.xyz /= vcolor;
 
 }
 

@@ -27,7 +27,9 @@ void main()
     tex_coords.x = tex_coords.x * sprite_width + dx;
 
 	vpos = in_position.xy; // local coordinated before transform
-	vcolor = in_color;
+
+	vcolor = in_color * 3.0;
+
 	vec3 pos = projection * transform * vec3(in_position.xy, 1.0); // why not simply *in_position.xyz ?
 	gl_Position = vec4(pos.xy, in_position.z, 1.0);
 }

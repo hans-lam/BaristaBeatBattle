@@ -107,6 +107,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			else if (player_velocity.x < 0.f) {
 				glUniform1i(curr_frame_uloc, 6);	// moving left
 			}
+			else if (player_velocity.y > 0.f) {
+				glUniform1i(curr_frame_uloc, 2);	// moving left
+			}
+			else if (player_velocity.y < 0.f) {
+				glUniform1i(curr_frame_uloc, 8);	// moving left
+			}
 			else {
 				glUniform1i(curr_frame_uloc, 0);	// idle
 			}
@@ -129,12 +135,13 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		glEnableVertexAttribArray(in_position_loc);
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-			sizeof(TexturedVertex), (void*)0);
+			sizeof(ColoredVertex), (void*)0);
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_color_loc);
 		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-			sizeof(TexturedVertex), (void*)sizeof(vec3));
+			sizeof(ColoredVertex), (void*)sizeof(vec3));
+		assert(in_color_loc > -1);
 		gl_has_errors();
 
 	}
