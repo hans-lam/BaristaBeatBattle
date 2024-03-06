@@ -170,7 +170,7 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, En
 	return entity;
 }
 
-Entity createMenu(RenderSystem* renderer, vec2 pos, Entity assoicated_character)
+Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 {
 	auto menuEnt = Entity();
 	auto attack = Entity();
@@ -195,7 +195,7 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity assoicated_character)
 	menu.options[1] = rest;
 	menu.activeOption = attack;
 
-	menu.assoicated_character = assoicated_character;
+	menu.associated_character = associated_character;
 
 	vec2 menuPos = pos;
 	// Initialize the position, scale, and physics components

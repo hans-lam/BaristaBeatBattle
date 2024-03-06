@@ -223,7 +223,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				MenuOption& atk = registry.menuOptions.get(attack);
 				MenuOption& rst = registry.menuOptions.get(rest);
 
-				if (menu.assoicated_character == active_char_entity) {
+				if (menu.associated_character == active_char_entity) {
 					if (!registry.renderRequests.has(attack)) {
 						registry.renderRequests.insert(
 							attack,
@@ -346,6 +346,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 				registry.remove_all_components_of(entity);
 				ended = true;
+
+				// Assign score to ability 
+				Entity active_char_entity = turn_based->get_active_character(); 
+				// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
+				handle_attack(active_char_entity, "Basic Attack");
 			}
 		}
 
@@ -566,7 +571,7 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 				}
 			}
 		
-			if (menu.assoicated_character == active_char_entity) {
+			if (menu.associated_character == active_char_entity) {
 				if (key == GLFW_KEY_UP) {
 					Mix_PlayChannel(-1, change_selection_effect, 0); 
 					if (index > 0) {
@@ -591,32 +596,35 @@ void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
 	}
 }
 
+void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) {
+	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
+
+	if (!out_of_combat) {
+		Mix_PlayChannel(-1, attack_sound, 0);
+
+		Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
+		Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
+
+		turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { enemy_target });
+	}
+}
+
 void WorldSystem::handle_selection() {
 	Entity active_char_entity = turn_based->get_active_character();
 	if (active_char_entity != emptyEntity) {
-
-		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
 		// Get active option
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
+
 			// found correct menu
-			if (menu_entity == active_char_entity) {
+			if (menu.associated_character == active_char_entity) {
 				Entity correctOption = menu.activeOption; 
 				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
 
 				if (opComponent.option == "attack") {
-					if (!out_of_combat) {
-						Mix_PlayChannel(-1, attack_sound, 0);
-
-						Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-						Character* enemy_target = registry.characterDatas.get(enemy_target_entity).characterData;
-
-						turn_based->process_character_action(active_char->get_ability_by_name("Basic Attack"), active_char, {enemy_target});
-					}
+					handle_attack(active_char_entity, "Basic Attack");
 				}
 				else if (opComponent.option == "rest") {
-
 					// TODO USE REST ABILITY
 
 					// set stage to 2, which is mini-game mapping
@@ -655,7 +663,7 @@ void WorldSystem::handle_mini(int bpm) {
 			std::cout << "YOU HIT IT late" << '\n';
 		}
 		else {
-			std::cout << "YOU MISSED IT" << '\n';
+			std::cout << "Not quite my tempo." << '\n';
 			break;
 		}
 
