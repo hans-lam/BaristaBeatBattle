@@ -17,6 +17,9 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+
+bool tutorialOn = false;
+Entity tutorial;
 std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
 int frames_since_prev_second = 0;
 int fps = 0;
@@ -808,6 +811,44 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
+	motion.angle = 0.f; 
+	motion.velocity = { 0.f, 0.f }; 
+
+	if (window == 1) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else if (window == 2) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::BATTLEBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	} else {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
+			  EFFECT_ASSET_ID::TEXTURED,
+			  GEOMETRY_BUFFER_ID::SPRITE });
+
+	}
+	
+	return entity;
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// handle movement
@@ -820,6 +861,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				handle_menu(key, turn_based);
 			}
 		}
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+
+		if (tutorialOn == false) {
+			if (stage == 0) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
+				tutorialOn = true;
+			}
+			else if (stage == 1) {
+				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+				tutorialOn = true;
+			}
+
+		}
+		else if (tutorialOn == true) {
+			registry.renderRequests.remove(tutorial);
+			tutorialOn = false;
+		}
+
 	}
 
 	// player attack

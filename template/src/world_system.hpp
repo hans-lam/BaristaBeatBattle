@@ -24,6 +24,7 @@ public:
 	// Creates a window
 	GLFWwindow* create_window();
 
+
 	// starts the game
 	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg);
 
