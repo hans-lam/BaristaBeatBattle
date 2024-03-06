@@ -29,6 +29,8 @@ public:
 	ComponentContainer<Minigame> miniGame;
 	ComponentContainer<MiniGameTimer> miniGameTimer;
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
+	ComponentContainer<Background> backgrounds;
+	ComponentContainer<Foreground> foregrounds;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -54,6 +56,8 @@ public:
 		registry_list.push_back(&enemyDrinks);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
+		registry_list.push_back(&backgrounds);
+		registry_list.push_back(&foregrounds);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
