@@ -52,6 +52,7 @@ class RenderSystem {
 			textures_path("bug.png"),
 			textures_path("eagle.png"),
 			textures_path("enemydrink.png"), 
+			textures_path("tutorial_board.png"),
 			textures_path("attackbutton.png"),
 			textures_path("itembutton.png"),
 			textures_path("minigamecup.png"),

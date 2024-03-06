@@ -16,6 +16,8 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+bool tutorialOn = false;
+Entity tutorial;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -754,6 +756,31 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Assuming SPRITE is the generic geometry buffer ID for 2D textures
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the position, scale, and other motion properties as needed
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2}); // Set to your desired window size
+	motion.angle = 0.f; // No rotation
+	motion.velocity = { 0.f, 0.f }; // Static window
+
+	// Specify the texture to use for the tutorial window
+	// Assuming TUTORIAL_IMAGE is the ID for your tutorial image idn the texture asset enum
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TUTORIALBOARD, // Use the actual texture ID for your image
+		  EFFECT_ASSET_ID::TEXTURED,       // Assuming a basic textured effect
+		  GEOMETRY_BUFFER_ID::SPRITE });   // Use the sprite geometry for 2D images
+
+	return entity;
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// handle movement
@@ -765,6 +792,18 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			if (action == GLFW_RELEASE) {
 				handle_menu(key, turn_based);
 			}
+		}
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+
+		if (stage == 1 && tutorialOn == false) {
+			tutorial = createTutorialWindow(renderer, vec2(window_width_px/2, window_height_px/2));
+			tutorialOn = true;
+		}
+		else {
+			registry.renderRequests.remove(tutorial);
+			tutorialOn = false;
 		}
 	}
 
