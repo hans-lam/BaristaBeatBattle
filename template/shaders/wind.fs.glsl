@@ -35,7 +35,8 @@ vec4 fade_color(vec4 in_color)
 
 void main()
 {
-	vec2 coord = distort(texcoord);
+	// temporarily turned wind off
+	vec2 coord = texcoord; //distort(texcoord);
 
     vec4 in_color = texture(screen_texture, coord);
     color = color_shift(in_color);

@@ -3,13 +3,12 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
-#include "turn_based_system/character_factory/character_factory.hpp"
+#include "turn_based_system/character_system.hpp"
 
 // Player component
 struct Player
 {
-	Character* thisPlayer;
-
+	//Character* thisPlayer;
 };
 
 // Eagles have a hard shell
@@ -20,6 +19,18 @@ struct Deadly
 
 // Bug and Chicken have a soft shell
 struct Eatable
+{
+
+};
+
+// Scrolling background
+struct Background
+{
+
+};
+
+// Scrolling foreground
+struct Foreground
 {
 
 };
@@ -38,9 +49,31 @@ struct MenuOption
 
 struct Menu
 {
-	Entity options[2] = {};
-	Character* currentPlayer;
+	Entity options[3] = {};
+	Entity associated_character;
 	Entity activeOption;
+};
+
+struct Minigame
+{
+	int score = 0;
+};
+
+struct CharacterData {
+	Character* characterData;
+};
+
+struct PartyMember {
+
+};
+
+struct TurnBasedEnemy {
+
+};
+
+struct TurnCounter {
+	int placement = 0;
+	int speed_value = 0;
 };
 
 // All data relevant to the shape and motion of entities
@@ -88,6 +121,18 @@ struct DeathTimer
 struct AttackTimer
 {
 	float counter_ms = 700; // might change this number
+};
+
+struct MiniGameTimer
+{
+	float counter_ms = 10000;
+	float inter_timer = 500;
+	bool inter_state = false;
+};
+
+struct MiniGameResTimer
+{
+	float counter_ms = 250;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -141,11 +186,23 @@ enum class TEXTURE_ASSET_ID {
 	BUG = 0,
 	EAGLE = BUG + 1,
 	ENEMYDRINK = EAGLE + 1,
-	PLAYER = ENEMYDRINK +  1,
-	ATTACKBUTTON = PLAYER + 1,
-	ITEMBUTTON = ATTACKBUTTON + 1,
-	TEXTURE_COUNT = ITEMBUTTON + 1
 
+	BATTLEBOARD = ENEMYDRINK + 1,
+	TUTORIALBOARD = BATTLEBOARD + 1,
+	GAMEOVERBOARD = TUTORIALBOARD + 1,
+	ATTACKBUTTON = GAMEOVERBOARD + 1,
+	ITEMBUTTON = ATTACKBUTTON + 1,
+	RESTBUTTON = ITEMBUTTON + 1,
+	MINIGAMECUP = RESTBUTTON + 1,
+	MINIGAMEINTER = MINIGAMECUP + 1,
+	MINIGAMESUCCESS = MINIGAMEINTER + 1,
+	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	BGSCROLL = MINIGAMEFAIL + 1,
+	FGSCROLL = BGSCROLL + 1,
+	FGLIGHT = FGSCROLL + 1,
+	BGBATTLE = FGLIGHT + 1,
+	PLAYER = BGBATTLE + 1,
+	TEXTURE_COUNT = PLAYER + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -155,18 +212,21 @@ enum class EFFECT_ASSET_ID {
 	CHICKEN = EGG + 1,
 	TEXTURED = CHICKEN + 1,
 	WIND = TEXTURED + 1,
-	EFFECT_COUNT = WIND + 1
+	BACKGROUND = WIND + 1,
+	FOREGROUND = BACKGROUND + 1,
+	LIGHTS = FOREGROUND + 1,
+	EFFECT_COUNT = LIGHTS + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
 	CHICKEN = 0,
-	PLAYER = CHICKEN + 1,
-	SPRITE = PLAYER + 1, 
+	SPRITE = CHICKEN + 1,
 	EGG = SPRITE + 1,
 	DEBUG_LINE = EGG + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
-	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
+	PLAYER = SCREEN_TRIANGLE + 1,
+	GEOMETRY_COUNT = PLAYER + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
@@ -174,5 +234,6 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool shown = true;
 };
 

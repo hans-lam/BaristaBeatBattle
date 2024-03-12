@@ -1,12 +1,12 @@
 #include "character_stat_sheet.hpp"
 
 
-CharacterStatSheet::CharacterStatSheet(unsigned int max_health_ = 0,
-	unsigned int strength_ = 0,
-	unsigned int magic_ = 0,
-	unsigned int defense_ = 0,
-	unsigned int magic_resist_ = 0,
-	unsigned int speed_ = 0) :
+CharacterStatSheet::CharacterStatSheet(int max_health_ = 0,
+	int strength_ = 0,
+	int magic_ = 0,
+	int defense_ = 0,
+	int magic_resist_ = 0,
+	int speed_ = 0) :
 	max_health(max_health_),
 	strength(strength_),
 	magic(magic_),
@@ -14,41 +14,41 @@ CharacterStatSheet::CharacterStatSheet(unsigned int max_health_ = 0,
 	magic_resist(magic_resist_),
 	speed(speed_) {}
 
-void CharacterStatSheet::set_max_health(unsigned int max_health_val) {
+void CharacterStatSheet::set_max_health(int max_health_val) {
 	max_health = max_health_val;
 }
-void CharacterStatSheet::set_strength(unsigned int strength_val) {
+void CharacterStatSheet::set_strength(int strength_val) {
 	strength = strength_val;
 }
-void CharacterStatSheet::set_magic(unsigned int magic_val) {
+void CharacterStatSheet::set_magic(int magic_val) {
 	magic = magic_val;
 }
-void CharacterStatSheet::set_defense(unsigned int defense_val) {
+void CharacterStatSheet::set_defense(int defense_val) {
 	defense = defense_val;
 }
-void CharacterStatSheet::set_magic_resist(unsigned int magic_resist_val) {
+void CharacterStatSheet::set_magic_resist(int magic_resist_val) {
 	magic_resist = magic_resist_val;
 }
-void CharacterStatSheet::set_speed(unsigned int speed_val) {
+void CharacterStatSheet::set_speed(int speed_val) {
 	speed = speed_val;
 }
 
 
-unsigned int CharacterStatSheet::get_max_health() {
+int CharacterStatSheet::get_max_health() {
 	return max_health;
 }
-unsigned int CharacterStatSheet::get_strength() {
+int CharacterStatSheet::get_strength() {
 	return strength;
 }
-unsigned int CharacterStatSheet::get_magic() {
+int CharacterStatSheet::get_magic() {
 	return magic;
 }
-unsigned int CharacterStatSheet::get_defense() {
+int CharacterStatSheet::get_defense() {
 	return defense;
 }
-unsigned int CharacterStatSheet::get_magic_resist() {
+int CharacterStatSheet::get_magic_resist() {
 	return magic_resist;
 }
-unsigned int CharacterStatSheet::get_speed() {
+int CharacterStatSheet::get_speed() {
 	return speed;
 }

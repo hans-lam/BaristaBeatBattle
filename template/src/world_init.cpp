@@ -2,12 +2,13 @@
 #include "tiny_ecs_registry.hpp"
 #include <iostream>
 
-Entity createChicken(RenderSystem* renderer, vec2 pos)
+Entity createChicken(RenderSystem* renderer, vec2 pos) {
+	return createChicken(renderer, pos, Entity());
+}
+Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
 {
-	auto entity = Entity();
-
 	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PLAYER);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	// Setting initial motion values
@@ -15,16 +16,16 @@ Entity createChicken(RenderSystem* renderer, vec2 pos)
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ EAGLE_BB_WIDTH*.8f, EAGLE_BB_HEIGHT });
-
+	motion.scale = mesh.original_size * 300.f;
+	motion.scale.y *= -1; // point front to the right
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.players.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
 
 	return entity;
 }
@@ -58,6 +59,58 @@ Entity createBug(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
+Entity createCup(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+
+	// Place in minigame
+	registry.miniGame.emplace(entity);
+	// Place in minigame timer for ryhthym calcs
+	registry.miniGameTimer.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MINIGAMECUP,
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE }
+	);
+
+	return entity;
+}
+
+Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+	// place in minigame result
+	registry.miniGameResTimer.emplace(entity);
+	RenderRequest& render = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+		EFFECT_ASSET_ID::TEXTURED,
+		GEOMETRY_BUFFER_ID::SPRITE }
+	);
+	render.shown = false;
+	return entity;
+}
+
 Entity createEagle(RenderSystem* renderer, vec2 position)
 {
 	auto entity = Entity();
@@ -86,9 +139,12 @@ Entity createEagle(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
-Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
+
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position) {
+	return createEnemyDrink(renderer, velocity, position, Entity());
+}
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity)
 {
-	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -114,33 +170,47 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 	return entity;
 }
 
-Entity createMenu(RenderSystem* renderer, vec2 pos)
+Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 {
 	auto menuEnt = Entity();
 	auto attack = Entity();
-	auto item = Entity();
+	auto rest = Entity();
+	auto pourIt = Entity();
 
 	// Store a reference to the potentially re-used mesh object
 	Mesh& atkMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(attack, &atkMesh);
-	Mesh& itemMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(item, &itemMesh);
+	Mesh& restMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(rest, &restMesh);
+	Mesh& pourItMesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(pourIt, &pourItMesh);
 
-	MenuOption& attackOp = registry.menuOptions.emplace(attack); 
+	MenuOption& pourItOp = registry.menuOptions.emplace(pourIt);
+	registry.colors.insert(pourIt, { 1, 0.8f, 0.8f });
+	pourItOp.option = "pour it";
+	MenuOption& attackOp = registry.menuOptions.emplace(attack);
 	registry.colors.insert(attack, { 1, 0.8f, 0.8f });
 	attackOp.option = "attack";
-	MenuOption& itemOp = registry.menuOptions.emplace(item);
-	registry.colors.insert(item, { 1, 0.8f, 0.8f });
-	itemOp.option = "item";
+	MenuOption& restOp = registry.menuOptions.emplace(rest);
+	registry.colors.insert(rest, { 1, 0.8f, 0.8f });
+	restOp.option = "rest";
 
 	Menu& menu = registry.menu.emplace(menuEnt);
-	menu.currentPlayer = nullptr;
 	menu.options[0] = attack;
-	menu.options[1] = item;
+	menu.options[1] = rest;
+	menu.options[2] = pourIt;
 	menu.activeOption = attack;
+
+	menu.associated_character = associated_character;
 
 	vec2 menuPos = pos;
 	// Initialize the position, scale, and physics components
+	auto& pourItMotion = registry.motions.emplace(pourIt);
+	pourItMotion.angle = 0.f;
+	pourItMotion.velocity = { 0, 0 };
+	pourItMotion.position = { menuPos.x, menuPos.y - 108.f };
+	pourItMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
 	auto& atkMotion = registry.motions.emplace(attack);
 	atkMotion.angle = 0.f;
 	atkMotion.velocity = { 0, 0 };
@@ -148,13 +218,107 @@ Entity createMenu(RenderSystem* renderer, vec2 pos)
 	atkMotion.position = { menuPos.x, menuPos.y - 54.f };
 	atkMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
-	auto& itemMotion = registry.motions.emplace(item);
-	itemMotion.angle = 0.f;
-	itemMotion.velocity = { 0, 0 };
-	itemMotion.position = menuPos;
-	itemMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+	auto& restMotion = registry.motions.emplace(rest);
+	restMotion.angle = 0.f;
+	restMotion.velocity = { 0, 0 };
+	restMotion.position = menuPos;
+	restMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
 	return menuEnt;
+}
+
+Entity createBackgroundScroller(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// scale the background
+	motion.scale = vec2({ BG_WIDTH, BG_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.backgrounds.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::BGSCROLL,
+		 EFFECT_ASSET_ID::BACKGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.foregrounds.emplace(entity);
+
+	if (isLight) {
+		// scale the background
+		motion.scale = vec2({ BG_WIDTH, BG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGLIGHT,
+			 EFFECT_ASSET_ID::LIGHTS,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	else {
+		// scale the background
+		motion.scale = vec2({ FG_WIDTH, FG_HEIGHT });
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::FGSCROLL,
+			 EFFECT_ASSET_ID::FOREGROUND,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+	}
+
+
+
+	return entity;
+}
+
+Entity createBackgroundBattle(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// scale the background
+	motion.scale = vec2({ 1700, window_height_px });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.backgrounds.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::BGBATTLE,
+		 EFFECT_ASSET_ID::BACKGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
 }
 
 Entity createLine(vec2 position, vec2 scale)

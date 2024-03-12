@@ -4,9 +4,10 @@
 #include <map>
 #include "character_system.hpp"
 #include "abilities.hpp"
+#include "../tiny_ecs_registry.hpp"
+#include "../tiny_ecs.hpp"
+#include "../ai_system.hpp"
 
-
-class TurnCounter;
 
 class TurnBasedSystem {
 	
@@ -14,49 +15,35 @@ public:
 
 	TurnBasedSystem();
 
-	void init();
+	void init(AISystem* ai_system);
 
 	void step(float elapsed_ms_since_last_update);
 
-	void start_encounter(std::vector<Character*> enemies);
+	void start_encounter();
 
-	void process_character_action(Ability* ability);
-	void process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
+	int process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
 
-	bool is_game_over();
+	Entity get_entity_given_character(Character* receiving_character);
 
-	std::vector<Character*> party_members;
+	bool all_allies_defeated();
+	bool all_enenmies_defeated();
 
-	std::vector<Character*> current_enemies;
+	void process_death(Entity o7);
 
-	TurnCounter* active_character = nullptr;
+	Entity get_active_character() {
+		return active_character;
+	}
 
 private:
-	
-	// Moved these to public so I can access them in world system; we can implement get functions if needed
-	// std::vector<Character*> party_members;
-
-	// std::vector<Character*> current_enemies;
 
 	void construct_party();
+
+	Entity active_character = emptyEntity;
 	
-	// Same for active character
-	// TurnCounter* active_character = nullptr;
-
-	std::vector<TurnCounter*> turn_counter_list;
-
 	bool waiting_for_player = false;
 
-};
+	AISystem* ai_system;
 
-
-class TurnCounter {
-public:
-	TurnCounter();
-
-	Character * character;
-	int placement = 0;
-	int speed_value = 0;
 };
 
 extern bool out_of_combat;
