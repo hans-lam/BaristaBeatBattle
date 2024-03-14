@@ -2,11 +2,11 @@
 #include "tiny_ecs_registry.hpp"
 #include <iostream>
 
-Entity createChicken(RenderSystem* renderer, vec2 pos) {
-	return createChicken(renderer, pos, Entity());
-}
-Entity createChicken(RenderSystem* renderer, vec2 pos, Entity entity)
+
+Entity createChicken(RenderSystem* renderer, vec2 pos)
 {
+	auto entity = Entity();
+
 	// Store a reference to the potentially re-used mesh object
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -140,11 +140,9 @@ Entity createEagle(RenderSystem* renderer, vec2 position)
 }
 
 
-Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position) {
-	return createEnemyDrink(renderer, velocity, position, Entity());
-}
-Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position, Entity entity)
+Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 {
+	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -383,6 +381,130 @@ Entity createEgg(vec2 pos, vec2 size)
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::EGG,
 			GEOMETRY_BUFFER_ID::EGG });
+
+	return entity;
+}
+
+
+
+Entity create_chai(RenderSystem* renderer, vec2 pos) {
+
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = mesh.original_size * 300.f;
+	motion.scale.y *= -1; // point front to the right
+
+	// Create and (empty) Chicken component to be able to refer to all eagles
+	registry.players.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
+
+
+	// give entity turn based components
+	character_factory.construct_chai(entity);
+
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	return entity;
+}
+Entity create_americano(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = mesh.original_size * 300.f;
+	motion.scale.y *= -1; // point front to the right
+
+	
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
+
+	// give entity turn based components
+	character_factory.construct_americano(entity);
+
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	return entity;
+}
+Entity create_earl(RenderSystem* renderer, vec2 pos) {
+
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = mesh.original_size * 300.f;
+	motion.scale.y *= -1; // point front to the right
+
+	
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
+
+	// give entity turn based components
+	character_factory.construct_earl(entity);
+
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	return entity;
+}
+Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
+
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+	
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::ENEMYDRINK,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	// give entity turn based components
+	character_factory.construct_enemy(entity, level);
+
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
 	return entity;
 }

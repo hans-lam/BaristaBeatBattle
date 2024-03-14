@@ -7,13 +7,13 @@
 class CharacterFactory {
 
 public:
-	Entity construct_chai();
+	Entity construct_chai(Entity entity);
 
-	Entity construct_earl();
+	Entity construct_earl(Entity entity);
 
-	Entity construct_americano();
+	Entity construct_americano(Entity entity);
 
-	Entity construct_enemy(int level);
+	Entity construct_enemy(Entity entity, int level);
 };
 
 extern CharacterFactory character_factory;

@@ -7,6 +7,8 @@
 #include "../tiny_ecs_registry.hpp"
 #include "../tiny_ecs.hpp"
 #include "../ai_system.hpp"
+#include "level_select_system.hpp"
+#include "../world_init.hpp"
 
 
 class TurnBasedSystem {
@@ -19,14 +21,14 @@ public:
 
 	void step(float elapsed_ms_since_last_update);
 
-	void start_encounter();
+	void start_encounter(Level* level);
 
 	int process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients);
 
 	Entity get_entity_given_character(Character* receiving_character);
 
-	bool all_allies_defeated();
-	bool all_enenmies_defeated();
+	bool are_all_allies_defeated();
+	bool are_all_enemies_defeated();
 
 	void process_death(Entity o7);
 
@@ -35,8 +37,6 @@ public:
 	}
 
 private:
-
-	void construct_party();
 
 	Entity active_character = emptyEntity;
 	
