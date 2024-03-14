@@ -16,7 +16,7 @@ TurnBasedSystem::TurnBasedSystem() {
 	// influence for random code
 	// https://www.geeksforgeeks.org/generate-a-random-number-between-0-and-1/
 	srand(time(0));
-	
+
 }
 
 void TurnBasedSystem::init(AISystem* ai_system) {
@@ -57,10 +57,10 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 	if (registry.partyMembers.has(active_character)) {
 		waiting_for_player = true;
-		
+
 	}
 	else {
-		
+
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
 
 
@@ -122,7 +122,7 @@ void TurnBasedSystem::start_encounter(Level* level) {
 int TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
 
 	std::cout << "Current Character: " << caller->get_name() << '\n';
-		
+
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
@@ -132,9 +132,9 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 			if (receiving_character->is_dead()) {
 
-				
+
 				process_death(get_entity_given_character(receiving_character));
-				
+
 
 			}
 
@@ -152,7 +152,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
 
-		
+
 		return 2;
 
 	}
@@ -160,7 +160,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	if (are_all_enemies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You won the fight!!");
-		
+
 		return 1;
 	}
 

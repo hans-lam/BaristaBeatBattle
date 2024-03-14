@@ -27,7 +27,7 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
 Entity createCup(RenderSystem* renderer, vec2 pos);
-// minigame result 
+// minigame result
 Entity createMiniResult(RenderSystem* renderer, vec2 pos);
 // the enemy
 Entity createEagle(RenderSystem* renderer, vec2 position);
@@ -37,7 +37,7 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
 Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 // the foreground scoller(s)
 Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight);
-// minigame background 
+// minigame background
 Entity createBackgroundBattle(RenderSystem* renderer, vec2 position);
 
 // a red line for debugging purposes

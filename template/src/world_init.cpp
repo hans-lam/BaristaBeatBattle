@@ -60,9 +60,9 @@ Entity createBug(RenderSystem* renderer, vec2 position)
 }
 
 Entity createCup(RenderSystem* renderer, vec2 pos) {
-	auto entity = Entity(); 
+	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE); 
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	auto& motion = registry.motions.emplace(entity);
@@ -75,7 +75,7 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 
 	// Place in minigame
 	registry.miniGame.emplace(entity);
-	// Place in minigame timer for ryhthym calcs 
+	// Place in minigame timer for ryhthym calcs
 	registry.miniGameTimer.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -85,10 +85,10 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	);
 
 	return entity;
-} 
+}
 
 Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
-	auto entity = Entity(); 
+	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -186,13 +186,13 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 	MenuOption& pourItOp = registry.menuOptions.emplace(pourIt);
 	registry.colors.insert(pourIt, { 1, 0.8f, 0.8f });
 	pourItOp.option = "pour it";
-	MenuOption& attackOp = registry.menuOptions.emplace(attack); 
+	MenuOption& attackOp = registry.menuOptions.emplace(attack);
 	registry.colors.insert(attack, { 1, 0.8f, 0.8f });
 	attackOp.option = "attack";
 	MenuOption& restOp = registry.menuOptions.emplace(rest);
 	registry.colors.insert(rest, { 1, 0.8f, 0.8f });
 	restOp.option = "rest";
-	
+
 	Menu& menu = registry.menu.emplace(menuEnt);
 	menu.options[0] = attack;
 	menu.options[1] = rest;
@@ -286,8 +286,8 @@ Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLi
 			 EFFECT_ASSET_ID::FOREGROUND,
 			 GEOMETRY_BUFFER_ID::SPRITE });
 	}
-	
-	
+
+
 
 	return entity;
 }
@@ -434,7 +434,7 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	motion.scale = mesh.original_size * 300.f;
 	motion.scale.y *= -1; // point front to the right
 
-	
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
@@ -464,7 +464,7 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	motion.scale = mesh.original_size * 300.f;
 	motion.scale.y *= -1; // point front to the right
 
-	
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
@@ -494,7 +494,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 
 	// Setting initial values, scale is negative to make it face the opposite way
 	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
-	
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,

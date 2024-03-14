@@ -64,11 +64,11 @@ struct CharacterData {
 };
 
 struct PartyMember {
-	
+
 };
 
 struct TurnBasedEnemy {
-	
+
 };
 
 struct TurnCounter {
@@ -221,7 +221,8 @@ const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
 	CHICKEN = 0,
-	SPRITE = CHICKEN + 1,
+	PLAYER = CHICKEN + 1,
+	SPRITE = PLAYER + 1,
 	EGG = SPRITE + 1,
 	DEBUG_LINE = EGG + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
