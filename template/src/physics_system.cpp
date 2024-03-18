@@ -326,14 +326,19 @@ void PhysicsSystem::step(float elapsed_ms)
 			continue;
 		}
 		float step_seconds = elapsed_ms / 1000.f;
+
 		if (registry.players.has(entity)) {
 			float x_pos = motion.position.x + (motion.velocity.x * step_seconds);
 			float y_pos = motion.position.y + (motion.velocity.y * step_seconds);
-			if (x_pos <= 0.0 || x_pos >= window_width_px) motion.velocity.x = 0.f;
-			if (y_pos <= 0.0 || y_pos >= window_height_px) motion.velocity.y = 0.f;
+			// need to make a variable for the player size once mesh is done
+			if (x_pos <= 20.0 || x_pos >= window_width_px - 20.0) motion.velocity.x = 0.f;
+			if (y_pos <= BG_HEIGHT || y_pos >= window_height_px - 20.0) motion.velocity.y = 0.f;
 		}
-		//motion.position.x += motion.velocity.x * step_seconds;
-		//motion.position.y += motion.velocity.y * step_seconds;
+
+		if (registry.enemyDrinks.has(entity)) {
+			float y_pos = motion.position.y + (motion.velocity.y * step_seconds);
+			if (y_pos <= BG_HEIGHT) motion.velocity.y *= -1.f;
+		}
 		motion.position += motion.velocity * step_seconds;
 		// (void)elapsed_ms; // placeholder to silence unused warning until implemented
 	}

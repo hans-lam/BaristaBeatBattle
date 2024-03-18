@@ -24,6 +24,7 @@ public:
 	// Creates a window
 	GLFWwindow* create_window();
 
+
 	// starts the game
 	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg);
 
@@ -47,6 +48,8 @@ public:
 
 	void handle_menu(int key, TurnBasedSystem* turn_based);
 
+	void handle_mini(int bpm);
+
 	// handle option selection 
 	void handle_selection();
 
@@ -59,6 +62,12 @@ private:
 
 	// restart level
 	void restart_game();
+
+	// change stage 
+	void change_stage(int level);
+
+	// handle attack for turn-based
+	void handle_attack(Entity active_char_entity, std::string ability);
 
 	// OpenGL window handle
 	GLFWwindow* window;
