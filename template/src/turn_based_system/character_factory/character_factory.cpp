@@ -1,7 +1,7 @@
 #include "character_factory.hpp"
 
 
-Entity CharacterFactory::construct_chai() {
+Entity CharacterFactory::construct_chai(Entity entity) {
 	std::string name = "Chai";
 	unsigned int chai_max_health = 25;
 	unsigned int chai_strength = 5;
@@ -20,22 +20,16 @@ Entity CharacterFactory::construct_chai() {
 	chai_character_obj->add_ability(basic_attack);
 	chai_character_obj->add_ability(rest);
 
-	PartyMember partyMemberComponent = PartyMember();
-
-	Entity chaiEntity = Entity();
-
 	CharacterData characterData = CharacterData();
 	characterData.characterData = chai_character_obj;
-	registry.characterDatas.emplace(chaiEntity, characterData);
-
-	registry.partyMembers.emplace(chaiEntity, partyMemberComponent);
+	registry.characterDatas.emplace(entity, characterData);
 	
 
-	return chaiEntity;
+	return entity;
 
 }
 
-Entity CharacterFactory::construct_earl() {
+Entity CharacterFactory::construct_earl(Entity entity) {
 	std::string name = "Earl";
 	unsigned int earl_max_health = 45;
 	unsigned int earl_strength = 8;
@@ -50,27 +44,18 @@ Entity CharacterFactory::construct_earl() {
 	Ability* rest = ability_factory->construct_rest();
 
 
-
-	Entity earlEntity = Entity();
-
 	Character* earl_character_obj = new Character(name, character_stat);
 	earl_character_obj->add_ability(basic_attack);
 	earl_character_obj->add_ability(rest);
 
-	PartyMember partyMemberComponent = PartyMember();
-
 	CharacterData characterData = CharacterData();
 	characterData.characterData = earl_character_obj;
-	registry.characterDatas.emplace(earlEntity, characterData);
-	
+	registry.characterDatas.emplace(entity, characterData);
 
-	registry.partyMembers.emplace(earlEntity, partyMemberComponent);
-	
-
-	return earlEntity;
+	return entity;
 }
 
-Entity CharacterFactory::construct_americano() {
+Entity CharacterFactory::construct_americano(Entity entity) {
 	std::string name = "Americano";
 	unsigned int americano_max_health = 20;
 	unsigned int americano_strength = 2;
@@ -89,21 +74,15 @@ Entity CharacterFactory::construct_americano() {
 	americano_character_obj->add_ability(basic_attack);
 	americano_character_obj->add_ability(rest);
 
-	PartyMember partyMemberComponent = PartyMember();
-
-	Entity americanoEntity = Entity();
 
 	CharacterData characterData = CharacterData();
 	characterData.characterData = americano_character_obj;
-	registry.characterDatas.emplace(americanoEntity, characterData);
+	registry.characterDatas.emplace(entity, characterData);
 
-
-	registry.partyMembers.emplace(americanoEntity, partyMemberComponent);
-
-	return americanoEntity;
+	return entity;
 }
 
-Entity CharacterFactory::construct_enemy(int level) {
+Entity CharacterFactory::construct_enemy(Entity entity, int level) {
 	std::string name = "Enemy " + std::to_string(level);
 	unsigned int enemy_max_health = 30 * level;
 	unsigned int enemy_strength = 1 * level;
@@ -120,17 +99,11 @@ Entity CharacterFactory::construct_enemy(int level) {
 	Character* enemy_character_obj = new Character(name, character_stat);
 	enemy_character_obj->add_ability(basic_attack);
 
-	Entity enemyEntity = Entity();
-
-	TurnBasedEnemy tbe = TurnBasedEnemy();
-
 	CharacterData characterData = CharacterData();
 	characterData.characterData = enemy_character_obj;
-	registry.characterDatas.emplace(enemyEntity, characterData);
+	registry.characterDatas.emplace(entity, characterData);
 
-	registry.turnBasedEnemies.emplace(enemyEntity,tbe);
-
-	return enemyEntity;
+	return entity;
 }
 
 

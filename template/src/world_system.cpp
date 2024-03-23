@@ -10,6 +10,7 @@
 #include "physics_system.hpp"
 #include "turn_based_system/character_factory/character_factory.hpp"
 #include <chrono>
+#include <turn_based_system/level_factory.hpp>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -432,6 +433,9 @@ void WorldSystem::restart_game() {
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
 		registry.remove_all_components_of(registry.motions.entities.back());
+
+	while (registry.menu.entities.size() > 0) 
+		registry.remove_all_components_of(registry.menu.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
@@ -920,24 +924,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				//render battle background
 				createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
 
-				// enemies are created and added to turnBasedEnemy ecs
-				character_factory.construct_enemy(1);
-				character_factory.construct_enemy(2);
+				int x_base = 100;
+				vec2 base_ally_position = { x_base, window_height_px -  200 };
+				vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
+				Level* temp_level = construct_level_one(renderer, base_ally_position, base_enemy_position);
 
-				int i = 0;
-				for (Entity enemy_entity : registry.turnBasedEnemies.entities) {
-					vec2 velocity = { 0.f, 0.f };
-					vec2 position = { window_width_px - 100, window_height_px - (i + 1) * 200 };
-					Entity entity = createEnemyDrink(renderer, velocity, position, enemy_entity);
-					i++;
-				}
 
 				int j = 0;
-				for (Entity party_member_entity : registry.partyMembers.entities) {
-					int x_base = 100;
-					vec2 position = { x_base, window_height_px - (j + 1) * 200 };
-					Entity entity = createChicken(renderer, position, party_member_entity);
-					registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+				for (Entity party_member_entity : temp_level->allies) {
+					
 
 					// Creating Menu entity 
 					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
@@ -947,7 +942,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 					j++;
 				}
 
-				turn_based->start_encounter();
+				turn_based->start_encounter(temp_level);
 			}
 
 	}
