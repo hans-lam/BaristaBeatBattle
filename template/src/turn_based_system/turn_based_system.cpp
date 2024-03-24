@@ -70,6 +70,22 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
 	}
+
+	// deal with injury graphics
+	float min_counter_ms = 3000.f;
+	for (Entity entity : registry.injuryTimers.entities) {
+		// progress timer, 
+		InjuredTimer& counter = registry.injuryTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		if (counter.counter_ms < min_counter_ms) {
+			min_counter_ms = counter.counter_ms;
+		}
+
+		// stop shaking the attacked character after 3 seconds
+		if (counter.counter_ms < 0) {
+			registry.injuryTimers.remove(entity);
+		}
+	}
 }
 
 
@@ -129,6 +145,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);
+			registry.injuryTimers.emplace(get_entity_given_character(receiving_character));
 
 			if (receiving_character->is_dead()) {
 

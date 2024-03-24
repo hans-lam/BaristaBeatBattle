@@ -31,6 +31,7 @@ public:
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
+	ComponentContainer<InjuredTimer> injuryTimers;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -58,6 +59,7 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&backgrounds);
 		registry_list.push_back(&foregrounds);
+		registry_list.push_back(&injuryTimers);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
@@ -68,6 +70,7 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		
 	}
 
 	void clear_all_components() {

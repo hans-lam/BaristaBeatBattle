@@ -123,6 +123,11 @@ struct AttackTimer
 	float counter_ms = 700; // might change this number
 };
 
+struct InjuredTimer
+{
+	float counter_ms = 3000;
+};
+
 struct MiniGameTimer
 {
 	float counter_ms = 10000;
@@ -215,7 +220,8 @@ enum class EFFECT_ASSET_ID {
 	BACKGROUND = WIND + 1,
 	FOREGROUND = BACKGROUND + 1,
 	LIGHTS = FOREGROUND + 1,
-	EFFECT_COUNT = LIGHTS + 1
+	BATTLE = LIGHTS + 1,
+	EFFECT_COUNT = BATTLE + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

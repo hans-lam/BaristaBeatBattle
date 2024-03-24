@@ -82,6 +82,7 @@ class RenderSystem {
 		shader_path("background"),
 		shader_path("foreground"),
 		shader_path("lights"),
+		shader_path("battle"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
