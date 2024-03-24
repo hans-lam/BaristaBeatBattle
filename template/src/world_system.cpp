@@ -1,16 +1,16 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "physics_system.hpp"
+#include "turn_based_system/character_factory/character_factory.hpp"
+#include "turn_based_system/level_factory.hpp"
 
 // stlib
 #include <cassert>
 #include <sstream>
 #include <iostream>
 #include <array>
-#include "physics_system.hpp"
-#include "turn_based_system/character_factory/character_factory.hpp"
 #include <chrono>
-#include <turn_based_system/level_factory.hpp>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
