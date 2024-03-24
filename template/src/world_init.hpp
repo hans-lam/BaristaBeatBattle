@@ -39,9 +39,12 @@ Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight);
 // minigame background
 Entity createBackgroundBattle(RenderSystem* renderer, vec2 position);
+// Main Menu
+Entity createMainMenu(RenderSystem* renderer, vec2 position);
+// Tutorial
+Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window);
 
 // a red line for debugging purposes
-Entity createLine(vec2 position, vec2 size); 
 Entity createLine(vec2 position, vec2 scale, float angle);
 // a egg
 Entity createEgg(vec2 pos, vec2 size);

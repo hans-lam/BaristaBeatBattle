@@ -5,10 +5,26 @@
 #include "../ext/stb_image/stb_image.h"
 #include "turn_based_system/character_system.hpp"
 
+struct MainMenu {
+
+};
+
+struct OverWorld {
+
+};
+
+struct CutScene {
+
+};
+
+struct TutorialBoard {
+
+};
+
 // Player component
 struct Player
 {
-	//Character* thisPlayer;
+
 };
 
 // Eagles have a hard shell
@@ -234,6 +250,6 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
-	bool shown = true;
+	bool shown = false;
 };
 

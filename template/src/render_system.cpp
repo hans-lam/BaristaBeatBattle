@@ -281,7 +281,7 @@ void RenderSystem::drawToScreen()
 
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
-void RenderSystem::draw()
+void RenderSystem::draw(StageSystem::Stage current_stage)
 {
 	// Getting size of window
 	int w, h;
@@ -293,8 +293,21 @@ void RenderSystem::draw()
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	//glClearColor(0.674, 0.847, 1.0 , 1.0);
-	glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+
+	// Set color for background here
+	switch (current_stage) {
+	case StageSystem::Stage::main_menu:
+		glClearColor(0.674, 0.847, 1.0, 1.0);
+	case StageSystem::Stage::overworld:
+		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+	case StageSystem::Stage::cutscene:
+		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+	case StageSystem::Stage::turn_based:
+		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+	case StageSystem::Stage::minigame:
+		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+	}
+
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);

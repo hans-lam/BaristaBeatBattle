@@ -3,9 +3,10 @@
 #include <array>
 #include <utility>
 
-#include "common.hpp"
-#include "components.hpp"
-#include "tiny_ecs.hpp"
+#include "common.hpp";
+#include "components.hpp";
+#include "tiny_ecs.hpp";
+#include "stage_system/stage_system.hpp";
 
 struct TextChar {
 	unsigned int TextureID;  // ID handle of the glyph texture
@@ -14,8 +15,6 @@ struct TextChar {
 	unsigned int Advance;    // Offset to advance to next glyph
 	char character;
 };
-
-
 
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
@@ -114,7 +113,7 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
+	void draw(StageSystem::Stage current_stage);
 
 	// Draw Turn Based 
 	void drawTurn();

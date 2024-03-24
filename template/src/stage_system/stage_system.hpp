@@ -1,10 +1,10 @@
 #pragma once
 
-// A simple physics system that moves rigid bodies and checks for collision
+// Stage System for handling stage switching
 class StageSystem
 {
 public:
-	enum stage {
+	enum Stage {
 		main_menu, 
 		overworld,
 		cutscene, 
@@ -14,11 +14,13 @@ public:
 
 	StageSystem();
 
-	stage get_current_stage() const {
+	void init();
+
+	Stage get_current_stage() const {
 		return this->current_stage;
 	}
 
-	void set_stage(stage target);
+	void set_stage(Stage target);
 private: 
 	void set_main_menu();
 
@@ -30,5 +32,5 @@ private:
 
 	void set_minigame();
 
-	stage current_stage; 
+	Stage current_stage;
 };
