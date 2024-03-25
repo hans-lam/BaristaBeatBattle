@@ -16,31 +16,21 @@ TurnBasedSystem::TurnBasedSystem() {
 	// influence for random code
 	// https://www.geeksforgeeks.org/generate-a-random-number-between-0-and-1/
 	srand(time(0));
-	
+
 }
 
 void TurnBasedSystem::init(AISystem* ai_system) {
 	this->ai_system = ai_system;
-	construct_party();
-}
-
-
-void TurnBasedSystem::construct_party() {
-	Entity chai = character_factory.construct_chai();
-	Entity earl = character_factory.construct_earl();
-	Entity americano = character_factory.construct_americano();
 }
 
 void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 	if (out_of_combat || waiting_for_player) return;
 
-
 	if (active_character == emptyEntity) {
 
 		TurnCounter* highest = NULL;
 		Entity highest_entity_number;
-
 
 		for (Entity turnCounterEntity : registry.turnCounter.entities) {
 
@@ -55,6 +45,8 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		}
 
+		assert(highest != NULL && "There ara no character in the turn counter");
+
 		if (highest->placement < SPEED_REQUIRED_FOR_TURN) return;
 
 		active_character = highest_entity_number;
@@ -65,10 +57,10 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 	if (registry.partyMembers.has(active_character)) {
 		waiting_for_player = true;
-		
+
 	}
 	else {
-		
+
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
 
 
@@ -81,34 +73,40 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 }
 
 
-void TurnBasedSystem::start_encounter() {
+void TurnBasedSystem::start_encounter(Level* level) {
+	registry.partyMembers.clear();
+	registry.turnBasedEnemies.clear();
 	registry.turnCounter.clear();
 
-	for (Entity partyMember : registry.partyMembers.entities) {
-		Character* characterData = registry.characterDatas.get(partyMember).characterData;
+
+	for (Entity ally_entity : level->allies) {
+		PartyMember partyMemberComponent = PartyMember();
+		registry.partyMembers.emplace(ally_entity, partyMemberComponent);
+
+		Character* characterData = registry.characterDatas.get(ally_entity).characterData;
 
 		TurnCounter* turn = new TurnCounter();
 
 		turn->placement = 0;
 		turn->speed_value = characterData->get_character_stat_sheet()->get_speed();
 
-		registry.turnCounter.emplace(partyMember, turn);
-
+		registry.turnCounter.emplace(ally_entity, turn);
 	}
 
+	for (Entity enemy_entity : level->enemies) {
+		TurnBasedEnemy tbe = TurnBasedEnemy();
+		registry.turnBasedEnemies.emplace(enemy_entity, tbe);
 
-	for (Entity enemyEntity : registry.turnBasedEnemies.entities) {
-
-		Character* characterData = registry.characterDatas.get(enemyEntity).characterData;
+		Character* characterData = registry.characterDatas.get(enemy_entity).characterData;
 
 		TurnCounter* turn = new TurnCounter();
 
 		turn->placement = 0;
 		turn->speed_value = characterData->get_character_stat_sheet()->get_speed();
 
-		registry.turnCounter.emplace(enemyEntity, turn);
-
+		registry.turnCounter.emplace(enemy_entity, turn);
 	}
+
 
 	out_of_combat = false;
 }
@@ -124,7 +122,7 @@ void TurnBasedSystem::start_encounter() {
 int TurnBasedSystem::process_character_action(Ability* ability, Character* caller, std::vector<Character*> recipients) {
 
 	std::cout << "Current Character: " << caller->get_name() << '\n';
-		
+
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
@@ -134,9 +132,9 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 			if (receiving_character->is_dead()) {
 
-				
+
 				process_death(get_entity_given_character(receiving_character));
-				
+
 
 			}
 
@@ -150,19 +148,19 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	waiting_for_player = false;
 
 
-	if (all_allies_defeated()) {
+	if (are_all_allies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
 
-		
+
 		return 2;
 
 	}
 
-	if (all_enenmies_defeated()) {
+	if (are_all_enemies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You won the fight!!");
-		
+
 		return 1;
 	}
 
@@ -172,7 +170,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 
 
-bool TurnBasedSystem::all_allies_defeated() {
+bool TurnBasedSystem::are_all_allies_defeated() {
 	for (Entity partyMember : registry.partyMembers.entities) {
 		Character* characterData = registry.characterDatas.get(partyMember).characterData;
 
@@ -183,7 +181,7 @@ bool TurnBasedSystem::all_allies_defeated() {
 	return true;
 }
 
-bool TurnBasedSystem::all_enenmies_defeated() {
+bool TurnBasedSystem::are_all_enemies_defeated() {
 	for (Entity enemyEntity : registry.turnBasedEnemies.entities) {
 		Character* characterData = registry.characterDatas.get(enemyEntity).characterData;
 
@@ -203,7 +201,6 @@ void TurnBasedSystem::process_death(Entity o7)
 
 	registry.turnCounter.remove(o7);
 
-
 }
 
 Entity TurnBasedSystem::get_entity_given_character(Character* receiving_character)
@@ -218,7 +215,6 @@ Entity TurnBasedSystem::get_entity_given_character(Character* receiving_characte
 	}
 	return emptyEntity;
 }
-
 
 
 bool out_of_combat = true;

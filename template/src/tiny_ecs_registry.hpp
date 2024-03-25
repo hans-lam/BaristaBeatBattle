@@ -31,6 +31,12 @@ public:
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
+	ComponentContainer<MainMenu> mainMenu;
+	ComponentContainer<OverWorld> overWorld;
+	ComponentContainer<TutorialBoard> tutorials;
+	ComponentContainer<CutScene> cutscenes;
+	ComponentContainer<TurnBased> turnBased;
+	ComponentContainer<MiniStage> miniStage;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -58,6 +64,12 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&backgrounds);
 		registry_list.push_back(&foregrounds);
+		registry_list.push_back(&mainMenu);
+		registry_list.push_back(&overWorld);
+		registry_list.push_back(&tutorials);
+		registry_list.push_back(&cutscenes);
+		registry_list.push_back(&turnBased);
+		registry_list.push_back(&miniStage);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);

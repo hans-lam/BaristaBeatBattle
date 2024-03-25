@@ -3,9 +3,10 @@
 #include <array>
 #include <utility>
 
-#include "common.hpp"
-#include "components.hpp"
-#include "tiny_ecs.hpp"
+#include "common.hpp";
+#include "components.hpp";
+#include "tiny_ecs.hpp";
+#include "stage_system/stage_system.hpp";
 
 struct TextChar {
 	unsigned int TextureID;  // ID handle of the glyph texture
@@ -14,8 +15,6 @@ struct TextChar {
 	unsigned int Advance;    // Offset to advance to next glyph
 	char character;
 };
-
-
 
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
@@ -52,7 +51,7 @@ class RenderSystem {
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("bug.png"),
 			textures_path("eagle.png"),
-			textures_path("enemydrink.png"), 
+			textures_path("enemydrink.png"),
 			textures_path("battle_tutorial.png"),
 			textures_path("overworld_tutorial.png"),
 			textures_path("gameover_screen.png"),
@@ -60,8 +59,8 @@ class RenderSystem {
 			textures_path("itembutton.png"),
 			textures_path("restbutton.png"),
 			textures_path("minigamecup.png"),
-			textures_path("minigameinter.png"), 
-			textures_path("minigamesuccess.png"), 
+			textures_path("minigameinter.png"),
+			textures_path("minigamesuccess.png"),
 			textures_path("minigamefail.png"),
 			textures_path("bg.png"),
 			textures_path("fg.png"),
@@ -114,13 +113,7 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
-
-	// Draw Turn Based 
-	void drawTurn();
-
-	// Draw Mini Game
-	void drawMini();
+	void draw(StageSystem::Stage current_stage);
 
 	// Render text
 	void renderText(const std::string& text, float x, float y,
