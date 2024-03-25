@@ -222,6 +222,11 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 	restMotion.position = menuPos;
 	restMotion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
+	registry.turnBased.emplace(menuEnt);
+	registry.turnBased.emplace(attack);
+	registry.turnBased.emplace(rest);
+	registry.turnBased.emplace(pourIt);
+
 	return menuEnt;
 }
 
@@ -306,7 +311,7 @@ Entity createBackgroundBattle(RenderSystem* renderer, vec2 position) {
 	// scale the background
 	motion.scale = vec2({ 1700, window_height_px });
 
-	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.turnBased.emplace(entity);
 	registry.backgrounds.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -365,6 +370,7 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 
 	}
 	else if (window == 2) {
+		registry.turnBased.emplace(entity);
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::BATTLEBOARD,
@@ -442,17 +448,20 @@ Entity create_chai(RenderSystem* renderer, vec2 pos) {
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.players.emplace(entity);
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::PLAYER });
+	rr.shown = true;
 
 
 	// give entity turn based components
 	character_factory.construct_chai(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
@@ -472,16 +481,19 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	motion.scale.y *= -1; // point front to the right
 
 
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::PLAYER });
+	rr.shown = true;
 
 	// give entity turn based components
 	character_factory.construct_americano(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
@@ -502,16 +514,19 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	motion.scale.y *= -1; // point front to the right
 
 
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::PLAYER });
+	rr.shown = true;
 
 	// give entity turn based components
 	character_factory.construct_earl(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
@@ -532,16 +547,19 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	// Setting initial values, scale is negative to make it face the opposite way
 	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
 
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
 
 	// give entity turn based components
 	character_factory.construct_enemy(entity, level);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }

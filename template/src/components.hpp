@@ -17,6 +17,10 @@ struct CutScene {
 
 };
 
+struct TurnBased {
+
+};
+
 struct TutorialBoard {
 
 };

@@ -41,7 +41,11 @@ file(GLOB SOURCE_FILES src/*.cpp
     src/stage_system/main_menu/*.cpp
     src/stage_system/main_menu/*.hpp
     src/stage_system/overworld/*.cpp
-    src/stage_system/overworld/*.hpp)
+    src/stage_system/overworld/*.hpp
+    src/stage_system/cutscene/*.cpp
+    src/stage_system/cutscene/*.hpp
+    src/stage_system/combat/*.cpp
+    src/stage_system/combat/*.hpp)
 
 
 #set(SOURCE_FILES 

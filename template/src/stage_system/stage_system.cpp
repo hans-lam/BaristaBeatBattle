@@ -42,6 +42,7 @@ void StageSystem::set_main_menu()
 void StageSystem::set_overworld()
 {
 	// Set all main menu entities to not be shown
+	// Keeping entities live right now in case we need them
 	for (Entity entity : registry.mainMenu.entities) {
 		RenderRequest& render = registry.renderRequests.get(entity);
 		render.shown = false;
@@ -52,12 +53,21 @@ void StageSystem::set_overworld()
 		RenderRequest& render = registry.renderRequests.get(entity);
 		if (!registry.tutorials.has(entity))
 			render.shown = true;
+	} 
+
+	// Set all entites from turn_based to not shown
+	for (Entity entity : registry.turnBased.entities) {
+		if (registry.renderRequests.has(entity)) {
+			RenderRequest& render = registry.renderRequests.get(entity);
+			render.shown = false;
+		}
 	}
 }
 
 void StageSystem::set_cutscene()
 {
 	// Set all overworld entities to not be shown
+	// Keep entities live since we still might need them
 	for (Entity entity : registry.overWorld.entities) {
 		RenderRequest& render = registry.renderRequests.get(entity);
 		render.shown = false;
@@ -73,7 +83,25 @@ void StageSystem::set_cutscene()
 
 void StageSystem::set_turn_based()
 {
+	// Remove all components from cutscenes
+	for (Entity entity : registry.cutscenes.entities) {
+		registry.remove_all_components_of(entity);
+	}
 
+	// Set all overworld entities to be not shown
+	for (Entity entity : registry.overWorld.entities) {
+		RenderRequest& render = registry.renderRequests.get(entity);
+		render.shown = false;
+	}
+
+	// Set turn based entities to be rendered
+	for (Entity entity : registry.turnBased.entities) {
+		if (registry.renderRequests.has(entity)) {
+			RenderRequest& render = registry.renderRequests.get(entity);
+			if (!registry.tutorials.has(entity))
+				render.shown = true;
+		}
+	}
 }
 
 void StageSystem::set_minigame()

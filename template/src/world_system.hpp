@@ -17,6 +17,8 @@
 #include "stage_system/stage_system.hpp"
 #include "stage_system/main_menu/main_menu_system.hpp"
 #include "stage_system/overworld/overworld_system.hpp"
+#include "stage_system/cutscene/cutscene_system.hpp"
+#include "stage_system/combat/combat_system.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
@@ -32,7 +34,8 @@ public:
 	// starts the game
 	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg, 
 		StageSystem* stage_system_arg, MainMenuSystem* main_menu_system_arg,
-		OverworldSystem* overworld_system_arg);
+		OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
+		CombatSystem* combat_system_arg);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -89,6 +92,8 @@ private:
 	StageSystem* stage_system;
 	MainMenuSystem* main_menu_system;
 	OverworldSystem* overworld_system;
+	CutSceneSystem* cutscene_system;
+	CombatSystem* combat_system;
 
 	float current_speed;
 	float player_speed;

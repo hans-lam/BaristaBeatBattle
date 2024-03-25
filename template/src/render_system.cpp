@@ -303,7 +303,7 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 	case StageSystem::Stage::cutscene:
 		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
 	case StageSystem::Stage::turn_based:
-		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
+		glClearColor(0, 0, 0, 1.0); // light brown
 	case StageSystem::Stage::minigame:
 		glClearColor(0.8549, 0.7765, 0.6941, 1.0); // light brown
 	}

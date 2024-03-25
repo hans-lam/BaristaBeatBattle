@@ -2,8 +2,6 @@
 #include "world_system.hpp"
 #include "world_init.hpp"
 #include "physics_system.hpp"
-#include "turn_based_system/character_factory/character_factory.hpp"
-#include "turn_based_system/level_factory.hpp"
 #include "stage_system/stage_system.hpp"
 
 // stlib
@@ -145,15 +143,18 @@ GLFWwindow* WorldSystem::create_window() {
 }
 
 void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg, StageSystem* stage_system_arg,
-	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg) {
+	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
+	CombatSystem* combat_system_arg) {
 	// Global Systems Set up
 	this->renderer = renderer_arg;
 	this->turn_based = turn_based_arg;
 	this->stage_system = stage_system_arg;
-	this->overworld_system = overworld_system_arg;
 	stage = 0;
 
 	this->main_menu_system = main_menu_system_arg;
+	this->overworld_system = overworld_system_arg;
+	this->cutscene_system = cutscene_system_arg;
+	this->combat_system = combat_system_arg;
 
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
@@ -194,28 +195,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	set_fps(elapsed_ms_since_last_update);
 
 	StageSystem::Stage curr_stage = stage_system->get_current_stage();
+	// Removing out of screen entities
+	auto& motions_registry = registry.motions;
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
-	// Removing out of screen entities
-	auto& motions_registry = registry.motions;
-
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	    Motion& motion = motions_registry.components[i];
-		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
-				registry.remove_all_components_of(motions_registry.entities[i]);
-		}
-	}
-
-	// Spawning new enemy drinks
+	// Handle overworld stepping 
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
+		// Remove entities that leave the screen on the left side
+		// Iterate backwards to be able to remove without unterfering with the next object to visit
+		// (the containers exchange the last element with the current)
+		for (int i = (int)motions_registry.components.size() - 1; i >= 0; --i) {
+			Motion& motion = motions_registry.components[i];
+			if (motion.position.x + abs(motion.scale.x) < 0.f) {
+				if (!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
+					registry.remove_all_components_of(motions_registry.entities[i]);
+			}
+		}
+
 		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
 			// Reset timer
 			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
@@ -226,96 +226,43 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// TODO: fix to spawn from only the edges
 				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
 		}
+
+		// Processing the chicken state
+		assert(registry.screenStates.components.size() <= 1);
+		ScreenState& screen = registry.screenStates.components[0];
+
+		// process attacks
+		float min_attack_counter_ms = 700.f;
+		for (Entity entity : registry.attackTimers.entities) {
+			// progress timer
+			AttackTimer& counter = registry.attackTimers.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			if (counter.counter_ms < min_attack_counter_ms) {
+				min_attack_counter_ms = counter.counter_ms;
+			}
+
+			// handle attack
+			Motion& player_motion = registry.motions.get(entity);
+			player_motion.angle += M_PI / 12.0f;
+
+			// stop attack once timer expires
+			if (counter.counter_ms < 0) {
+				registry.attackTimers.remove(entity);
+				player_motion.angle = 0.f;
+				return true;
+			}
+		}
 	}
 
-	//// Highlighting current char 
-	//if (stage == 1) {
-
-	//	Entity active_char_entity = turn_based->get_active_character();
-	//	
-	//	if (active_char_entity != emptyEntity) {
-
-
-	//		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
-	//		// setting player color 
-	//		for (Entity entity : registry.partyMembers.entities) {
-	//			vec3& color = registry.colors.get(entity);
-	//			
-	//			if (entity == active_char_entity) {
-	//				// change current player character to red
-	//				color = { 1.0f, 0.f, 0.f };
-	//			}
-	//			else {
-	//				// return player character color to normal
-	//				color = { 1, 0.8f, 0.8f };
-	//			}
-	//		}
-
-	//		// Setting menu's active 
-	//		for (Entity menu_entity : registry.menu.entities) {
-	//			Menu& menu = registry.menu.get(menu_entity);
-	//			Entity attack = menu.options[0];
-	//			Entity rest = menu.options[1];
-	//			Entity pourIt = menu.options[2];
-	//			MenuOption& atk = registry.menuOptions.get(attack);
-	//			MenuOption& rst = registry.menuOptions.get(rest);
-	//			MenuOption& prt = registry.menuOptions.get(pourIt);
-
-	//			if (menu.associated_character == active_char_entity) {
-	//				if (!registry.renderRequests.has(attack)) {
-	//					registry.renderRequests.insert(
-	//						attack,
-	//						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-	//						EFFECT_ASSET_ID::TEXTURED,
-	//						GEOMETRY_BUFFER_ID::SPRITE });
-	//				}
-	//				if (!registry.renderRequests.has(rest)) {
-	//					registry.renderRequests.insert(
-	//						rest,
-	//						{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-	//						EFFECT_ASSET_ID::TEXTURED,
-	//						GEOMETRY_BUFFER_ID::SPRITE });
-	//				}
-	//				if (!registry.renderRequests.has(pourIt)) {
-	//					registry.renderRequests.insert(
-	//						pourIt,
-	//						{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-	//						EFFECT_ASSET_ID::TEXTURED,
-	//						GEOMETRY_BUFFER_ID::SPRITE });
-	//				}
-
-	//			}
-	//			else {
-	//				if (registry.renderRequests.has(attack)) {
-	//					registry.renderRequests.remove(attack);
-	//				}
-	//				if (registry.renderRequests.has(rest)) {
-	//					registry.renderRequests.remove(rest);
-	//				}
-	//				if (registry.renderRequests.has(pourIt)) {
-	//					registry.renderRequests.remove(pourIt);
-	//				}
-	//			}
-
-	//			// handle color change of option 
-	//			for (Entity entity : menu.options) {
-	//				vec3& color = registry.colors.get(entity);
-
-	//				if (entity == menu.activeOption) {
-	//					color.x = 0.8f;
-	//				}
-	//				else {
-	//					color.x = 1;
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-	// Processing the chicken state
-	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
+	// Handle turn based stepping
+	if (curr_stage == StageSystem::Stage::turn_based) {
+		if (out_of_combat) {
+			combat_system->handle_level(renderer);
+		}
+		else {
+			combat_system->handle_turn_rendering();
+		}
+	}
 
  //   float min_counter_ms = 3000.f;
 	//for (Entity entity : registry.deathTimers.entities) {
@@ -336,28 +283,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//}
 	//// reduce window brightness if any of the present chickens is dying
 	//screen.darken_screen_factor = 1 - min_counter_ms / 3000;
-
-	// process attacks
-	float min_attack_counter_ms = 700.f;
-	for (Entity entity : registry.attackTimers.entities) {
-		// progress timer
-		AttackTimer& counter = registry.attackTimers.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-		if (counter.counter_ms < min_attack_counter_ms) {
-			min_attack_counter_ms = counter.counter_ms;
-		}
-
-		// handle attack
-		Motion& player_motion = registry.motions.get(entity);
-		player_motion.angle += M_PI / 12.0f;
-
-		// stop attack once timer expires
-		if (counter.counter_ms < 0) {
-			registry.attackTimers.remove(entity);
-			player_motion.angle = 0.f;
-			return true;
-		}
-	}
 
 	//// Countdown minigame for ending
 	//if (stage == 2) {
@@ -437,6 +362,8 @@ void WorldSystem::restart_game() {
 	// Set Default values for systems
 	main_menu_system->init(stage_system);
 	overworld_system->init(stage_system);
+	cutscene_system->init(stage_system);
+	combat_system->init(stage_system, turn_based);
 
 	// Reset the game speed
 	current_speed = 1.f;
@@ -465,6 +392,9 @@ void WorldSystem::restart_game() {
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
+
+	// Create Background for turn based battle
+	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create the main menu
 	createMainMenu(renderer, { 0, 0 });
@@ -781,15 +711,6 @@ void WorldSystem::handle_mini(int bpm) {
 	}
 }
 
-void player_attack() {
-	for (uint i = 0; i < registry.players.size(); i++) {
-		Entity entity = registry.players.entities[i];
-		if (!registry.attackTimers.has(entity)) {
-			registry.attackTimers.emplace(registry.players.entities[i]);
-		}
-	}
-}
-
 void WorldSystem::change_stage(int level) {
 	if (level == 0) {
 		return;
@@ -833,44 +754,6 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
-//Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
-//	auto entity = Entity();
-//
-//	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-//	registry.meshPtrs.emplace(entity, &mesh);
-//
-//	Motion& motion = registry.motions.emplace(entity);
-//	motion.position = position;
-//	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
-//	motion.angle = 0.f; 
-//	motion.velocity = { 0.f, 0.f }; 
-//
-//	if (window == 1) {
-//		registry.renderRequests.insert(
-//			entity,
-//			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
-//			  EFFECT_ASSET_ID::TEXTURED,
-//			  GEOMETRY_BUFFER_ID::SPRITE });
-//
-//	} else if (window == 2) {
-//		registry.renderRequests.insert(
-//			entity,
-//			{ TEXTURE_ASSET_ID::BATTLEBOARD,
-//			  EFFECT_ASSET_ID::TEXTURED,
-//			  GEOMETRY_BUFFER_ID::SPRITE });
-//
-//	} else {
-//		registry.renderRequests.insert(
-//			entity,
-//			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
-//			  EFFECT_ASSET_ID::TEXTURED,
-//			  GEOMETRY_BUFFER_ID::SPRITE });
-//
-//	}
-//	
-//	return entity;
-//}
-
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	switch (stage_system->get_current_stage()) {
@@ -879,6 +762,23 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		break;
 	case StageSystem::Stage::overworld:
 		overworld_system->handle_overworld_keys(key, action, player_speed);
+		break;
+	case StageSystem::Stage::cutscene:
+		cutscene_system->handle_cutscene_keys(key, action);
+		break;
+	case StageSystem::Stage::turn_based:
+		CombatSystem::SoundMapping play_sound = combat_system->handle_turnbased_keys(key, action);
+
+		// handle sound effects
+		switch (play_sound) {
+		case CombatSystem::SoundMapping::change_sound:
+			Mix_PlayChannel(-1, change_selection_effect, 0);
+			break;
+		case CombatSystem::SoundMapping::attack_sound:
+			Mix_PlayChannel(-1, attack_sound, 0);
+			break;
+		}
+
 		break;
 	}
 
@@ -939,31 +839,31 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Justin 40 minutes later: I had plans to put a temp screen but i went and did other parts of the project sorry
 		// createTutorialWindow
 		
-		if (stage == 1)
-			if (out_of_combat) {
-				//render battle background
-				createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
+	//	if (stage == 1)
+	//		if (out_of_combat) {
+	//			//render battle background
+	//			createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
 
-				int x_base = 100;
-				vec2 base_ally_position = { x_base, window_height_px -  200 };
-				vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-				Level* temp_level = construct_level_one(renderer, base_ally_position, base_enemy_position);
+	//			int x_base = 100;
+	//			vec2 base_ally_position = { x_base, window_height_px -  200 };
+	//			vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
+	//			Level* temp_level = construct_level_one(renderer, base_ally_position, base_enemy_position);
 
 
-				int j = 0;
-				for (Entity party_member_entity : temp_level->allies) {
-					
+	//			int j = 0;
+	//			for (Entity party_member_entity : temp_level->allies) {
+	//				
 
-					// Creating Menu entity 
-					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
-					Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
-					Menu& menu = registry.menu.get(menuEnt);
+	//				// Creating Menu entity 
+	//				vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
+	//				Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
+	//				Menu& menu = registry.menu.get(menuEnt);
 
-					j++;
-				}
+	//				j++;
+	//			}
 
-				turn_based->start_encounter(temp_level);
-			}
+	//			turn_based->start_encounter(temp_level);
+	//		}
 
 	}
 
@@ -1011,8 +911,4 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		printf("Current speed = %f\n", current_speed);
 	}
 	current_speed = fmax(0.f, current_speed);
-}
-
-int WorldSystem::get_stage() {
-	return stage;
 }
