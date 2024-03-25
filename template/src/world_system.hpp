@@ -19,6 +19,7 @@
 #include "stage_system/overworld/overworld_system.hpp"
 #include "stage_system/cutscene/cutscene_system.hpp"
 #include "stage_system/combat/combat_system.hpp"
+#include "stage_system/combat/minigame_system.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
@@ -30,12 +31,11 @@ public:
 	// Creates a window
 	GLFWwindow* create_window();
 
-
 	// starts the game
 	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg, 
 		StageSystem* stage_system_arg, MainMenuSystem* main_menu_system_arg,
 		OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
-		CombatSystem* combat_system_arg);
+		CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -52,21 +52,13 @@ public:
 	// check if player is in world bounds
 	bool player_in_bounds(Motion* motion, bool is_x);
 
-	// handle player movement
-	void handle_player_movement(int key, int action);
-
-	void handle_menu(int key, TurnBasedSystem* turn_based);
-
 	void handle_mini(int bpm);
-
-	// handle option selection 
-	void handle_selection();
-
-	// get stage 
-	int get_stage();
 private:
 	// setting fps
 	void set_fps(float elapsed_ms_since_last_update);
+
+	// setting music
+	void set_music(StageSystem::Stage curr_stage);
 
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
@@ -77,14 +69,8 @@ private:
 	// change stage 
 	void change_stage(int level);
 
-	// handle attack for turn-based
-	void handle_attack(Entity active_char_entity, std::string ability);
-
 	// OpenGL window handle
 	GLFWwindow* window;
-
-	// Number of bug eaten by the chicken, displayed in the window title
-	unsigned int points;
 
 	// Game state
 	RenderSystem* renderer;
@@ -94,6 +80,7 @@ private:
 	OverworldSystem* overworld_system;
 	CutSceneSystem* cutscene_system;
 	CombatSystem* combat_system;
+	MinigameSystem* minigame_system;
 
 	float current_speed;
 	float player_speed;

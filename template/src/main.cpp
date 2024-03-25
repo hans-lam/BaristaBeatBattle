@@ -15,6 +15,7 @@
 #include "stage_system/overworld/overworld_system.hpp"
 #include "stage_system/cutscene/cutscene_system.hpp"
 #include "stage_system/combat/combat_system.hpp"
+#include "stage_system/combat/minigame_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -28,6 +29,7 @@ int main()
 	OverworldSystem overworld_system;
 	CutSceneSystem cutscene_system;
 	CombatSystem combat_system;
+	MinigameSystem minigame_system;
 
 	// Global systems
 	WorldSystem world;
@@ -48,7 +50,7 @@ int main()
 	turn_based.init(&ai_system);
 	stage_system.init();
 	world.init(&renderer, &turn_based, &stage_system, &main_menu_system, 
-		&overworld_system, &cutscene_system, &combat_system);
+		&overworld_system, &cutscene_system, &combat_system, &minigame_system);
 
 	// setup fonts 
 	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";

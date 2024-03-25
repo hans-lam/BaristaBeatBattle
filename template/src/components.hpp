@@ -21,6 +21,10 @@ struct TurnBased {
 
 };
 
+struct MiniStage {
+
+};
+
 struct TutorialBoard {
 
 };

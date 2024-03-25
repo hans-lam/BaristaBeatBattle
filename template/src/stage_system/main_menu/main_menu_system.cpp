@@ -10,6 +10,7 @@ MainMenuSystem::MainMenuSystem() :
 
 void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
+	selected_option = new_game;
 }
 
 void MainMenuSystem::handle_menu_keys(int key, int action) {

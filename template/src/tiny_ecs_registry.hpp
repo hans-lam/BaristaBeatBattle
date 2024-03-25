@@ -36,6 +36,7 @@ public:
 	ComponentContainer<TutorialBoard> tutorials;
 	ComponentContainer<CutScene> cutscenes;
 	ComponentContainer<TurnBased> turnBased;
+	ComponentContainer<MiniStage> miniStage;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -68,6 +69,7 @@ public:
 		registry_list.push_back(&tutorials);
 		registry_list.push_back(&cutscenes);
 		registry_list.push_back(&turnBased);
+		registry_list.push_back(&miniStage);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);

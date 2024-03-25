@@ -26,8 +26,7 @@ int fps = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem()
-	: points(0)
-	, player_speed(300.f)
+	: player_speed(300.f)
 	, next_eagle_spawn(0.f)
 	, next_bug_spawn(0.f)
 	, next_enemy_spawn(0.f)
@@ -38,8 +37,12 @@ WorldSystem::WorldSystem()
 
 WorldSystem::~WorldSystem() {
 	// Destroy music components
+	if (main_menu_music != nullptr) 
+		Mix_FreeMusic(main_menu_music);
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (cutscene_music != nullptr)
+		Mix_FreeMusic(cutscene_music);
 	if (turn_based_music != nullptr)
 		Mix_FreeMusic(turn_based_music); 
 	if (minigame_music != nullptr)
@@ -117,7 +120,9 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
+	main_menu_music = Mix_LoadMUS(audio_path("main_menu_music.wav").c_str());
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
+	cutscene_music = Mix_LoadMUS(audio_path("cutscene_music.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
 	//minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
@@ -144,7 +149,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg, StageSystem* stage_system_arg,
 	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
-	CombatSystem* combat_system_arg) {
+	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg) {
 	// Global Systems Set up
 	this->renderer = renderer_arg;
 	this->turn_based = turn_based_arg;
@@ -155,9 +160,10 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	this->overworld_system = overworld_system_arg;
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
+	this->minigame_system = minigame_system_arg;
 
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(main_menu_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
 	// Setting up the stage to music map
@@ -190,6 +196,14 @@ void WorldSystem::set_fps(float elapsed_ms_since_last_update) {
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 }
 
+void WorldSystem::set_music(StageSystem::Stage curr_stage) {
+	if (stage_system->get_music_changed()) {
+		Mix_PlayMusic(stage_music_map[curr_stage], -1);
+		Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+		stage_system->set_music_changed();
+	}
+}
+
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	set_fps(elapsed_ms_since_last_update);
@@ -197,6 +211,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	StageSystem::Stage curr_stage = stage_system->get_current_stage();
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
+
+	set_music(curr_stage);
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
@@ -211,7 +227,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)motions_registry.components.size() - 1; i >= 0; --i) {
 			Motion& motion = motions_registry.components[i];
 			if (motion.position.x + abs(motion.scale.x) < 0.f) {
-				if (!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
+				if (!registry.players.has(motions_registry.entities[i]) && 
+					!registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
 					registry.remove_all_components_of(motions_registry.entities[i]);
 			}
 		}
@@ -263,26 +280,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			combat_system->handle_turn_rendering();
 		}
 	}
-
- //   float min_counter_ms = 3000.f;
-	//for (Entity entity : registry.deathTimers.entities) {
-	//	// progress timer
-	//	DeathTimer& counter = registry.deathTimers.get(entity);
-	//	counter.counter_ms -= elapsed_ms_since_last_update;
-	//	if(counter.counter_ms < min_counter_ms){
-	//	    min_counter_ms = counter.counter_ms;
-	//	}
-
-	//	// restart the game once the death timer expired
-	//	if (counter.counter_ms < 0) {
-	//		registry.deathTimers.remove(entity);
-	//		screen.darken_screen_factor = 0;
- //           restart_game();
-	//		return true;
-	//	}
-	//}
-	//// reduce window brightness if any of the present chickens is dying
-	//screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
 	//// Countdown minigame for ending
 	//if (stage == 2) {
@@ -364,6 +361,7 @@ void WorldSystem::restart_game() {
 	overworld_system->init(stage_system);
 	cutscene_system->init(stage_system);
 	combat_system->init(stage_system, turn_based);
+	minigame_system->init(stage_system);
 
 	// Reset the game speed
 	current_speed = 1.f;
@@ -433,24 +431,8 @@ void WorldSystem::handle_collisions() {
 
 					// Stage = 1 maps to turn based
 					stage_system->set_stage(StageSystem::Stage::cutscene);
-
-					// Play music
-					Mix_PlayMusic(turn_based_music, -1);
-					// max volume is at 128; this sets it to 75%
-					Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
 				}
 			}
-			//// Checking Player - Eatable collisions
-			//else if (registry.eatables.has(entity_other)) {
-			//	if (!registry.deathTimers.has(entity)) {
-			//		// chew, count points, and set the LightUp timer
-			//		registry.remove_all_components_of(entity_other);
-			//		Mix_PlayChannel(-1, chicken_eat_sound, 0);
-			//		++points;
-
-			//		// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the chicken entity by modifying the ECS registry
-			//	}
-			//}
 		}
 	}
 
@@ -489,159 +471,6 @@ bool WorldSystem::is_over() const {
 //
 //	return in_bounds;
 //}
-
-// chicken movement helper
-void WorldSystem::handle_player_movement(int key, int action) {
-
-	for (uint i = 0; i < registry.players.size(); i++) {
-		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
-		// do not move player if it is dying
-		if (registry.deathTimers.has(registry.players.entities[i])) continue;
-		// check if player is in bounds
-		bool is_x = (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT);
-		//if (!player_in_bounds(&player_motion, is_x)) {
-		//	action = GLFW_RELEASE;
-		//}
-
-		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-			if (key == GLFW_KEY_UP) {
-				player_motion.velocity.y = -player_speed;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = -player_speed;
-			}
-			else if (key == GLFW_KEY_DOWN) {
-				player_motion.velocity.y = player_speed;
-			}
-			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = player_speed;
-			}
-
-		}
-		else if (action == GLFW_RELEASE) {
-			if (key == GLFW_KEY_UP) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = 0.0f;
-			}
-			else if (key == GLFW_KEY_DOWN) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = 0.0f;
-			}
-		}
-	}
-
-
-}
-
-void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
-
-	Entity active_char_entity = turn_based->get_active_character();
-
-	if (active_char_entity != emptyEntity) {
-
-		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-		
-		for (Entity menu_entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(menu_entity);
-			int arrayLen = std::end(menu.options) - std::begin(menu.options);
-			int index = -1;
-			for (int i = 0; i < arrayLen; i++) {
-				if (menu.activeOption == menu.options[i]) {
-					index = i; 
-					break;
-				}
-			}
-		
-			if (menu.associated_character == active_char_entity) {
-				if (key == GLFW_KEY_UP) {
-					Mix_PlayChannel(-1, change_selection_effect, 0); 
-					if (index > 0) {
-						menu.activeOption = menu.options[index - 1];
-					}
-					else {
-						menu.activeOption = menu.options[(arrayLen - 1)];
-					}
-				}
-				else if (key == GLFW_KEY_DOWN) {
-					Mix_PlayChannel(-1, change_selection_effect, 0); 
-					if (index < (arrayLen - 1)) {
-						menu.activeOption = menu.options[index + 1];
-					}
-					else {
-						menu.activeOption = menu.options[0];
-					}
-				}
-				break;
-			}
-		}
-	}
-}
-
-void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) {
-	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
-	if (!out_of_combat) {
-		Mix_PlayChannel(-1, attack_sound, 0);
-
-		Character* target;
-
-		if (ability == "rest") {
-			target = registry.characterDatas.get(active_char_entity).characterData;
-		}
-		else {
-			Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-			target = registry.characterDatas.get(enemy_target_entity).characterData;
-		}
-
-
-		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
-
-		if (is_game_over != 0) {
-			restart_game();
-		}
-	}
-
-
-}
-
-void WorldSystem::handle_selection() {
-	Entity active_char_entity = turn_based->get_active_character();
-	if (active_char_entity != emptyEntity) {
-		// Get active option
-		for (Entity menu_entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(menu_entity);
-
-			// found correct menu
-			if (menu.associated_character == active_char_entity) {
-				Entity correctOption = menu.activeOption; 
-				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
-
-				if (opComponent.option == "attack") {
-					handle_attack(active_char_entity, "Basic Attack");
-				}
-				else if (opComponent.option == "rest") {
-					// TODO USE REST ABILITY
-
-					// set stage to 2, which is mini-game mapping
-
-					handle_attack(active_char_entity, "rest");
-					
-				}
-				else if (opComponent.option == "pour it") {
-					handle_mini(120);
-
-					if (stage == 1) {
-						change_stage(2);
-					}
-				}
-			}
-		}
-	}
-}
 
 void WorldSystem::handle_mini(int bpm) { 
 	bool hit = false;
@@ -717,10 +546,6 @@ void WorldSystem::change_stage(int level) {
 	} 
 	else if (level == 1) {
 		stage = 1;
-		// Play music
-		Mix_PlayMusic(turn_based_music, -1);
-		// max volume is at 128; this sets it to 75%
-		Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
 		// Anything  we need to set upon changing back should go here or in step
 		// Remove all minigame entities 
 		for (Entity entity : registry.miniGame.entities) {
@@ -766,9 +591,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	case StageSystem::Stage::cutscene:
 		cutscene_system->handle_cutscene_keys(key, action);
 		break;
-	case StageSystem::Stage::turn_based:
+	case StageSystem::Stage::turn_based: {
 		CombatSystem::SoundMapping play_sound = combat_system->handle_turnbased_keys(key, action);
-
 		// handle sound effects
 		switch (play_sound) {
 		case CombatSystem::SoundMapping::change_sound:
@@ -781,90 +605,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 		break;
 	}
-
-	// handle movement
-	//if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-	//	if (stage == 0) {
-	//		handle_player_movement(key, action);
-	//	}
-	//	else if (stage == 1) {
-	//		if (action == GLFW_RELEASE) {
-	//			handle_menu(key, turn_based);
-	//		}
-	//	}
-	//}
-
-	//if (action == GLFW_PRESS && key == GLFW_KEY_T) {
-
-	//	if (tutorialOn == false) {
-	//		if (stage == 0) {
-	//			tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
-	//			tutorialOn = true;
-	//		}
-	//		else if (stage == 1) {
-	//			tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
-	//			tutorialOn = true;
-	//		}
-
-	//	}
-	//	else if (tutorialOn == true) {
-	//		registry.renderRequests.remove(tutorial);
-	//		tutorialOn = false;
-	//	}
-
-	//}
-
-	//// player attack
-	//if (action == GLFW_PRESS && key == GLFW_KEY_A) {
-	//	if (stage == 0)
-	//		player_attack();
-	//}
-
-	// turn based option
-	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		if (stage == 1)
-			handle_selection();
+	case StageSystem::Stage::minigame:
+		minigame_system->handle_minigame_key(key, action);
+		break;
 	}
 
 	// Minigame 
 	if (action == GLFW_PRESS && key == GLFW_KEY_D) {
 		if (stage == 2)
 			handle_mini(120);
-	}
-
-	// start encounter
-	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
-		
-		// Justin: This is very bad code, I am using this function I wrote just to render the pokemon screen 
-		// Justin 40 minutes later: I had plans to put a temp screen but i went and did other parts of the project sorry
-		// createTutorialWindow
-		
-	//	if (stage == 1)
-	//		if (out_of_combat) {
-	//			//render battle background
-	//			createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
-
-	//			int x_base = 100;
-	//			vec2 base_ally_position = { x_base, window_height_px -  200 };
-	//			vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-	//			Level* temp_level = construct_level_one(renderer, base_ally_position, base_enemy_position);
-
-
-	//			int j = 0;
-	//			for (Entity party_member_entity : temp_level->allies) {
-	//				
-
-	//				// Creating Menu entity 
-	//				vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
-	//				Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
-	//				Menu& menu = registry.menu.get(menuEnt);
-
-	//				j++;
-	//			}
-
-	//			turn_based->start_encounter(temp_level);
-	//		}
-
 	}
 
 	// Going to Minigame encounter manually

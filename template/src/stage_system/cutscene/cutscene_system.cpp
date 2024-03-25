@@ -9,7 +9,9 @@ CutSceneSystem::CutSceneSystem() :
 {}
 
 void CutSceneSystem::init(StageSystem* stage_system_arg) {
-	stage_system = stage_system_arg; 
+	stage_system = stage_system_arg;
+	cutscene_done = false;
+	skip_cutscene = false;
 }
 
 void CutSceneSystem::handle_cutscene_timer(float elapsed_ms_since_last_update) {

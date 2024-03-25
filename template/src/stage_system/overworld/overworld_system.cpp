@@ -11,6 +11,7 @@ OverworldSystem::OverworldSystem() :
 
 void OverworldSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
+	overworld_tutorial = false;
 } 
 
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {

@@ -20,6 +20,12 @@ public:
 		return this->current_stage;
 	}
 
+	bool get_music_changed() const {
+		return this->music_changed;
+	}
+
+	void set_music_changed();
+
 	void set_stage(Stage target);
 private: 
 	void set_main_menu();
@@ -33,4 +39,6 @@ private:
 	void set_minigame();
 
 	Stage current_stage;
+
+	bool music_changed;
 };

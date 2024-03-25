@@ -9,6 +9,7 @@ StageSystem::StageSystem()
 void StageSystem::init()
 {
 	current_stage = main_menu;
+	music_changed = false;
 }
 
 void StageSystem::set_stage(Stage target)
@@ -32,11 +33,18 @@ void StageSystem::set_stage(Stage target)
 		set_minigame();
 		break;
 	}
+
+	music_changed = true;
+}
+
+void StageSystem::set_music_changed() {
+	music_changed = !music_changed;
 }
 
 void StageSystem::set_main_menu()
 {
-
+	// Do anything here we would need to do if going back to main menu
+	// Not sure when/how we go back to main menu at the moment
 }
 
 void StageSystem::set_overworld()
@@ -55,7 +63,7 @@ void StageSystem::set_overworld()
 			render.shown = true;
 	} 
 
-	// Set all entites from turn_based to not shown
+	// Set all entites from turn_based to not be shown
 	for (Entity entity : registry.turnBased.entities) {
 		if (registry.renderRequests.has(entity)) {
 			RenderRequest& render = registry.renderRequests.get(entity);
@@ -88,10 +96,9 @@ void StageSystem::set_turn_based()
 		registry.remove_all_components_of(entity);
 	}
 
-	// Set all overworld entities to be not shown
-	for (Entity entity : registry.overWorld.entities) {
-		RenderRequest& render = registry.renderRequests.get(entity);
-		render.shown = false;
+	// Set all minigame based entities to not be shown
+	for (Entity entity : registry.miniStage.entities) {
+
 	}
 
 	// Set turn based entities to be rendered
@@ -106,5 +113,17 @@ void StageSystem::set_turn_based()
 
 void StageSystem::set_minigame()
 {
+	// Set turn based entities to be rendered
+	for (Entity entity : registry.turnBased.entities) {
+		if (registry.renderRequests.has(entity)) {
+			RenderRequest& render = registry.renderRequests.get(entity);
+			if (!registry.tutorials.has(entity))
+				render.shown = false;
+		}
+	}
 
+	// Set minigame based entities to be rendered 
+	for (Entity entity : registry.miniStage.entities) {
+
+	}
 }

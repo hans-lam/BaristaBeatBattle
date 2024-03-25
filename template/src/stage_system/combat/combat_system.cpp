@@ -9,6 +9,8 @@ CombatSystem::CombatSystem() :
 void CombatSystem::init(StageSystem* stage_system_arg, TurnBasedSystem* turn_based_arg) {
 	stage_system = stage_system_arg;
 	turn_based = turn_based_arg;
+	// This can change depending on how we implement saving/loading
+	selected_level = level_one;
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int action) {
