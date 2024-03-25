@@ -115,12 +115,6 @@ public:
 	// Draw all entities
 	void draw(StageSystem::Stage current_stage);
 
-	// Draw Turn Based 
-	void drawTurn();
-
-	// Draw Mini Game
-	void drawMini();
-
 	// Render text
 	void renderText(const std::string& text, float x, float y,
 		float scale, const glm::vec3& color,
