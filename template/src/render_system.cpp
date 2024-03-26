@@ -194,9 +194,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	glUniform3fv(color_uloc, 1, (float *)&color);
 	gl_has_errors();
 
-	//glGenVertexArrays(1, &dummy_VAO);
-	//glBindVertexArray(dummy_VAO);
-
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
 	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -225,6 +222,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 // wind
 void RenderSystem::drawToScreen()
 {
+
+	glBindVertexArray(dummy_VAO);
 	// Setting shaders
 	// get the wind texture, sprite mesh, and program
 	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WIND]);
@@ -317,6 +316,7 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 							  // sprites back to front
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
+	glBindVertexArray(dummy_VAO);
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
@@ -325,6 +325,11 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
+	}
+
+
+	for (TextRenderRequest request : registry.textRenderRequests.components) {
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, request.trans);
 	}
 
 	// Truely render to the screen
