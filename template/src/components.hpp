@@ -126,6 +126,7 @@ struct AttackTimer
 struct InjuredTimer
 {
 	float counter_ms = 3000;
+	float redness_factor = 1.0f;
 };
 
 struct MiniGameTimer

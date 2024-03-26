@@ -350,6 +350,26 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// deal with injury graphics
+	// i do not know why this does not work if its in turn based system
+	float min_injury_counter_ms = 3000.f;
+	for (Entity entity : registry.injuryTimers.entities) {
+		// progress timer, 
+		InjuredTimer& counter = registry.injuryTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+		counter.redness_factor -= 1.f / 200.f; 
+		if (counter.counter_ms < min_injury_counter_ms) {
+			min_injury_counter_ms = counter.counter_ms;
+		}
+
+		// stop shaking the attacked character after 3 seconds
+		if (counter.counter_ms < 0) {
+			//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+			registry.injuryTimers.remove(entity);
+		}
+	}
+
 	// Countdown minigame for ending
 	if (stage == 2) {
 		bool ended = false;

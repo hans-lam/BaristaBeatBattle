@@ -498,7 +498,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	// give entity turn based components

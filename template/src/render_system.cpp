@@ -151,6 +151,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		render_request.used_effect == EFFECT_ASSET_ID::LIGHTS || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		
 		gl_has_errors();
 		assert(in_texcoord_loc >= 0);
 
@@ -188,14 +189,9 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	else if (render_request.used_effect == EFFECT_ASSET_ID::BATTLE) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+
 		gl_has_errors();
 		assert(in_texcoord_loc >= 0);
-
-		GLint player_pos_uloc = glGetUniformLocation(program, "player_pos");
-		float rel_x = (registry.motions.get(registry.players.entities[0]).position.x - (window_width_px / 2.f));
-		//std::cout << "curr pos" << rel_x << std::endl;
-
-		glUniform1f(player_pos_uloc, rel_x);
 
 		//glGenVertexArrays(1, &dummy_VAO);
 		glBindVertexArray(dummy_VAO);
@@ -221,6 +217,31 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
+
+		// is the injury timer on
+		GLint injured_uloc = glGetUniformLocation(program, "is_injured");
+		GLfloat redness_uloc = glGetUniformLocation(program, "redness");
+		GLuint counter_uloc = glGetUniformLocation(program, "counter");
+		assert(counter_uloc >= 0);
+		assert(injured_uloc >= 0);
+		assert(redness_uloc >= 0);
+
+		gl_has_errors();
+
+		if (registry.injuryTimers.has(entity)) {
+			InjuredTimer& injury = registry.injuryTimers.get(entity);
+			glUniform1i(injured_uloc, 1);
+			glUniform1f(redness_uloc, injury.redness_factor);
+			glUniform1f(counter_uloc, (3000.f - injury.counter_ms) / 3000.f);
+		}
+		else {
+			glUniform1i(injured_uloc, 0);
+			glUniform1f(redness_uloc, 0.0);
+		}
+
+		gl_has_errors();
+
+		
 	}
 	else
 	{
