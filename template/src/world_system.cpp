@@ -158,6 +158,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 
 	this->main_menu_system = main_menu_system_arg;
 	this->overworld_system = overworld_system_arg;
+	// overworld_system->init(stage_system_arg);
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
 	this->minigame_system = minigame_system_arg;
@@ -221,6 +222,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Handle overworld stepping 
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
+		
 		// Remove entities that leave the screen on the left side
 		// Iterate backwards to be able to remove without unterfering with the next object to visit
 		// (the containers exchange the last element with the current)
@@ -233,16 +235,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
-		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-			// Reset timer
-			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-			// Create enemy drink with random initial velocity, position
-			Entity test = createEnemyDrink(renderer,
-				// TODO: make negative velocity possible
-				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-				// TODO: fix to spawn from only the edges
-				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		}
+		create_overworld_levels(5);
+		// This helper is replacing the block that spawns in enemies. 
+
+
+		// This block spawns in enemies
+		//if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+		//	// Reset timer
+		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		//	// Create enemy drink with random initial velocity, position
+		//	Entity test = createEnemyDrink(renderer,
+		//		// TODO: make negative velocity possible
+		//		vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+		//		// TODO: fix to spawn from only the edges
+		//		vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		//}
 
 		// Processing the chicken state
 		assert(registry.screenStates.components.size() <= 1);
@@ -347,7 +354,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	return true;
 }
+void WorldSystem::create_overworld_levels(int num_levels) {
+	// For now TODO: HELP
+	if (registry.levelNode.components.size() <= num_levels) {
+		// replace createEnemyDrink with createLevelNode
+		
+		for (int i = 0; i < num_levels; i++) {
+			// 1500 is window_width_px
+			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 600);
+			Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), levelpos);
 
+		}
+		std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+	}
+}
 // Reset the world state to its initial state
 void WorldSystem::restart_game() {
 	stage_system->set_stage(StageSystem::Stage::main_menu);
@@ -578,6 +598,9 @@ void WorldSystem::change_stage(int level) {
 		createMiniResult(renderer, { window_width_px / 4, window_height_px / 2 });
 	}
 }
+
+
+
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {

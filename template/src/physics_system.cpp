@@ -343,11 +343,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		// (void)elapsed_ms; // placeholder to silence unused warning until implemented
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG UPDATES HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	
 	// Check for collisions between all moving entities
     ComponentContainer<Motion> &motion_container = registry.motions;
 	for(uint i = 0; i<motion_container.components.size(); i++)
@@ -378,8 +374,4 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG collisions HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }

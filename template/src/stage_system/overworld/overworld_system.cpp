@@ -3,6 +3,7 @@
 
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <world_init.hpp>
 
 OverworldSystem::OverworldSystem() : 
 	overworld_tutorial(false)
@@ -12,6 +13,8 @@ OverworldSystem::OverworldSystem() :
 void OverworldSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
 	overworld_tutorial = false;
+	// I dont think this call works
+	//create_overworld_levels();
 } 
 
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {
@@ -29,6 +32,12 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 	}
 }
 
+//void OverworldSystem::create_overworld_levels() {
+//	vec2 level1pos = vec2(100, 100);
+//	Entity test = createEnemyDrink(renderer, vec2(0.f, 0.f), level1pos);
+//	std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+//}
+
 void OverworldSystem::handle_player_movement(int key, int action, float player_speed) {
 	for (int i = 0; i < registry.players.size(); i++) {
 		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
@@ -45,7 +54,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 				player_motion.velocity.y = -player_speed;
 			}
 			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = -player_speed;
+				//player_motion.velocity.x = -player_speed;
+
 			}
 			else if (key == GLFW_KEY_DOWN) {
 				player_motion.velocity.y = player_speed;

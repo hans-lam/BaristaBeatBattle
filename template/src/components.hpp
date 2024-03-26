@@ -29,6 +29,17 @@ struct TutorialBoard {
 
 };
 
+struct LevelNode
+{
+	vec2 position;
+	int level_number;
+	LevelNode* left_level;
+	LevelNode* right_level;
+	LevelNode* up_level;
+	LevelNode* down_level;
+
+};
+
 // Player component
 struct Player
 {
