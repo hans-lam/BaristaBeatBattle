@@ -960,6 +960,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 					Menu& menu = registry.menu.get(menuEnt);
 
 					j++;
+
+					vec2 posn = registry.motions.get(party_member_entity).position;
+					create_health_bar_outline(renderer, posn + vec2(25.f, -125.f));
+					create_health_bar_fill(renderer, posn + vec2(50.f, -125.f), party_member_entity);
+			
+				}
+
+				for (Entity enemy_member : temp_level->enemies) {
+					vec2 posn = registry.motions.get(enemy_member).position;
+					create_health_bar_outline(renderer, posn + vec2(-25.f, -125.f));
+					create_health_bar_fill(renderer, posn + vec2(0.f, -125.f), enemy_member);
 				}
 
 				turn_based->start_encounter(temp_level);

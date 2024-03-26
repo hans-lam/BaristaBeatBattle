@@ -509,11 +509,58 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	return entity;
 }
 
-Entity create_health_bar(RenderSystem* renderer, vec2 pos) {
-	// create component
-	// will just sprite sheet animate this
+Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos) {
+	
 	auto entity = Entity();
 
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = pos;
+
+	// scale the background
+	motion.scale = vec2({ HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.healthOutlines.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTHOUTLINE,
+		 EFFECT_ASSET_ID::BATTLE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = pos;
+
+	// scale the background
+	motion.scale = vec2({ FILL_WIDTH, FILL_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	HealthBarFill& fill = registry.healthBarFills.emplace(entity);
+	fill.associated_char = associated_character;
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTHFILL,
+		 EFFECT_ASSET_ID::BATTLEBAR,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }

@@ -94,7 +94,7 @@ void TurnBasedSystem::start_encounter(Level* level) {
 
 		registry.turnCounter.emplace(ally_entity, turn);
 
-		// emplace health bars
+		
 	}
 
 	for (Entity enemy_entity : level->enemies) {
@@ -109,6 +109,8 @@ void TurnBasedSystem::start_encounter(Level* level) {
 		turn->speed_value = characterData->get_character_stat_sheet()->get_speed();
 
 		registry.turnCounter.emplace(enemy_entity, turn);
+
+
 	}
 
 
@@ -146,7 +148,12 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 				injury.counter_ms = 3000.f;
 				//std::cout << "Current time: " << (3000.f - registry.injuryTimers.get(receiving_entity).counter_ms) /3000.f << '\n';
 			}
-			
+
+			HealthBarFill& fill = get_health_bar_given_entity(receiving_entity);
+			fill.percent_filled = (float) receiving_character->get_current_health_points() / receiving_character->get_character_stat_sheet()->get_max_health();
+			std::cout << "Current percent health: " << receiving_character->get_current_health_points() / receiving_character->get_character_stat_sheet()->get_max_health() << '\n';
+			std::cout << "Current health: " << receiving_character->get_current_health_points()  << '\n';
+			std::cout << "Current health: " << receiving_character->get_character_stat_sheet()->get_max_health() << '\n';
 
 			if (receiving_character->is_dead()) {
 
@@ -236,3 +243,14 @@ Entity TurnBasedSystem::get_entity_given_character(Character* receiving_characte
 
 
 bool out_of_combat = true;
+
+HealthBarFill& TurnBasedSystem::get_health_bar_given_entity(Entity receiving_character) {
+	HealthBarFill dummy;
+	for (Entity fills : registry.healthBarFills.entities) {
+		HealthBarFill& fill = registry.healthBarFills.get(fills);
+		if (fill.associated_char == receiving_character) {
+			return fill;
+		}
+	}
+	return dummy;
+}

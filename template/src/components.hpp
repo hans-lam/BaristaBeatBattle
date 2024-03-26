@@ -81,6 +81,7 @@ struct HealthOutline {
 
 struct HealthBarFill {
 	float percent_filled = 1.0f;
+	Entity associated_char;
 };
 
 // All data relevant to the shape and motion of entities
