@@ -18,6 +18,7 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<Eatable> eatables;
 	ComponentContainer<Deadly> deadlys;
@@ -31,6 +32,12 @@ public:
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
+	ComponentContainer<MainMenu> mainMenu;
+	ComponentContainer<OverWorld> overWorld;
+	ComponentContainer<TutorialBoard> tutorials;
+	ComponentContainer<CutScene> cutscenes;
+	ComponentContainer<TurnBased> turnBased;
+	ComponentContainer<MiniStage> miniStage;
 
 
 	// TURN BASED COMPONENTS
@@ -54,6 +61,7 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
+		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&eatables);
 		registry_list.push_back(&deadlys);
@@ -62,6 +70,12 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&backgrounds);
 		registry_list.push_back(&foregrounds);
+		registry_list.push_back(&mainMenu);
+		registry_list.push_back(&overWorld);
+		registry_list.push_back(&tutorials);
+		registry_list.push_back(&cutscenes);
+		registry_list.push_back(&turnBased);
+		registry_list.push_back(&miniStage);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
@@ -98,8 +112,13 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		for (ContainerInterface* reg : registry_list) {
+			// preserve the character datas
+			if (reg != &characterDatas || !partyMembers.has(e)) {
+				reg->remove(e);
+			}
+		}
+			
 	}
 };
 

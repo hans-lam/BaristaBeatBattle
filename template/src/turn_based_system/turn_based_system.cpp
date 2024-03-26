@@ -86,6 +86,7 @@ void TurnBasedSystem::start_encounter(Level* level) {
 		registry.partyMembers.emplace(ally_entity, partyMemberComponent);
 
 		Character* characterData = registry.characterDatas.get(ally_entity).characterData;
+		characterData->restore_health_to_full();
 
 		TurnCounter* turn = new TurnCounter();
 
@@ -98,10 +99,12 @@ void TurnBasedSystem::start_encounter(Level* level) {
 	}
 
 	for (Entity enemy_entity : level->enemies) {
+		Character* characterData = registry.characterDatas.get(enemy_entity).characterData;
+
 		TurnBasedEnemy tbe = TurnBasedEnemy();
+		tbe.experience_value = characterData->level;
 		registry.turnBasedEnemies.emplace(enemy_entity, tbe);
 
-		Character* characterData = registry.characterDatas.get(enemy_entity).characterData;
 
 		TurnCounter* turn = new TurnCounter();
 
@@ -190,6 +193,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	}
 
 	return 0;
+
 }
 
 
@@ -221,7 +225,18 @@ void TurnBasedSystem::process_death(Entity o7)
 {
 
 	if (registry.turnBasedEnemies.has(o7)) {
+
+		// apply experience to allies!
+		for (Entity party_member : registry.partyMembers.entities) {			
+			experience_manager.apply_experience(party_member, registry.turnBasedEnemies.get(o7).experience_value);
+		}
+
 		registry.turnBasedEnemies.remove(o7);
+		registry.characterDatas.remove(o7);
+	}
+
+	if (registry.partyMembers.has(o7)) {
+		registry.partyMembers.remove(o7);
 	}
 
 	registry.turnCounter.remove(o7);

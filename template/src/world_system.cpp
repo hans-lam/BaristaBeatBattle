@@ -1,16 +1,15 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "physics_system.hpp"
+#include "stage_system/stage_system.hpp"
 
 // stlib
 #include <cassert>
 #include <sstream>
 #include <iostream>
 #include <array>
-#include "physics_system.hpp"
-#include "turn_based_system/character_factory/character_factory.hpp"
 #include <chrono>
-#include <turn_based_system/level_factory.hpp>
 
 // Game configuration
 const size_t MAX_EAGLES = 15;
@@ -27,8 +26,7 @@ int fps = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem()
-	: points(0)
-	, player_speed(300.f)
+	: player_speed(300.f)
 	, next_eagle_spawn(0.f)
 	, next_bug_spawn(0.f)
 	, next_enemy_spawn(0.f)
@@ -39,8 +37,12 @@ WorldSystem::WorldSystem()
 
 WorldSystem::~WorldSystem() {
 	// Destroy music components
+	if (main_menu_music != nullptr)
+		Mix_FreeMusic(main_menu_music);
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (cutscene_music != nullptr)
+		Mix_FreeMusic(cutscene_music);
 	if (turn_based_music != nullptr)
 		Mix_FreeMusic(turn_based_music); 
 	if (minigame_music != nullptr)
@@ -105,9 +107,7 @@ GLFWwindow* WorldSystem::create_window() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
-	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
-	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
 	//////////////////////////////////////
 	// Loading music and sounds with SDL
@@ -120,7 +120,9 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
+	main_menu_music = Mix_LoadMUS(audio_path("main_menu_music.wav").c_str());
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
+	cutscene_music = Mix_LoadMUS(audio_path("cutscene_music.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
 	//minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
@@ -145,20 +147,38 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg, StageSystem* stage_system_arg,
+	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
+	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg) {
+	// Global Systems Set up
 	this->renderer = renderer_arg;
 	this->turn_based = turn_based_arg;
+	this->stage_system = stage_system_arg;
+	stage = 0;
+
+	this->main_menu_system = main_menu_system_arg;
+	this->overworld_system = overworld_system_arg;
+	this->cutscene_system = cutscene_system_arg;
+	this->combat_system = combat_system_arg;
+	this->minigame_system = minigame_system_arg;
+
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(main_menu_music, -1);
 	fprintf(stderr, "Loaded music\n");
+
+	// Setting up the stage to music map
+	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
+	stage_music_map[StageSystem::Stage::overworld] = background_music;
+	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
+	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music;
+	stage_music_map[StageSystem::Stage::minigame] = minigame_music;
 
 	// Set all states to default
     restart_game();
 }
 
-// Update our game world
-bool WorldSystem::step(float elapsed_ms_since_last_update) {
-	// Updating window title with points
+void WorldSystem::set_fps(float elapsed_ms_since_last_update) {
+	// Updating window title with fps
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
 	frames_since_prev_second++;
@@ -172,161 +192,61 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	std::stringstream title_ss;
 
 	title_ss << "FPS: " << fps << " | ";
-	
-	/*
-	if (stage == 0)
-		title_ss << "OVERWORLD: Hit A to attack";
-	else if (stage == 1)
-		title_ss << "TURN-BASED: Hit S to start turn-based, SPACE to select option, M to start minigame";
-	else if (stage == 2)
-		title_ss << "MINIGAME: Hit M again to go back to turn-based";
-	*/
-	
+
 	glfwSetWindowTitle(window, title_ss.str().c_str());
+}
+
+void WorldSystem::set_music(StageSystem::Stage curr_stage) {
+	if (stage_system->get_music_changed()) {
+		Mix_PlayMusic(stage_music_map[curr_stage], -1);
+		Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+		stage_system->set_music_changed();
+	}
+}
+
+// Update our game world
+bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	set_fps(elapsed_ms_since_last_update);
+
+	StageSystem::Stage curr_stage = stage_system->get_current_stage();
+	// Removing out of screen entities
+	auto& motions_registry = registry.motions;
+
+	set_music(curr_stage);
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
-	// Removing out of screen entities
-	auto& motions_registry = registry.motions;
-
-	
-
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	    Motion& motion = motions_registry.components[i];
-		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i]) && !registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
-				registry.remove_all_components_of(motions_registry.entities[i]);
-		}
-	}
-
-	// Spawning new enemy drinks
+	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (stage == 0) {
+	if (curr_stage == StageSystem::Stage::overworld) {
+		// Remove entities that leave the screen on the left side
+		// Iterate backwards to be able to remove without unterfering with the next object to visit
+		// (the containers exchange the last element with the current)
+		for (int i = (int)motions_registry.components.size() - 1; i >= 0; --i) {
+			Motion& motion = motions_registry.components[i];
+			if (motion.position.x + abs(motion.scale.x) < 0.f) {
+				if (!registry.players.has(motions_registry.entities[i]) &&
+					!registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
+					registry.remove_all_components_of(motions_registry.entities[i]);
+			}
+		}
+
 		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
 			// Reset timer
 			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
 			// Create enemy drink with random initial velocity, position
-			createEnemyDrink(renderer,
+			Entity test = createEnemyDrink(renderer,
 				// TODO: make negative velocity possible
 				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
 				// TODO: fix to spawn from only the edges
 				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
 		}
-	}
 
-	// Highlighting current char 
-	if (stage == 1) {
-
-		Entity active_char_entity = turn_based->get_active_character();
-		
-		if (active_char_entity != emptyEntity) {
-
-
-			Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
-			// setting player color 
-			for (Entity entity : registry.partyMembers.entities) {
-				vec3& color = registry.colors.get(entity);
-				
-				if (entity == active_char_entity) {
-					// change current player character to red
-					color = { 1.0f, 0.f, 0.f };
-				}
-				else {
-					// return player character color to normal
-					color = { 1, 0.8f, 0.8f };
-				}
-			}
-
-			// Setting menu's active 
-			for (Entity menu_entity : registry.menu.entities) {
-				Menu& menu = registry.menu.get(menu_entity);
-				Entity attack = menu.options[0];
-				Entity rest = menu.options[1];
-				Entity pourIt = menu.options[2];
-				MenuOption& atk = registry.menuOptions.get(attack);
-				MenuOption& rst = registry.menuOptions.get(rest);
-				MenuOption& prt = registry.menuOptions.get(pourIt);
-
-				if (menu.associated_character == active_char_entity) {
-					if (!registry.renderRequests.has(attack)) {
-						registry.renderRequests.insert(
-							attack,
-							{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-							EFFECT_ASSET_ID::TEXTURED,
-							GEOMETRY_BUFFER_ID::SPRITE });
-					}
-					if (!registry.renderRequests.has(rest)) {
-						registry.renderRequests.insert(
-							rest,
-							{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-							EFFECT_ASSET_ID::TEXTURED,
-							GEOMETRY_BUFFER_ID::SPRITE });
-					}
-					if (!registry.renderRequests.has(pourIt)) {
-						registry.renderRequests.insert(
-							pourIt,
-							{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-							EFFECT_ASSET_ID::TEXTURED,
-							GEOMETRY_BUFFER_ID::SPRITE });
-					}
-
-				}
-				else {
-					if (registry.renderRequests.has(attack)) {
-						registry.renderRequests.remove(attack);
-					}
-					if (registry.renderRequests.has(rest)) {
-						registry.renderRequests.remove(rest);
-					}
-					if (registry.renderRequests.has(pourIt)) {
-						registry.renderRequests.remove(pourIt);
-					}
-				}
-
-				// handle color change of option 
-				for (Entity entity : menu.options) {
-					vec3& color = registry.colors.get(entity);
-
-					if (entity == menu.activeOption) {
-						color.x = 0.8f;
-					}
-					else {
-						color.x = 1;
-					}
-				}
-			}
-		}
-	}
-
-	// Processing the chicken state
-	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
-
-    float min_counter_ms = 3000.f;
-	for (Entity entity : registry.deathTimers.entities) {
-		// progress timer
-		DeathTimer& counter = registry.deathTimers.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-		if(counter.counter_ms < min_counter_ms){
-		    min_counter_ms = counter.counter_ms;
-		}
-
-		// restart the game once the death timer expired
-		if (counter.counter_ms < 0) {
-			registry.deathTimers.remove(entity);
-			screen.darken_screen_factor = 0;
-            restart_game();
-			return true;
-		}
-	}
-	// reduce window brightness if any of the present chickens is dying
-	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
+		// Processing the chicken state
+		assert(registry.screenStates.components.size() <= 1);
+		ScreenState& screen = registry.screenStates.components[0];
 
 	// process attacks
 	float min_attack_counter_ms = 700.f;
@@ -338,14 +258,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			min_attack_counter_ms = counter.counter_ms;
 		}
 
-		// handle attack
-		//Motion& player_motion = registry.motions.get(entity);
-		//player_motion.angle += M_PI / 12.0f;
-
 		// stop attack once timer expires
 		if (counter.counter_ms < 0) {
 			registry.attackTimers.remove(entity);
-			//player_motion.angle = 0.f;
 			return true;
 		}
 	}
@@ -370,78 +285,100 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// Countdown minigame for ending
-	if (stage == 2) {
-		bool ended = false;
-		float minigame_timer_counter_ms = 10000.f;
-		for (Entity entity : registry.miniGameTimer.entities) {
-			// progress timer 
-			MiniGameTimer& counter = registry.miniGameTimer.get(entity);
-			counter.counter_ms -= elapsed_ms_since_last_update;
-			if (counter.counter_ms < minigame_timer_counter_ms) {
-				minigame_timer_counter_ms = counter.counter_ms;
-			}
 
-			if (counter.inter_state) {
-				counter.inter_timer -= elapsed_ms_since_last_update;
+	}
 
-				if (counter.inter_timer < 0) {
-					registry.renderRequests.remove(entity); 
-					registry.renderRequests.insert(
-						entity,
-						{ TEXTURE_ASSET_ID::MINIGAMECUP,
-						EFFECT_ASSET_ID::TEXTURED,
-						GEOMETRY_BUFFER_ID::SPRITE }
-					);
-
-					counter.inter_state = false;
-					counter.inter_timer = 500.f;
-				}
-			}
-
-			// stop minigame once timer expires 
-			if (counter.counter_ms < 0) {
-				// Change turn-based values here to deal damage based on score
-				Minigame& minigame = registry.miniGame.get(entity); 
-				std::cout << "SCORE: " << minigame.score << '\n';
-
-				registry.remove_all_components_of(entity);
-				ended = true;
-
-				// Assign score to ability 
-				Entity active_char_entity = turn_based->get_active_character(); 
-				// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
-				handle_attack(active_char_entity, "Basic Attack");
-			}
+	// Handle turn based stepping
+	if (curr_stage == StageSystem::Stage::turn_based) {
+		if (out_of_combat) {
+			combat_system->handle_level(renderer);
 		}
-
-		for (Entity entity : registry.miniGameResTimer.entities) {
-			if (ended) {
-				registry.remove_all_components_of(entity);
-				change_stage(1);
-				break;
-			}
-			
-			if (registry.renderRequests.has(entity)) {
-				MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
-				counter.counter_ms -= elapsed_ms_since_last_update;
-
-				if (counter.counter_ms < 0) {
-					registry.renderRequests.remove(entity);
-					counter.counter_ms = 250.f;
-				}
-			}
+		else {
+			combat_system->handle_turn_rendering();
 		}
 	}
+
+	//// Countdown minigame for ending
+	//if (stage == 2) {
+	//	bool ended = false;
+	//	float minigame_timer_counter_ms = 10000.f;
+	//	for (Entity entity : registry.miniGameTimer.entities) {
+	//		// progress timer
+	//		MiniGameTimer& counter = registry.miniGameTimer.get(entity);
+	//		counter.counter_ms -= elapsed_ms_since_last_update;
+	//		if (counter.counter_ms < minigame_timer_counter_ms) {
+	//			minigame_timer_counter_ms = counter.counter_ms;
+	//		}
+
+	//		if (counter.inter_state) {
+	//			counter.inter_timer -= elapsed_ms_since_last_update;
+
+	//			if (counter.inter_timer < 0) {
+	//				registry.renderRequests.remove(entity);
+	//				registry.renderRequests.insert(
+	//					entity,
+	//					{ TEXTURE_ASSET_ID::MINIGAMECUP,
+	//					EFFECT_ASSET_ID::TEXTURED,
+	//					GEOMETRY_BUFFER_ID::SPRITE }
+	//				);
+
+	//				counter.inter_state = false;
+	//				counter.inter_timer = 500.f;
+	//			}
+	//		}
+
+	//		// stop minigame once timer expires
+	//		if (counter.counter_ms < 0) {
+	//			// Change turn-based values here to deal damage based on score
+	//			Minigame& minigame = registry.miniGame.get(entity);
+	//			std::cout << "SCORE: " << minigame.score << '\n';
+
+	//			registry.remove_all_components_of(entity);
+	//			ended = true;
+
+	//			// Assign score to ability
+	//			Entity active_char_entity = turn_based->get_active_character();
+	//			// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
+	//			handle_attack(active_char_entity, "Basic Attack");
+	//		}
+	//	}
+
+	//	for (Entity entity : registry.miniGameResTimer.entities) {
+	//		if (ended) {
+	//			registry.remove_all_components_of(entity);
+	//			change_stage(1);
+	//			break;
+	//		}
+	//
+	//		if (registry.renderRequests.has(entity)) {
+	//			MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
+	//			counter.counter_ms -= elapsed_ms_since_last_update;
+
+	//			if (counter.counter_ms < 0) {
+	//				registry.renderRequests.remove(entity);
+	//				counter.counter_ms = 250.f;
+	//			}
+	//		}
+	//	}
+	//}
 
 	return true;
 }
 
 // Reset the world state to its initial state
 void WorldSystem::restart_game() {
+	stage_system->set_stage(StageSystem::Stage::main_menu);
+
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 	printf("Restarting\n");
+
+	// Set Default values for systems
+	main_menu_system->init(stage_system);
+	overworld_system->init(stage_system);
+	cutscene_system->init(stage_system);
+	combat_system->init(stage_system, turn_based);
+	minigame_system->init(stage_system);
 
 	// Reset the game speed
 	current_speed = 1.f;
@@ -470,6 +407,16 @@ void WorldSystem::restart_game() {
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
+
+	// Create Background for turn based battle
+	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+
+	// Create the main menu
+	createMainMenu(renderer, { 0, 0 });
+
+	// Create tutorials
+	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
+	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
 }
 
 // Compute collisions between entities
@@ -494,42 +441,15 @@ void WorldSystem::handle_collisions() {
 					// potential problem: if we don't remove the enemy it might keep colliding and screaming
 					registry.remove_all_components_of(entity_other);
 
-					// remove all overworld bgs
-					for (uint i = 0; i < registry.backgrounds.entities.size(); i++) {
-						registry.remove_all_components_of(registry.backgrounds.entities[i]);
-					}
-
-					for (Entity foregrounds : registry.foregrounds.entities) {
-						registry.remove_all_components_of(foregrounds);
-					}
-
 					// We also need to kill all other eagles
 					for (Entity enemies : registry.enemyDrinks.entities) {
 						registry.remove_all_components_of(enemies);
 					}
 
 					// Stage = 1 maps to turn based
-					stage = 1;
-					// Delete current player
-					registry.remove_all_components_of(entity);
-
-					// Play music
-					Mix_PlayMusic(turn_based_music, -1);
-					// max volume is at 128; this sets it to 75%
-					Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
+					stage_system->set_stage(StageSystem::Stage::cutscene);
 				}
 			}
-			//// Checking Player - Eatable collisions
-			//else if (registry.eatables.has(entity_other)) {
-			//	if (!registry.deathTimers.has(entity)) {
-			//		// chew, count points, and set the LightUp timer
-			//		registry.remove_all_components_of(entity_other);
-			//		Mix_PlayChannel(-1, chicken_eat_sound, 0);
-			//		++points;
-
-			//		// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the chicken entity by modifying the ECS registry
-			//	}
-			//}
 		}
 	}
 
@@ -569,160 +489,7 @@ bool WorldSystem::is_over() const {
 //	return in_bounds;
 //}
 
-// chicken movement helper
-void WorldSystem::handle_player_movement(int key, int action) {
-
-	for (uint i = 0; i < registry.players.size(); i++) {
-		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
-		// do not move player if it is dying
-		if (registry.deathTimers.has(registry.players.entities[i])) continue;
-		// check if player is in bounds
-		bool is_x = (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT);
-		//if (!player_in_bounds(&player_motion, is_x)) {
-		//	action = GLFW_RELEASE;
-		//}
-
-		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-			if (key == GLFW_KEY_UP) {
-				player_motion.velocity.y = -player_speed;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = -player_speed;
-			}
-			else if (key == GLFW_KEY_DOWN) {
-				player_motion.velocity.y = player_speed;
-			}
-			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = player_speed;
-			}
-
-		}
-		else if (action == GLFW_RELEASE) {
-			if (key == GLFW_KEY_UP) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = 0.0f;
-			}
-			else if (key == GLFW_KEY_DOWN) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = 0.0f;
-			}
-		}
-	}
-
-
-}
-
-void WorldSystem::handle_menu(int key, TurnBasedSystem* turn_based) {
-
-	Entity active_char_entity = turn_based->get_active_character();
-
-	if (active_char_entity != emptyEntity) {
-
-		Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-		
-		for (Entity menu_entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(menu_entity);
-			int arrayLen = std::end(menu.options) - std::begin(menu.options);
-			int index = -1;
-			for (int i = 0; i < arrayLen; i++) {
-				if (menu.activeOption == menu.options[i]) {
-					index = i; 
-					break;
-				}
-			}
-		
-			if (menu.associated_character == active_char_entity) {
-				if (key == GLFW_KEY_UP) {
-					Mix_PlayChannel(-1, change_selection_effect, 0); 
-					if (index > 0) {
-						menu.activeOption = menu.options[index - 1];
-					}
-					else {
-						menu.activeOption = menu.options[(arrayLen - 1)];
-					}
-				}
-				else if (key == GLFW_KEY_DOWN) {
-					Mix_PlayChannel(-1, change_selection_effect, 0); 
-					if (index < (arrayLen - 1)) {
-						menu.activeOption = menu.options[index + 1];
-					}
-					else {
-						menu.activeOption = menu.options[0];
-					}
-				}
-				break;
-			}
-		}
-	}
-}
-
-void WorldSystem::handle_attack(Entity active_char_entity, std::string ability) {
-	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-
-	if (!out_of_combat) {
-		Mix_PlayChannel(-1, attack_sound, 0);
-
-		Character* target;
-
-		if (ability == "rest") {
-			target = registry.characterDatas.get(active_char_entity).characterData;
-		}
-		else {
-			Entity enemy_target_entity = registry.turnBasedEnemies.entities[0];
-			target = registry.characterDatas.get(enemy_target_entity).characterData;
-		}
-
-
-		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
-
-		if (is_game_over != 0) {
-			restart_game();
-		}
-	}
-
-
-}
-
-void WorldSystem::handle_selection() {
-	Entity active_char_entity = turn_based->get_active_character();
-	if (active_char_entity != emptyEntity) {
-		// Get active option
-		for (Entity menu_entity : registry.menu.entities) {
-			Menu& menu = registry.menu.get(menu_entity);
-
-			// found correct menu
-			if (menu.associated_character == active_char_entity) {
-				Entity correctOption = menu.activeOption; 
-				MenuOption& opComponent = registry.menuOptions.get(correctOption); 
-
-				if (opComponent.option == "attack") {
-					handle_attack(active_char_entity, "Basic Attack");
-				}
-				else if (opComponent.option == "rest") {
-					// TODO USE REST ABILITY
-
-					// set stage to 2, which is mini-game mapping
-
-					handle_attack(active_char_entity, "rest");
-					
-				}
-				else if (opComponent.option == "pour it") {
-					handle_mini(120);
-
-					if (stage == 1) {
-						change_stage(2);
-					}
-				}
-			}
-		}
-	}
-}
-
-void WorldSystem::handle_mini(int bpm) { 
+void WorldSystem::handle_mini(int bpm) {
 	bool hit = false;
 	// Assuming that the bpm is based on quarter notes and it's 4/4
 	for (Entity entity : registry.miniGameTimer.entities) {
@@ -790,25 +557,12 @@ void WorldSystem::handle_mini(int bpm) {
 	}
 }
 
-void player_attack() {
-	for (uint i = 0; i < registry.players.size(); i++) {
-		Entity entity = registry.players.entities[i];
-		if (!registry.attackTimers.has(entity)) {
-			registry.attackTimers.emplace(registry.players.entities[i]);
-		}
-	}
-}
-
 void WorldSystem::change_stage(int level) {
 	if (level == 0) {
 		return;
 	} 
 	else if (level == 1) {
 		stage = 1;
-		// Play music
-		Mix_PlayMusic(turn_based_music, -1);
-		// max volume is at 128; this sets it to 75%
-		Mix_VolumeMusic(MIX_MAX_VOLUME - 32);
 		// Anything  we need to set upon changing back should go here or in step
 		// Remove all minigame entities 
 		for (Entity entity : registry.miniGame.entities) {
@@ -842,88 +596,35 @@ void WorldSystem::change_stage(int level) {
 	}
 }
 
-Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
-	auto entity = Entity();
-
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = position;
-	motion.scale = vec2({ MENU_WIDTH*2, MENU_HEIGHT*2 + 100}); // ??? i don't think this is right
-	motion.angle = 0.f; 
-	motion.velocity = { 0.f, 0.f }; 
-
-	if (window == 1) {
-		registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
-			  EFFECT_ASSET_ID::TEXTURED,
-			  GEOMETRY_BUFFER_ID::SPRITE });
-
-	} else if (window == 2) {
-		registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::BATTLEBOARD,
-			  EFFECT_ASSET_ID::TEXTURED,
-			  GEOMETRY_BUFFER_ID::SPRITE });
-
-	} else {
-		registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
-			  EFFECT_ASSET_ID::TEXTURED,
-			  GEOMETRY_BUFFER_ID::SPRITE });
-
-	}
-	
-	return entity;
-}
-
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	// handle movement
-	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-		if (stage == 0) {
-			handle_player_movement(key, action);
+	switch (stage_system->get_current_stage()) {
+	case StageSystem::Stage::main_menu:
+		main_menu_system->handle_menu_keys(key, action);
+		break;
+	case StageSystem::Stage::overworld:
+		overworld_system->handle_overworld_keys(key, action, player_speed);
+		break;
+	case StageSystem::Stage::cutscene:
+		cutscene_system->handle_cutscene_keys(key, action);
+		break;
+	case StageSystem::Stage::turn_based: {
+		CombatSystem::SoundMapping play_sound = combat_system->handle_turnbased_keys(key, action);
+		// handle sound effects
+		switch (play_sound) {
+		case CombatSystem::SoundMapping::change_sound:
+			Mix_PlayChannel(-1, change_selection_effect, 0);
+			break;
+		case CombatSystem::SoundMapping::attack_sound:
+			Mix_PlayChannel(-1, attack_sound, 0);
+			break;
 		}
-		else if (stage == 1) {
-			if (action == GLFW_RELEASE) {
-				handle_menu(key, turn_based);
-			}
-		}
+
+		break;
 	}
-
-	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
-
-		if (tutorialOn == false) {
-			if (stage == 0) {
-				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
-				tutorialOn = true;
-			}
-			else if (stage == 1) {
-				tutorial = createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
-				tutorialOn = true;
-			}
-
-		}
-		else if (tutorialOn == true) {
-			registry.renderRequests.remove(tutorial);
-			tutorialOn = false;
-		}
-
-	}
-
-	// player attack
-	if (action == GLFW_PRESS && key == GLFW_KEY_A) {
-		if (stage == 0)
-			player_attack();
-	}
-
-	// turn based option
-	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		if (stage == 1)
-			handle_selection();
+	case StageSystem::Stage::minigame:
+		minigame_system->handle_minigame_key(key, action);
+		break;
 	}
 
 	// Minigame 
@@ -932,61 +633,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			handle_mini(120);
 	}
 
-	// start encounter
-	if (action == GLFW_PRESS && key == GLFW_KEY_S) {
-		
-		// Justin: This is very bad code, I am using this function I wrote just to render the pokemon screen 
-		// Justin 40 minutes later: I had plans to put a temp screen but i went and did other parts of the project sorry
-		// createTutorialWindow
-		
-		if (stage == 1)
-			if (out_of_combat) {
-				//render battle background
-				createBackgroundBattle(renderer, {window_width_px/2.0-100,window_height_px/2.0});
 
-				int x_base = 100;
-				vec2 base_ally_position = { x_base, window_height_px -  200 };
-				vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-				Level* temp_level = construct_level_one(renderer, base_ally_position, base_enemy_position);
+	// Going to Main Menu manually
 
-
-				int j = 0;
-				for (Entity party_member_entity : temp_level->allies) {
-					
-
-					// Creating Menu entity 
-					vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
-					Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
-					Menu& menu = registry.menu.get(menuEnt);
-
-					j++;
-
-					vec2 posn = registry.motions.get(party_member_entity).position;
-					create_health_bar_outline(renderer, posn + vec2(25.f, -125.f));
-					create_health_bar_fill(renderer, posn + vec2(50.f, -125.f), party_member_entity);
-			
-				}
-
-				for (Entity enemy_member : temp_level->enemies) {
-					vec2 posn = registry.motions.get(enemy_member).position;
-					create_health_bar_outline(renderer, posn + vec2(-25.f, -125.f));
-					create_health_bar_fill(renderer, posn + vec2(0.f, -125.f), enemy_member);
-				}
-
-				turn_based->start_encounter(temp_level);
-			}
-
-	}
-
-	// Going to Minigame encounter manually
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		// set stage to 2, which is mini-game mapping
-		if (stage != 2) {
-			change_stage(2);
-		}
-		else {
-			change_stage(1);
-		}
+		stage_system->set_stage(StageSystem::Stage::main_menu);
 	}
 
 	// Resetting game
@@ -1022,18 +673,4 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		printf("Current speed = %f\n", current_speed);
 	}
 	current_speed = fmax(0.f, current_speed);
-}
-
-void WorldSystem::on_mouse_move(vec2 mouse_position) {
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE CHICKEN ROTATION HERE
-	// xpos and ypos are relative to the top-left of the window, the chicken's
-	// default facing direction is (1, 0)
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-	(vec2)mouse_position; // dummy to avoid compiler warning
-}
-
-int WorldSystem::get_stage() {
-	return stage;
 }
