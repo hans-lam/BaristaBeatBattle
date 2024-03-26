@@ -329,7 +329,8 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 
 
 	for (TextRenderRequest request : registry.textRenderRequests.components) {
-		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, request.trans);
+		if (request.shown)
+			renderText(request.text, request.position.x, request.position.y, request.scale, request.color, request.trans);
 	}
 
 	// Truely render to the screen

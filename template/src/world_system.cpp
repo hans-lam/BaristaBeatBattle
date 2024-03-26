@@ -616,15 +616,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			handle_mini(120);
 	}
 
-	// Going to Minigame encounter manually
+	// Going to Main Menu manually
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		// set stage to 2, which is mini-game mapping
-		if (stage != 2) {
-			change_stage(2);
-		}
-		else {
-			change_stage(1);
-		}
+		stage_system->set_stage(StageSystem::Stage::main_menu);
 	}
 
 	// Resetting game

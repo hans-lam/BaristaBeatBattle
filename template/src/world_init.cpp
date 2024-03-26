@@ -564,7 +564,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	return entity;
 }
 
-Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans) {
+Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
 	auto entity = Entity();
 	auto& textRenderRequest = registry.textRenderRequests.emplace(entity);
 	textRenderRequest.text = text;
@@ -572,6 +572,25 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 	textRenderRequest.scale = scale;
 	textRenderRequest.color = color;
 	textRenderRequest.trans = trans;
+
+	// Adding text to specified stage
+	switch (current_stage) {
+	case StageSystem::Stage::main_menu: 
+		registry.mainMenu.emplace(entity); 
+		break;
+	case StageSystem::Stage::overworld:
+		registry.overWorld.emplace(entity); 
+		break;
+	case StageSystem::Stage::cutscene:
+		registry.cutscenes.emplace(entity);
+		break;
+	case StageSystem::Stage::turn_based:
+		registry.turnBased.emplace(entity); 
+		break;
+	case StageSystem::Stage::minigame:
+		registry.miniGame.emplace(entity);
+		break;
+	}
 
 	return entity;
 }

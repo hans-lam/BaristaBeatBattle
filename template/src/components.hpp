@@ -268,5 +268,6 @@ struct TextRenderRequest {
 	float scale;
 	vec3 color;
 	glm::mat4 trans;
+	bool shown = true;
 };
 

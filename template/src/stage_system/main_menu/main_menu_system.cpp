@@ -14,11 +14,11 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
 	selected_option = new_game;
 	const int basex = window_width_px / 2 - 200;
-	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f));
-	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f));
-	menu_text_map[options] = createText("Options", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f));
-	menu_text_map[tutorials] = createText("Tutorials", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f));
-	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f));
+	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[options] = createText("Options", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[tutorials] = createText("Tutorials", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
 }
 
 void MainMenuSystem::handle_menu_keys(int key, int action) {
@@ -56,10 +56,11 @@ void MainMenuSystem::handle_option()
 {
 	switch (selected_option) {
 	case new_game:
-		// remove all texts
+		// set all texts to not be shown
 		for (int i = new_game; i <= credits; i++) {
 			MenuOption menu_option = static_cast<MenuOption>(i);
-			registry.textRenderRequests.remove(menu_text_map[menu_option]);
+			TextRenderRequest& trr = registry.textRenderRequests.get(menu_text_map[menu_option]);
+			trr.shown = false;
 		}
 
 		// go to overworld with default settings

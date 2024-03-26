@@ -55,4 +55,4 @@ Entity create_earl(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
 
 
-Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans);
+Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
