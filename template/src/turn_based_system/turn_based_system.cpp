@@ -202,10 +202,8 @@ void TurnBasedSystem::process_death(Entity o7)
 	if (registry.turnBasedEnemies.has(o7)) {
 
 		// apply experience to allies!
-		for (Entity party_member : registry.partyMembers.entities) {
-			CharacterData data = registry.characterDatas.get(party_member);
-			
-			experience_manager.apply_experience(data.characterData, registry.turnBasedEnemies.get(o7).experience_value);
+		for (Entity party_member : registry.partyMembers.entities) {			
+			experience_manager.apply_experience(party_member, registry.turnBasedEnemies.get(o7).experience_value);
 		}
 
 		registry.turnBasedEnemies.remove(o7);

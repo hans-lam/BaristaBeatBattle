@@ -1,6 +1,8 @@
 #include "combat_system.hpp"
 #include "common.hpp"
 
+const int BASE_X_VALUE = 100;
+
 CombatSystem::CombatSystem() :
 	selected_level(level_one),
 	turn_based_tutorial(false)
@@ -30,18 +32,42 @@ CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int acti
 }
 
 void CombatSystem::handle_level(RenderSystem* renderer) {
+	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
+	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
+	Level* level;
 	switch (selected_level) {
 	case level_one:
-		create_level_one(renderer);
+		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
 		break;
 	case level_two:
 		// Need to switch this up once more create levels are implemented
-		create_level_one(renderer);
+		level = level_factory->construct_level_two(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
 		break;
 	case level_three:
-		printf("LEVEL 3");
+		level = level_factory->construct_level_three(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
+		break;
+	case level_four:
+		level = level_factory->construct_level_four(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
+		break;
+	case level_five:
+		level = level_factory->construct_level_five(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
+		break;
+	case level_six:
+		level = level_factory->construct_level_six(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
+		break;
+	case level_seven:
+		level = level_factory->construct_level_seven(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
 		break;
 	}
+
+	turn_based->start_encounter(level);
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_selection() {
@@ -116,10 +142,10 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
 
 		if (is_game_over != 0) {
-			// delete all enemies 
+			// delete all enemies	
 			handle_combat_over();
 			// move selected level to next level
-			selected_level = static_cast<CombatLevel>((selected_level + 1) % (final_level + 1));
+			selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
 			stage_system->set_stage(StageSystem::Stage::overworld);
 		}
 	}
@@ -191,23 +217,18 @@ void CombatSystem::handle_tutorial() {
 	}
 }
 
-void CombatSystem::create_level_one(RenderSystem* renderer) {
-	int x_base = 100;
-	vec2 base_ally_position = { x_base, window_height_px - 200 };
-	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-	Level* temp_level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
+void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* level) {
 
 	int j = 0;
-	for (Entity party_member_entity : temp_level->allies) {
+	for (Entity party_member_entity : level->allies) {
 		// Creating Menu entity 
-		vec2 menu_pos = { x_base + 200, window_height_px - (j + 1) * 200 };
+		vec2 menu_pos = { BASE_X_VALUE + 200, window_height_px - (j + 1) * 200 };
 		Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
 		Menu& menu = registry.menu.get(menuEnt);
 
 		j++;
 	}
 
-	turn_based->start_encounter(temp_level);
 }
 
 void CombatSystem::handle_turn_rendering() {

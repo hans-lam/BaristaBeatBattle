@@ -8,15 +8,15 @@ class LevelFactory {
 public:
 	Level* construct_level_one(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position); 
 
-	Level* construct_level_two();
+	Level* construct_level_two(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
-	Level* construct_level_three();
+	Level* construct_level_three(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
-	Level* construct_level_four();
+	Level* construct_level_four(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
-	Level* construct_level_five();
+	Level* construct_level_five(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
-	Level* construct_level_six();
+	Level* construct_level_six(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
-	Level* construct_level_seven();
+	Level* construct_level_seven(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 };

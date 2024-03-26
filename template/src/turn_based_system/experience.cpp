@@ -4,17 +4,19 @@
 
 const unsigned int EXPERIENCE_REQUIRED_TO_LEVEL = 5;
 
-void ExperienceManager::apply_experience(Character* character_data, int experience_amount) {
+void ExperienceManager::apply_experience(Entity character_entity, int experience_amount) {
+	Character* character_data = registry.characterDatas.get(character_entity).characterData;
 
 	character_data->curr_experience_points += experience_amount;
 
 	if (character_data->curr_experience_points >= EXPERIENCE_REQUIRED_TO_LEVEL) {
-		level_up_character(character_data);
+		level_up_character(character_entity);
 	}
 
 }
 
-void ExperienceManager::level_up_character(Character* character_data) {
+void ExperienceManager::level_up_character(Entity character_entity) {
+	Character* character_data = registry.characterDatas.get(character_entity).characterData;
 
 	character_data->curr_experience_points -= EXPERIENCE_REQUIRED_TO_LEVEL;
 	character_data->level++;

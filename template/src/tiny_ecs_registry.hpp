@@ -106,7 +106,7 @@ public:
 	void remove_all_components_of(Entity e) {
 		for (ContainerInterface* reg : registry_list) {
 			// preserve the character datas
-			if (reg != &characterDatas) {
+			if (reg != &characterDatas || !partyMembers.has(e)) {
 				reg->remove(e);
 			}
 		}
