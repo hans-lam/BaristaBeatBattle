@@ -18,6 +18,10 @@ const float BG_WIDTH = 2000.f;
 const float BG_HEIGHT = 350.f;
 const float FG_WIDTH = 2000.f;
 const float FG_HEIGHT = 550.f;
+const float HEALTH_BAR_WIDTH = 250.f;
+const float HEALTH_BAR_HEIGHT = 62.5f;
+const float FILL_WIDTH = 135.f;
+const float FILL_HEIGHT = 18.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
@@ -54,6 +58,7 @@ Entity create_americano(RenderSystem* renderer, vec2 pos);
 Entity create_earl(RenderSystem* renderer, vec2 pos);
 Entity create_london(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
-
+Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos);
+Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character);
 
 Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);

@@ -39,11 +39,15 @@ public:
 	ComponentContainer<TurnBased> turnBased;
 	ComponentContainer<MiniStage> miniStage;
 
+
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
 	ComponentContainer<TurnBasedEnemy> turnBasedEnemies;
 	ComponentContainer<PartyMember> partyMembers;
 	ComponentContainer<TurnCounter*> turnCounter;
+	ComponentContainer<InjuredTimer> injuryTimers;
+	ComponentContainer<HealthOutline> healthOutlines;
+	ComponentContainer<HealthBarFill> healthBarFills;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -82,6 +86,10 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&injuryTimers);
+		registry_list.push_back(&healthOutlines);
+		registry_list.push_back(&healthBarFills);
+		
 	}
 
 	void clear_all_components() {

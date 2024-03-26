@@ -37,6 +37,8 @@ public:
 		return active_character;
 	}
 
+	HealthBarFill& get_health_bar_given_entity(Entity receiving_character);
+
 private:
 
 	Entity active_character = emptyEntity;
