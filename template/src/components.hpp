@@ -261,3 +261,12 @@ struct RenderRequest {
 	bool shown = false;
 };
 
+
+struct TextRenderRequest {
+	std::string text;
+	vec2 position = { 0,0 };
+	float scale;
+	vec3 color;
+	glm::mat4 trans;
+};
+
