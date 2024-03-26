@@ -9,18 +9,20 @@
 // This creates circular header inclusion, that is quite bad.
 #include "tiny_ecs_registry.hpp"
 
+// stlib
+#include <iostream>
+#include <sstream>
+
 // matrices
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// stlib
-#include <iostream>
-#include <sstream>
-
-
 #include <map>
-#include "../ext/freetype/include/freetype/freetype.h"
+
+// fonts
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 const char* fontVertexShaderSource =
 "#version 330 core\n"
@@ -95,6 +97,8 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+
+	fontInit();
 
 	return true;
 }
@@ -172,7 +176,7 @@ void RenderSystem::initializeGlMeshes()
 	}
 }
 
-bool RenderSystem:: fontInit(const std::string& font_filename, unsigned int font_default_size) {
+bool RenderSystem:: fontInit() {
 	std::cout << "made it to fontInit" << std::endl;
 	// font buffer setup
 	glGenVertexArrays(1, &m_font_VAO);

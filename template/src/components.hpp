@@ -5,10 +5,34 @@
 #include "../ext/stb_image/stb_image.h"
 #include "turn_based_system/character_system.hpp"
 
+struct MainMenu {
+
+};
+
+struct OverWorld {
+
+};
+
+struct CutScene {
+
+};
+
+struct TurnBased {
+
+};
+
+struct MiniStage {
+
+};
+
+struct TutorialBoard {
+
+};
+
 // Player component
 struct Player
 {
-	//Character* thisPlayer;
+
 };
 
 // Eagles have a hard shell
@@ -234,6 +258,16 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+	bool shown = false;
+};
+
+
+struct TextRenderRequest {
+	std::string text;
+	vec2 position = { 0,0 };
+	float scale;
+	vec3 color;
+	glm::mat4 trans;
 	bool shown = true;
 };
 

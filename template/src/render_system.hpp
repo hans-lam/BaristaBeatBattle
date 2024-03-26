@@ -3,9 +3,10 @@
 #include <array>
 #include <utility>
 
-#include "common.hpp"
-#include "components.hpp"
-#include "tiny_ecs.hpp"
+#include "common.hpp";
+#include "components.hpp";
+#include "tiny_ecs.hpp";
+#include "stage_system/stage_system.hpp";
 
 struct TextChar {
 	unsigned int TextureID;  // ID handle of the glyph texture
@@ -14,8 +15,6 @@ struct TextChar {
 	unsigned int Advance;    // Offset to advance to next glyph
 	char character;
 };
-
-
 
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
@@ -38,6 +37,9 @@ class RenderSystem {
 	GLuint m_font_shaderProgram;
 	GLuint m_font_VAO;
 	GLuint m_font_VBO;
+
+	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+	unsigned int font_default_size = 24;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
@@ -101,7 +103,7 @@ public:
 
 	void initializeGlMeshes();
 
-	bool fontInit(const std::string& font_filename, unsigned int font_default_size);
+	bool fontInit();
 	Mesh& getMesh(GEOMETRY_BUFFER_ID id) { return meshes[(int)id]; };
 
 	void initializeGlGeometryBuffers();
@@ -114,13 +116,7 @@ public:
 	~RenderSystem();
 
 	// Draw all entities
-	void draw();
-
-	// Draw Turn Based 
-	void drawTurn();
-
-	// Draw Mini Game
-	void drawMini();
+	void draw(StageSystem::Stage current_stage);
 
 	// Render text
 	void renderText(const std::string& text, float x, float y,
