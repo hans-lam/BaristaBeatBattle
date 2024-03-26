@@ -31,13 +31,16 @@ public:
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
-	ComponentContainer<InjuredTimer> injuryTimers;
+
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
 	ComponentContainer<TurnBasedEnemy> turnBasedEnemies;
 	ComponentContainer<PartyMember> partyMembers;
 	ComponentContainer<TurnCounter*> turnCounter;
+	ComponentContainer<InjuredTimer> injuryTimers;
+	ComponentContainer<HealthOutline> healthOutlines;
+	ComponentContainer<HealthBarFill> healthBarFills;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -59,7 +62,6 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&backgrounds);
 		registry_list.push_back(&foregrounds);
-		registry_list.push_back(&injuryTimers);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
@@ -70,6 +72,9 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&injuryTimers);
+		registry_list.push_back(&healthOutlines);
+		registry_list.push_back(&healthBarFills);
 		
 	}
 

@@ -67,7 +67,9 @@ class RenderSystem {
 			textures_path("fg.png"),
 			textures_path("fglight.png"),
 			textures_path("bg_battle.png"),
-			textures_path("spritesheet.png")
+			textures_path("spritesheet.png"),
+			textures_path("health_bar_empty.png"),
+			textures_path("fill_bar.png")
 
 	};
 
@@ -83,6 +85,7 @@ class RenderSystem {
 		shader_path("foreground"),
 		shader_path("lights"),
 		shader_path("battle"),
+		shader_path("battlebar"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;

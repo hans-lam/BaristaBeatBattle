@@ -91,6 +91,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
 
+		GLuint time_uloc = glGetUniformLocation(program, "time");
+		glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+		gl_has_errors();
+
 		GLint curr_frame_uloc = glGetUniformLocation(program, "curr_frame");
 
 		// determine whether idle, walking +x, -x, attacking
@@ -110,10 +114,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 				glUniform1i(curr_frame_uloc, 6);	// moving left
 			}
 			else if (player_velocity.y > 0.f) {
-				glUniform1i(curr_frame_uloc, 2);	// moving left
+				glUniform1i(curr_frame_uloc, 2);	// moving up
 			}
 			else if (player_velocity.y < 0.f) {
-				glUniform1i(curr_frame_uloc, 8);	// moving left
+				glUniform1i(curr_frame_uloc, 8);	// moving down
 			}
 			else {
 				glUniform1i(curr_frame_uloc, 0);	// idle

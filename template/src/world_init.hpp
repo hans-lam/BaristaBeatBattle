@@ -50,3 +50,4 @@ Entity create_chai(RenderSystem* renderer, vec2 pos);
 Entity create_americano(RenderSystem* renderer, vec2 pos);
 Entity create_earl(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
+Entity create_health_bar(RenderSystem* renderer, vec2 pos);

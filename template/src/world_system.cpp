@@ -339,13 +339,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		// handle attack
-		Motion& player_motion = registry.motions.get(entity);
-		player_motion.angle += M_PI / 12.0f;
+		//Motion& player_motion = registry.motions.get(entity);
+		//player_motion.angle += M_PI / 12.0f;
 
 		// stop attack once timer expires
 		if (counter.counter_ms < 0) {
 			registry.attackTimers.remove(entity);
-			player_motion.angle = 0.f;
+			//player_motion.angle = 0.f;
 			return true;
 		}
 	}

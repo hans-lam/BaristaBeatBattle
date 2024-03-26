@@ -508,3 +508,12 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 
 	return entity;
 }
+
+Entity create_health_bar(RenderSystem* renderer, vec2 pos) {
+	// create component
+	// will just sprite sheet animate this
+	auto entity = Entity();
+
+
+	return entity;
+}

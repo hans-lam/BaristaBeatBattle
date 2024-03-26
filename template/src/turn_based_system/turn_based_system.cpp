@@ -93,6 +93,8 @@ void TurnBasedSystem::start_encounter(Level* level) {
 		turn->speed_value = characterData->get_character_stat_sheet()->get_speed();
 
 		registry.turnCounter.emplace(ally_entity, turn);
+
+		// emplace health bars
 	}
 
 	for (Entity enemy_entity : level->enemies) {
@@ -128,6 +130,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
+		registry.attackTimers.emplace(get_entity_given_character(caller));
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);

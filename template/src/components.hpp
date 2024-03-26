@@ -76,6 +76,13 @@ struct TurnCounter {
 	int speed_value = 0;
 };
 
+struct HealthOutline {
+};
+
+struct HealthBarFill {
+	float percent_filled = 1.0f;
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
@@ -208,7 +215,9 @@ enum class TEXTURE_ASSET_ID {
 	FGLIGHT = FGSCROLL + 1,
 	BGBATTLE = FGLIGHT + 1,
 	PLAYER = BGBATTLE + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	HEALTHOUTLINE = PLAYER + 1,
+	HEALTHFILL = HEALTHOUTLINE + 1,
+	TEXTURE_COUNT = HEALTHFILL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -222,7 +231,8 @@ enum class EFFECT_ASSET_ID {
 	FOREGROUND = BACKGROUND + 1,
 	LIGHTS = FOREGROUND + 1,
 	BATTLE = LIGHTS + 1,
-	EFFECT_COUNT = BATTLE + 1
+	BATTLEBAR = BATTLE + 1,
+	EFFECT_COUNT = BATTLEBAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
