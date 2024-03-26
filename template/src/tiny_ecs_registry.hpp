@@ -90,8 +90,13 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		for (ContainerInterface* reg : registry_list) {
+			// preserve the character datas
+			if (reg != &characterDatas) {
+				reg->remove(e);
+			}
+		}
+			
 	}
 };
 

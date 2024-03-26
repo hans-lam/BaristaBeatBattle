@@ -2,6 +2,7 @@
 #include "world_system.hpp"
 #include "world_init.hpp"
 
+
 // stlib
 #include <cassert>
 #include <sstream>
@@ -969,6 +970,27 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Exit game 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		glfwSetWindowShouldClose(window, true);
+	}
+
+
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_P) {
+		std::vector<Character*> curr_characters;
+
+		for (Entity character_entity : registry.characterDatas.entities) {
+			
+			if (registry.partyMembers.has(character_entity)) {
+				Character* character_data = registry.characterDatas.get(character_entity).characterData;
+				curr_characters.push_back(character_data);
+			}
+			
+		}
+
+		data_manager->write_data("barista_beat_battle_save_data.json", 1, curr_characters);
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_L) {
+		data_manager->read_data("barista_beat_battle_save_data.json");
 	}
 
 	// Debugging

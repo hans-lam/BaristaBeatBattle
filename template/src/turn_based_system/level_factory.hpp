@@ -4,6 +4,10 @@
 #include "turn_based_system.hpp"
 #include "level_select_system.hpp"
 
+// FLAGS:
+//	CURRENT_LEVEL
+//	IS_LONDON_RECRUITED
+
 
 Level* construct_level_one(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 	Level* level_one = new Level();

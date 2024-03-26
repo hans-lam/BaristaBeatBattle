@@ -13,6 +13,7 @@
 
 #include "render_system.hpp"
 #include "turn_based_system/turn_based_system.hpp"
+#include "persistence/data_manager.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods

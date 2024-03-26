@@ -9,6 +9,7 @@
 #include "../ai_system.hpp"
 #include "level_select_system.hpp"
 #include "../world_init.hpp"
+#include "experience.hpp"
 
 
 class TurnBasedSystem {

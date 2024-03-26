@@ -9,13 +9,8 @@
 const float BUG_BB_WIDTH = 0.6f * 165.f;
 const float BUG_BB_HEIGHT = 0.6f * 165.f;
 const float EAGLE_BB_WIDTH = 0.6f * 300.f;
-<<<<<<<<< Temporary merge branch 1
-const float EAGLE_BB_HEIGHT = 0.8f * 202.f;
-const float MENU_WIDTH = 0.6f * 700.f;
-=========
 const float EAGLE_BB_HEIGHT = 0.6f * 300.f;
 const float MENU_WIDTH = 0.6f * 700.f; 
->>>>>>>>> Temporary merge branch 2
 const float MENU_HEIGHT = 0.6f * 280.f;
 const float CUP_WIDTH = 0.6f * 700.f;
 const float CUP_HEIGHT = 0.6f * 550.f;
@@ -54,4 +49,5 @@ Entity createEgg(vec2 pos, vec2 size);
 Entity create_chai(RenderSystem* renderer, vec2 pos);
 Entity create_americano(RenderSystem* renderer, vec2 pos);
 Entity create_earl(RenderSystem* renderer, vec2 pos);
+Entity create_london(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
