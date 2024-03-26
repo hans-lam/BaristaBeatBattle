@@ -21,7 +21,7 @@ const float FG_HEIGHT = 550.f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
-// Menu 
+// Menu
 Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character);
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
@@ -52,6 +52,7 @@ Entity createEgg(vec2 pos, vec2 size);
 Entity create_chai(RenderSystem* renderer, vec2 pos);
 Entity create_americano(RenderSystem* renderer, vec2 pos);
 Entity create_earl(RenderSystem* renderer, vec2 pos);
+Entity create_london(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
 
 

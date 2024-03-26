@@ -37,7 +37,7 @@ WorldSystem::WorldSystem()
 
 WorldSystem::~WorldSystem() {
 	// Destroy music components
-	if (main_menu_music != nullptr) 
+	if (main_menu_music != nullptr)
 		Mix_FreeMusic(main_menu_music);
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
@@ -168,9 +168,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 
 	// Setting up the stage to music map
 	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
-	stage_music_map[StageSystem::Stage::overworld] = background_music; 
+	stage_music_map[StageSystem::Stage::overworld] = background_music;
 	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
-	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music; 
+	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music;
 	stage_music_map[StageSystem::Stage::minigame] = minigame_music;
 
 	// Set all states to default
@@ -218,7 +218,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
-	// Handle overworld stepping 
+	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
 		// Remove entities that leave the screen on the left side
@@ -227,7 +227,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		for (int i = (int)motions_registry.components.size() - 1; i >= 0; --i) {
 			Motion& motion = motions_registry.components[i];
 			if (motion.position.x + abs(motion.scale.x) < 0.f) {
-				if (!registry.players.has(motions_registry.entities[i]) && 
+				if (!registry.players.has(motions_registry.entities[i]) &&
 					!registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
 					registry.remove_all_components_of(motions_registry.entities[i]);
 			}
@@ -286,7 +286,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//	bool ended = false;
 	//	float minigame_timer_counter_ms = 10000.f;
 	//	for (Entity entity : registry.miniGameTimer.entities) {
-	//		// progress timer 
+	//		// progress timer
 	//		MiniGameTimer& counter = registry.miniGameTimer.get(entity);
 	//		counter.counter_ms -= elapsed_ms_since_last_update;
 	//		if (counter.counter_ms < minigame_timer_counter_ms) {
@@ -297,7 +297,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//			counter.inter_timer -= elapsed_ms_since_last_update;
 
 	//			if (counter.inter_timer < 0) {
-	//				registry.renderRequests.remove(entity); 
+	//				registry.renderRequests.remove(entity);
 	//				registry.renderRequests.insert(
 	//					entity,
 	//					{ TEXTURE_ASSET_ID::MINIGAMECUP,
@@ -310,17 +310,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//			}
 	//		}
 
-	//		// stop minigame once timer expires 
+	//		// stop minigame once timer expires
 	//		if (counter.counter_ms < 0) {
 	//			// Change turn-based values here to deal damage based on score
-	//			Minigame& minigame = registry.miniGame.get(entity); 
+	//			Minigame& minigame = registry.miniGame.get(entity);
 	//			std::cout << "SCORE: " << minigame.score << '\n';
 
 	//			registry.remove_all_components_of(entity);
 	//			ended = true;
 
-	//			// Assign score to ability 
-	//			Entity active_char_entity = turn_based->get_active_character(); 
+	//			// Assign score to ability
+	//			Entity active_char_entity = turn_based->get_active_character();
 	//			// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
 	//			handle_attack(active_char_entity, "Basic Attack");
 	//		}
@@ -332,7 +332,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//			change_stage(1);
 	//			break;
 	//		}
-	//		
+	//
 	//		if (registry.renderRequests.has(entity)) {
 	//			MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
 	//			counter.counter_ms -= elapsed_ms_since_last_update;
@@ -472,7 +472,7 @@ bool WorldSystem::is_over() const {
 //	return in_bounds;
 //}
 
-void WorldSystem::handle_mini(int bpm) { 
+void WorldSystem::handle_mini(int bpm) {
 	bool hit = false;
 	// Assuming that the bpm is based on quarter notes and it's 4/4
 	for (Entity entity : registry.miniGameTimer.entities) {

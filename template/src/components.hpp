@@ -92,7 +92,7 @@ struct PartyMember {
 };
 
 struct TurnBasedEnemy {
-
+	int experience_value = 0;
 };
 
 struct TurnCounter {
