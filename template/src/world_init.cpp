@@ -188,7 +188,9 @@ Entity createLevelNode(RenderSystem* renderer, LevelNode left_level, LevelNode r
 	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
 
 	registry.overWorld.emplace(entity);
-	registry.levelNode.emplace(entity);
+	auto& levelNode = registry.levelNode.emplace(entity);
+	levelNode.position = position;
+
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,

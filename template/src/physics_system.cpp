@@ -371,6 +371,16 @@ void PhysicsSystem::step(float elapsed_ms)
 				registry.collisions.emplace_with_duplicates(entity_i, entity_j);
 				registry.collisions.emplace_with_duplicates(entity_j, entity_i);
 			}
+			// ADDED AS PART OF THE COLLISION WITH LEVELNODES
+			if (collides(entity_i, entity_j) && ((registry.players.has(entity_j) && registry.levelNode.has(entity_i)) || (registry.players.has(entity_i) && registry.levelNode.has(entity_j))))
+			{
+				Entity entity_j = motion_container.entities[j];
+				// Create a collisions event
+				// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
+				registry.collisions.emplace_with_duplicates(entity_i, entity_j);
+				registry.collisions.emplace_with_duplicates(entity_j, entity_i);
+
+			}
 		}
 	}
 

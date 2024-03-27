@@ -14,10 +14,13 @@ public:
 
 private:
 	bool overworld_tutorial;
+	bool is_target_reached;
 	StageSystem* stage_system;
 	RenderSystem* renderer;
 	int current_level;
 	//void create_overworld_levels();
+	void updatePlayerVelocityTowardsTarget(Motion& player_motion, LevelNode* target_node, float player_speed);
+
 
 	// helpers for button presses
 	void handle_player_movement(int key, int action, float player_speed); 

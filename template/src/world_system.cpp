@@ -240,16 +240,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 		// This block spawns in enemies
-		//if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-		//	// Reset timer
-		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-		//	// Create enemy drink with random initial velocity, position
-		//	Entity test = createEnemyDrink(renderer,
-		//		// TODO: make negative velocity possible
-		//		vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-		//		// TODO: fix to spawn from only the edges
-		//		vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		//}
+		// 
+		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+			// Reset timer
+			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+			// Create enemy drink with random initial velocity, position
+			Entity test = createEnemyDrink(renderer,
+				// TODO: make negative velocity possible
+				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+				// TODO: fix to spawn from only the edges
+				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		}
 
 		// Processing the chicken state
 		assert(registry.screenStates.components.size() <= 1);
@@ -365,7 +366,7 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 			Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), levelpos);
 
 		}
-		std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+		//std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
 	}
 }
 // Reset the world state to its initial state
@@ -420,6 +421,18 @@ void WorldSystem::restart_game() {
 	// Create tutorials
 	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
 	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+
+	// TODO: MAKE IT SO THAT THE GAME SAVES THE LAST LEVEL THAT THE PLAYER WAS ON
+	if (registry.motions.has(registry.players.entities[0])) {
+		Motion& player_motion = registry.motions.get(registry.players.entities[0]);
+		std::cout << "THIS IS RUN" << std::endl;
+	}
+	//if (registry.levelNode.has(registry.levelNode.entities[0])) {
+	//	std::cout << "THESE ARE THE POSITION OF THE FIRST LEVELNODE" << std::endl;
+	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.x << std::endl;
+	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.y << std::endl;
+	//	//player_motion.position = registry.motions.get(registry.levelNode.entities[0]).position;
+	//}
 }
 
 // Compute collisions between entities
@@ -446,6 +459,45 @@ void WorldSystem::handle_collisions() {
 
 					// We also need to kill all other eagles
 					for (Entity enemies : registry.enemyDrinks.entities) {
+						registry.remove_all_components_of(enemies);
+					}
+
+					// Stage = 1 maps to turn based
+					stage_system->set_stage(StageSystem::Stage::cutscene);
+				}
+			}
+		}
+	}
+
+	// Remove all collisions from this simulation step
+	registry.collisions.clear();
+}
+
+void WorldSystem::handle_level_collisions() {
+	// Loop over all collisions detected by the physics system
+	auto& collisionsRegistry = registry.collisions;
+	std::cout << collisionsRegistry.size() << std::endl;
+	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+		// The entity and its collider
+		
+		Entity entity = collisionsRegistry.entities[i];
+		Entity entity_other = collisionsRegistry.components[i].other;
+
+		// For now, we are only interested in collisions that involve the chicken
+		if (registry.players.has(entity)) {
+
+			// Checking Player - Attack collisions
+			if (registry.levelNode.has(entity_other)) {
+				// initiate fight if player is attacking
+				if (registry.attackTimers.has(entity)) {
+					// Scream. we can replace this with a diff sound later
+					Mix_PlayChannel(-1, chicken_dead_sound, 0);
+
+					// potential problem: if we don't remove the enemy it might keep colliding and screaming
+					registry.remove_all_components_of(entity_other);
+
+					// We also need to kill all other eagles
+					for (Entity enemies : registry.levelNode.entities) {
 						registry.remove_all_components_of(enemies);
 					}
 

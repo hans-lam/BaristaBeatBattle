@@ -15,6 +15,9 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	overworld_tutorial = false;
 	// I dont think this call works
 	//create_overworld_levels();
+	std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
+	
+			
 } 
 
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {
@@ -39,6 +42,9 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 //}
 
 void OverworldSystem::handle_player_movement(int key, int action, float player_speed) {
+
+	bool player_at_target;
+
 	for (int i = 0; i < registry.players.size(); i++) {
 		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
 		// do not move player if it is dying
@@ -49,19 +55,110 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 		//	action = GLFW_RELEASE;
 		//}
 
+		// Make every key press find the nearest level and then just go there. If left or right, prioritize x nearness. if up or down, prioritize y nearness, If tie, prioritize x.
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+
+			float leftmost_x = std::numeric_limits<float>::max();
+			float rightmost_x = std::numeric_limits<float>::lowest();
+
+			for (LevelNode& levelnode : registry.levelNode.components) {
+				if (levelnode.position.x < leftmost_x) {
+					leftmost_x = levelnode.position.x;
+				}
+				if (levelnode.position.x > rightmost_x) {
+					rightmost_x = levelnode.position.x;
+				}
+			}
+
+			// Initialize variables to track the nearest nodes.
+			float nearest_left_dist = std::numeric_limits<float>::max();
+			float nearest_right_dist = std::numeric_limits<float>::max();
+			LevelNode nearest_left_node;
+			LevelNode nearest_right_node;
+			bool found_left_node = false;
+			bool found_right_node = false;
+
+			for (LevelNode& levelnode : registry.levelNode.components) {
+
+				// Calculate distance from player to current node.
+				float dist = sqrt(pow((levelnode.position.x - player_motion.position.x), 2) + pow((levelnode.position.y - player_motion.position.y), 2));
+
+				// Check if this node is to the left of the player.
+				if (levelnode.position.x < player_motion.position.x && dist < nearest_left_dist) {
+					nearest_left_dist = dist;
+					nearest_left_node = levelnode;
+					found_left_node = true;
+				}
+
+				// Check if this node is to the right of the player.
+				if (levelnode.position.x > player_motion.position.x && dist < nearest_right_dist) {
+					nearest_right_dist = dist;
+					nearest_right_node = levelnode;
+					found_right_node = true;
+				}
+			}
+
+
+			//// Go through all levelNodes:
+			//vec2 nearest_levelNode_pos = vec2(0.f, 0.f);
+			//float curr_best_dist = 9999.f;
+			//LevelNode nearest_left_node = LevelNode();
+			//LevelNode nearest_right_node = LevelNode();
+			//for (LevelNode levelnode : registry.levelNode.components) {
+			//	
+			//	// if find closer node, replace nearest_levelNode_pos with new best
+			//	vec2 nodePos = levelnode.position;
+			//	
+			//	// find nearest_left_node means that we check if levelnode.position.x is less than the player.position.x
+			//	if (levelnode.position.x > player_motion.position.x) {
+			//		
+			//		// dist to left calculation
+			//		float dist = sqrt(pow((levelnode.position.x - player_motion.position.x), 2) + pow(levelnode.position.y - player_motion.position.y, 2));
+			//		if (dist < curr_best_dist) {
+			//			curr_best_dist = dist;
+			//			nearest_levelNode_pos = levelnode.position;
+			//			nearest_right_node = levelnode;
+			//			std::cout << "THIS IS THE POSITION OF THE nearest_right_node: (x, y): " << levelnode.position.x << " " << levelnode.position.y << std::endl;
+			//		}
+			//	} 
+			//	
+			//	if (levelnode.position.x < player_motion.position.x) {
+			//		// dist to left calculation
+			//		float dist = sqrt(pow((levelnode.position.x - player_motion.position.x), 2) + pow(levelnode.position.y - player_motion.position.y, 2));
+			//		if (dist < curr_best_dist) {
+			//			curr_best_dist = dist;
+			//			nearest_levelNode_pos = levelnode.position;
+			//			nearest_left_node = levelnode;
+			//			std::cout << "THIS IS THE POSITION OF THE nearest_left_node: (x, y): " << levelnode.position.x << " " << levelnode.position.y << std::endl;
+			//		}
+			//	}
+			//	
+			//}
+
+
 			if (key == GLFW_KEY_UP) {
 				player_motion.velocity.y = -player_speed;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				//player_motion.velocity.x = -player_speed;
-
 			}
 			else if (key == GLFW_KEY_DOWN) {
 				player_motion.velocity.y = player_speed;
 			}
+			// just do left and right for now
+			else if (key == GLFW_KEY_LEFT) {
+				if (found_left_node && player_motion.position.x != leftmost_x) {
+					// Move player to the nearest left node if not already at the leftmost node.
+					player_motion.position.x = nearest_left_node.position.x;
+					/*while (player_motion.position.x != nearest_left_node.position.x) {
+						player_motion.velocity.x = -10;
+					}*/
+					std::cout << "Moved player to nearest left node at: (x, y): " << nearest_left_node.position.x << ", " << nearest_left_node.position.y << std::endl;
+				}
+			}
 			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = player_speed;
+				if (found_right_node && player_motion.position.x != rightmost_x) {
+					// Move player to the nearest right node if not already at the rightmost node.
+					player_motion.position.x = nearest_right_node.position.x;
+					std::cout << "Moved player to nearest right node at: (x, y): " << nearest_right_node.position.x << ", " << nearest_right_node.position.y << std::endl;
+				}
 			}
 
 		}
