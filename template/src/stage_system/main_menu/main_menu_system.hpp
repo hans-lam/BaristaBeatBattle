@@ -13,7 +13,7 @@ public:
 	enum MenuOption {
 		new_game,
 		load_game, 
-		options,
+		save_game,
 		tutorials,
 		credits
 	};
@@ -34,6 +34,7 @@ private:
 	StageSystem* stage_system;
 
 	std::map<MenuOption, Entity> menu_text_map;
+	Entity main_menu_title;
 	glm::vec3 selected_color = glm::vec3(1.0, 0.0, 0.0);
 	glm::vec3 not_selected_color = glm::vec3(1.0, 1.0, 1.0);
 };

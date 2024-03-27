@@ -30,6 +30,7 @@ public:
 	ComponentContainer<Minigame> miniGame;
 	ComponentContainer<MiniGameTimer> miniGameTimer;
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
+	ComponentContainer<PersistenceFeedbackTimer> persistanceFeedbackTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
 	ComponentContainer<MainMenu> mainMenu;
@@ -38,7 +39,8 @@ public:
 	ComponentContainer<CutScene> cutscenes;
 	ComponentContainer<TurnBased> turnBased;
 	ComponentContainer<MiniStage> miniStage;
-
+	ComponentContainer<MiniGameVisualizer> miniGameVisual;
+	ComponentContainer<LevelNode> levelNode;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -78,6 +80,8 @@ public:
 		registry_list.push_back(&cutscenes);
 		registry_list.push_back(&turnBased);
 		registry_list.push_back(&miniStage);
+		registry_list.push_back(&miniGameVisual);
+		registry_list.push_back(&levelNode);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
@@ -88,6 +92,7 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&persistanceFeedbackTimer);
 		registry_list.push_back(&injuryTimers);
 		registry_list.push_back(&healthOutlines);
 		registry_list.push_back(&healthBarFills);

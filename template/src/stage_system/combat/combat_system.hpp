@@ -32,6 +32,8 @@ public:
 
 	void handle_turn_rendering();
 
+	void handle_minigame_attack(Entity active_char, int score);
+
 private:
 	void init_combat_data_for_level(RenderSystem* renderer, Level* level);
 

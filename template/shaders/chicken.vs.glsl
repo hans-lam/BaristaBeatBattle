@@ -13,6 +13,8 @@ uniform mat3 transform;
 uniform mat3 projection;
 uniform float time;
 uniform int curr_frame;
+uniform int is_injured;
+uniform float counter;
 
 const float total_frames = 10.0;
 const float sprite_width = 1.0/total_frames;
@@ -46,6 +48,14 @@ void main()
 
 	vcolor = in_color * 3.0;
 
-	vec3 pos = projection * transform * vec3(in_position.xy, 1.0); // why not simply *in_position.xyz ?
+	float oscillate_x;
+	if (is_injured == 1) {
+	// hardcoded parameters - thank u desmos
+		oscillate_x = 0.80 * exp(-4.0 * counter) * sin(45.0 * counter);
+	} else {
+		oscillate_x = 0.0;
+	}
+
+	vec3 pos = projection * transform * vec3(in_position.x + oscillate_x, in_position.y, 1.0);
 	gl_Position = vec4(pos.xy, in_position.z, 1.0);
 }

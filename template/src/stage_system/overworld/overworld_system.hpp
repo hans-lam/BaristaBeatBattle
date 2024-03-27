@@ -1,5 +1,8 @@
 #pragma once
 #include "stage_system/stage_system.hpp"
+#include <render_system.hpp>
+
+// Justin: NOTE THAT SOME OF THE FUNCTOINALITY IS ALSO IN world_system.cpp
 
 // System for overworld
 class OverworldSystem
@@ -13,7 +16,13 @@ public:
 
 private:
 	bool overworld_tutorial;
+	bool is_target_reached;
 	StageSystem* stage_system;
+	RenderSystem* renderer;
+	int current_level;
+	//void create_overworld_levels();
+	void updatePlayerVelocityTowardsTarget(Motion& player_motion, LevelNode* target_node, float player_speed);
+
 
 	// helpers for button presses
 	void handle_player_movement(int key, int action, float player_speed); 

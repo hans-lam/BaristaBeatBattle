@@ -59,7 +59,7 @@ Entity createBug(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
-Entity createCup(RenderSystem* renderer, vec2 pos) {
+Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -76,7 +76,9 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	// Place in minigame
 	registry.miniGame.emplace(entity);
 	// Place in minigame timer for ryhthym calcs
-	registry.miniGameTimer.emplace(entity);
+	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
+	mgt.counter_ms = rhythm_length; 
+	mgt.inter_timer = inter_timer;
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::MINIGAMECUP,
@@ -87,7 +89,7 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_counter, minigame_state mini_result) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -100,13 +102,83 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
 
 	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 	// place in minigame result
-	registry.miniGameResTimer.emplace(entity);
-	RenderRequest& render = registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
-		EFFECT_ASSET_ID::TEXTURED,
-		GEOMETRY_BUFFER_ID::SPRITE }
-	);
+	MiniGameResTimer& res = registry.miniGameResTimer.emplace(entity);
+	res.counter_ms = interpolate_counter;
+
+	switch (mini_result) {
+	case minigame_state::perfect:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEPERFECT,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	case minigame_state::good:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEGOOD,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	case minigame_state::fail:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	case minigame_state::normal:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLCLOUD,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		motion.scale = { motion.scale.x * 2, motion.scale.y * 2 };
+		break;
+	}
+	res.res_state = mini_result;
+
+	return entity;
+}
+
+// minigame hit indicator 
+Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini_res) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
+	MiniGameVisualizer& visual = registry.miniGameVisual.emplace(entity);
+	visual.res_state = mini_res;
+
+	if (mini_res == minigame_state::good) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLGOOD,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+	}
+	else if (mini_res == minigame_state::perfect) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+	}
+
 	return entity;
 }
 
@@ -162,6 +234,40 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,
 		 EFFECT_ASSET_ID::FOREGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	return entity;
+}
+
+Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+	
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = vec2(0.f,0.f);
+	motion.position = position;
+
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+
+	registry.overWorld.emplace(entity);
+	auto& levelNode = registry.levelNode.emplace(entity);
+	levelNode.position = position;
+	levelNode.level_number = level_num;
+
+	RenderRequest& rr = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::ENEMYDRINK,
+		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
@@ -637,6 +743,7 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 	switch (current_stage) {
 	case StageSystem::Stage::main_menu: 
 		registry.mainMenu.emplace(entity); 
+		textRenderRequest.shown = true;
 		break;
 	case StageSystem::Stage::overworld:
 		registry.overWorld.emplace(entity); 
@@ -648,7 +755,8 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 		registry.turnBased.emplace(entity); 
 		break;
 	case StageSystem::Stage::minigame:
-		registry.miniGame.emplace(entity);
+		registry.miniStage.emplace(entity);
+		// textRenderRequest.shown = true;
 		break;
 	}
 
@@ -674,11 +782,14 @@ Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos) {
 
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	registry.healthOutlines.emplace(entity);
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTHOUTLINE,
 		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
@@ -702,11 +813,14 @@ Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associate
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	HealthBarFill& fill = registry.healthBarFills.emplace(entity);
 	fill.associated_char = associated_character;
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTHFILL,
 		 EFFECT_ASSET_ID::BATTLEBAR,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }

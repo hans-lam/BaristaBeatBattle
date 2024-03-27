@@ -21,6 +21,11 @@ TurnBasedSystem::TurnBasedSystem() {
 
 void TurnBasedSystem::init(AISystem* ai_system) {
 	this->ai_system = ai_system;
+	for (int i = (int)registry.players.components.size() - 1; i >= 0; --i) {
+		std::cout << "I GOT HEREEEEE" << std::endl;
+		current_level = registry.players.components[0].level_num;
+	}
+	
 }
 
 void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
@@ -135,7 +140,15 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
-		registry.attackTimers.emplace(get_entity_given_character(caller));
+		Entity caller_entity = get_entity_given_character(caller);
+		if (registry.attackTimers.has(caller_entity)) {
+			// registry.injuryTimers.remove(receiving_entity);
+			AttackTimer& attack = registry.attackTimers.get(caller_entity);
+			attack.counter_ms = 700.f;
+		}
+		else {
+			registry.attackTimers.emplace(caller_entity);
+		}
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);
