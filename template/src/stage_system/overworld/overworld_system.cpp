@@ -22,7 +22,6 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	//create_overworld_levels();
 	std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
 	
-			
 } 
 
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {
@@ -244,6 +243,8 @@ void OverworldSystem::handle_level_selection() {
 	for (Entity entity : registry.levelNode.entities) {
 		registry.remove_all_components_of(entity);
 	}
+
+	
 
 	std::cout << " handle level selection " << my_test_it++ << std::endl;
 	stage_system->set_stage(StageSystem::Stage::cutscene, current_level);
