@@ -5,6 +5,11 @@
 const int VERTICAL_SPACE_BETWEEN_ALLIES = 150;
 const int VERTICAL_SPACE_BETWEEN_ENEMIES = 150;
 
+LevelFactory::LevelFactory() {
+	this->is_london_recruited = false;
+}
+	
+
 Level* LevelFactory::construct_level_one(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 	Level* level_one = new Level();
 
@@ -76,12 +81,19 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 
 	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	//Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
 	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
 
+	// temp here as we currently only have 5 levels
+	Entity possessed_london = create_london(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+
 	level_four->enemies.push_back(level_two_ground_a);
-	level_four->enemies.push_back(level_two_ground_b);
+	//level_four->enemies.push_back(level_two_ground_b);
+
+	level_four->enemies.push_back(possessed_london);
+
 	level_four->enemies.push_back(level_two_ground_c);
+
 
 	return level_four;
 
@@ -107,6 +119,11 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	level_five->enemies.push_back(level_two_ground_a);
 	level_five->enemies.push_back(level_two_ground_b);
 	level_five->enemies.push_back(level_two_ground_c);
+
+	if (this->is_london_recruited) {
+		Entity london = create_london(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 3) });
+		level_five->allies.push_back(london);
+	}
 
 	return level_five;
 

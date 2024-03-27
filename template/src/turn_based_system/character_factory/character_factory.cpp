@@ -1,6 +1,5 @@
 #include "character_factory.hpp"
 
-
 Entity CharacterFactory::construct_chai(Entity entity) {
 	std::string name = "Chai";
 

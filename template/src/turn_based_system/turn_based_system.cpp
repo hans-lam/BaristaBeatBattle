@@ -207,6 +207,17 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		return 1;
 	}
 
+	// TODO CREATE A FLAG SYSTEM
+	if (registry.turnBasedEnemies.size() == 1) {
+		Entity turn_based_enemy_entity = registry.turnBasedEnemies.entities[0];
+		Character* turn_based_enemy = registry.characterDatas.get(turn_based_enemy_entity).characterData;
+		if (turn_based_enemy->get_name() == "London") {
+			out_of_combat = true;
+			printf("London was the last enemy alive and has been recruited!");
+			return 1;
+		}
+	}
+
 	return 0;
 
 }
