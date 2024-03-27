@@ -2,8 +2,8 @@
 
 #include "level_factory.hpp"
 
-const int VERTICAL_SPACE_BETWEEN_ALLIES = 100;
-const int VERTICAL_SPACE_BETWEEN_ENEMIES = 100;
+const int VERTICAL_SPACE_BETWEEN_ALLIES = 150;
+const int VERTICAL_SPACE_BETWEEN_ENEMIES = 150;
 
 Level* LevelFactory::construct_level_one(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 	Level* level_one = new Level();
@@ -43,15 +43,15 @@ Level* LevelFactory::construct_level_three(RenderSystem* renderer, vec2 base_all
 	Level* level_three = new Level();
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
-	Entity earl_entity = create_earl(renderer, { base_ally_position .x,base_ally_position.y + VERTICAL_SPACE_BETWEEN_ALLIES });
-	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2)});
+	Entity earl_entity = create_earl(renderer, { base_ally_position .x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2)});
 
 	level_three->allies.push_back(chai_entity);
 	level_three->allies.push_back(earl_entity);
 	level_three->allies.push_back(americano_entity);
 
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
 
 	level_three->enemies.push_back(level_two_ground_a);
 	level_three->enemies.push_back(level_two_ground_b);
@@ -67,8 +67,8 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
-	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y + VERTICAL_SPACE_BETWEEN_ALLIES });
-	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
+	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
 
 	level_four->allies.push_back(chai_entity);
 	level_four->allies.push_back(earl_entity);
@@ -76,8 +76,8 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 
 	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
-	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
 
 	level_four->enemies.push_back(level_two_ground_a);
 	level_four->enemies.push_back(level_two_ground_b);
@@ -92,8 +92,8 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	Level* level_five = new Level();
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
-	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y + VERTICAL_SPACE_BETWEEN_ALLIES });
-	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
+	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
 
 	level_five->allies.push_back(chai_entity);
 	level_five->allies.push_back(earl_entity);
@@ -101,8 +101,8 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 
 	// TO BECOME COFFEE ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
-	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
 
 	level_five->enemies.push_back(level_two_ground_a);
 	level_five->enemies.push_back(level_two_ground_b);
@@ -117,8 +117,8 @@ Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_
 	Level* level_six = new Level();
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
-	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y + VERTICAL_SPACE_BETWEEN_ALLIES });
-	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
+	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
 
 	level_six->allies.push_back(chai_entity);
 	level_six->allies.push_back(earl_entity);
@@ -127,7 +127,7 @@ Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_
 	// TODO ADD LONDON
 
 	Entity level_three_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 3);
-	Entity level_three_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + VERTICAL_SPACE_BETWEEN_ALLIES }, 3);
+	Entity level_three_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 3);
 
 	level_six->enemies.push_back(level_three_ground_a);
 	level_six->enemies.push_back(level_three_ground_b);
@@ -142,8 +142,8 @@ Level* LevelFactory::construct_level_seven(RenderSystem* renderer, vec2 base_all
 
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
-	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y + VERTICAL_SPACE_BETWEEN_ALLIES });
-	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
+	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity americano_entity = create_americano(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) });
 
 	level_seven->allies.push_back(chai_entity);
 	level_seven->allies.push_back(earl_entity);
@@ -151,9 +151,9 @@ Level* LevelFactory::construct_level_seven(RenderSystem* renderer, vec2 base_all
 
 	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
 	// To become devil, in the middle
-	Entity ground_devil = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y + VERTICAL_SPACE_BETWEEN_ALLIES }, 5);
+	Entity ground_devil = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 5);
 
 	level_seven->enemies.push_back(level_two_ground_a);
 	level_seven->enemies.push_back(level_two_ground_b);
