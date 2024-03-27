@@ -33,6 +33,10 @@ public:
 
 	void set_render_shown(Entity entity, bool show_render, bool tutorial);
 
+	int get_current_level() {
+		return this->current_level;
+	}
+
 private: 
 	void set_main_menu();
 

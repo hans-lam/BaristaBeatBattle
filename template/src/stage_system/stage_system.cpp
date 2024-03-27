@@ -7,11 +7,13 @@
 
 StageSystem::StageSystem()
 {
+	current_level = 1;
 	// stub;
 }
 
 void StageSystem::init()
 {
+	current_level = 1;
 	current_stage = main_menu;
 	music_changed = false;
 }
@@ -19,7 +21,13 @@ void StageSystem::init()
 // int level = 0 will make it an optional parameter and default to 1
 void StageSystem::set_stage(Stage target, int level)
 {
+
+	if (target != turn_based) {
+		this->current_level = level;
+
+	}
 	current_stage = target;
+
 
 	std::cout << "THIS IS current_level" << level << std::endl;
 

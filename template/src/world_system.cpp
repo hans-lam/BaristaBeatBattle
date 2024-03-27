@@ -248,7 +248,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
-		create_overworld_levels(5);
+		if (registry.levelNode.size() == 0) {
+			create_overworld_levels(5);
+		}
+		
 		// This helper is replacing the block that spawns in enemies. 
 
 
@@ -284,6 +287,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Handle turn based stepping
 	if (curr_stage == StageSystem::Stage::turn_based) {
 		// process attacks
+		
 		float min_attack_counter_ms = 700.f;
 		for (Entity entity : registry.attackTimers.entities) {
 			// progress timer
@@ -321,6 +325,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		if (out_of_combat) {
+			combat_system->set_selected_level(stage_system->get_current_level());
 			combat_system->handle_level(renderer);
 		}
 		else {
@@ -551,7 +556,7 @@ void WorldSystem::handle_level_collisions() {
 					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
 					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
 
-					stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
+					// stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
 				}
 			}
 		}
