@@ -2,6 +2,8 @@
 #include "stage_system/stage_system.hpp"
 #include <render_system.hpp>
 
+// Justin: NOTE THAT SOME OF THE FUNCTOINALITY IS ALSO IN world_system.cpp
+
 // System for overworld
 class OverworldSystem
 {

@@ -44,7 +44,7 @@ Entity createMainMenu(RenderSystem* renderer, vec2 position);
 // Tutorial
 Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window);
 // LevelNode
-Entity createLevelNode(RenderSystem* renderer, LevelNode left_level, LevelNode right_level, vec2 position);
+Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 scale, float angle);
 // a egg

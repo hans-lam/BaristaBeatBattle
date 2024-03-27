@@ -72,7 +72,7 @@ int main()
 		world.step(elapsed_ms);
 		physics.step(elapsed_ms);
 		turn_based.step(elapsed_ms);
-		world.handle_collisions();
+		//world.handle_collisions();
 		world.handle_level_collisions();
 		renderer.draw(stage_system.get_current_stage());
 	}

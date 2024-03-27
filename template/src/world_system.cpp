@@ -241,16 +241,26 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 		// This block spawns in enemies
 		// 
-		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-			// Reset timer
-			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-			// Create enemy drink with random initial velocity, position
-			Entity test = createEnemyDrink(renderer,
-				// TODO: make negative velocity possible
-				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-				// TODO: fix to spawn from only the edges
-				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		}
+		//if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+		//	// Reset timer
+		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		//	// Create enemy drink with random initial velocity, position
+		//	Entity test = createEnemyDrink(renderer,
+		//		// TODO: make negative velocity possible
+		//		vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+		//		// TODO: fix to spawn from only the edges
+		//		vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		//}
+
+		//if (registry.levelNode.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+		//	// Reset timer
+		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		//	// Create enemy drink with random initial velocity, position
+		//	Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		//	}
+
+
+
 
 		// Processing the chicken state
 		assert(registry.screenStates.components.size() <= 1);
@@ -363,7 +373,7 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 		for (int i = 0; i < num_levels; i++) {
 			// 1500 is window_width_px
 			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 600);
-			Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), levelpos);
+			Entity test = createLevelNode(renderer, i+1, levelpos);
 
 		}
 		//std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
@@ -438,36 +448,36 @@ void WorldSystem::restart_game() {
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
 	// Loop over all collisions detected by the physics system
-	auto& collisionsRegistry = registry.collisions;
-	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-		// The entity and its collider
-		Entity entity = collisionsRegistry.entities[i];
-		Entity entity_other = collisionsRegistry.components[i].other;
+	//auto& collisionsRegistry = registry.collisions;
+	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+	//	// The entity and its collider
+	//	Entity entity = collisionsRegistry.entities[i];
+	//	Entity entity_other = collisionsRegistry.components[i].other;
 
-		// For now, we are only interested in collisions that involve the chicken
-		if (registry.players.has(entity)) {
+	//	// For now, we are only interested in collisions that involve the chicken
+	//	if (registry.players.has(entity)) {
 
-			// Checking Player - Attack collisions
-			if (registry.enemyDrinks.has(entity_other)) {
-				// initiate fight if player is attacking
-				if (registry.attackTimers.has(entity)) {
-					// Scream. we can replace this with a diff sound later
-					Mix_PlayChannel(-1, chicken_dead_sound, 0);
+	//		// Checking Player - Attack collisions
+	//		if (registry.enemyDrinks.has(entity_other)) {
+	//			// initiate fight if player is attacking
+	//			if (registry.attackTimers.has(entity)) {
+	//				// Scream. we can replace this with a diff sound later
+	//				Mix_PlayChannel(-1, chicken_dead_sound, 0);
 
-					// potential problem: if we don't remove the enemy it might keep colliding and screaming
-					registry.remove_all_components_of(entity_other);
+	//				// potential problem: if we don't remove the enemy it might keep colliding and screaming
+	//				registry.remove_all_components_of(entity_other);
 
-					// We also need to kill all other eagles
-					for (Entity enemies : registry.enemyDrinks.entities) {
-						registry.remove_all_components_of(enemies);
-					}
+	//				// We also need to kill all other eagles
+	//				for (Entity enemies : registry.enemyDrinks.entities) {
+	//					registry.remove_all_components_of(enemies);
+	//				}
 
-					// Stage = 1 maps to turn based
-					stage_system->set_stage(StageSystem::Stage::cutscene);
-				}
-			}
-		}
-	}
+	//				// Stage = 1 maps to turn based
+	//				stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
+	//			}
+	//		}
+	//	}
+	//}
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
@@ -476,7 +486,6 @@ void WorldSystem::handle_collisions() {
 void WorldSystem::handle_level_collisions() {
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
-	std::cout << collisionsRegistry.size() << std::endl;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 		// The entity and its collider
 		
@@ -502,7 +511,12 @@ void WorldSystem::handle_level_collisions() {
 					}
 
 					// Stage = 1 maps to turn based
-					stage_system->set_stage(StageSystem::Stage::cutscene);
+					// TODO: SHOULD MAP TO DIFFERENT LEVELS
+
+					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
+					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
+
+					stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
 				}
 			}
 		}

@@ -1,5 +1,6 @@
 #include "stage_system.hpp"
 #include "tiny_ecs_registry.hpp"
+#include <iostream>
 
 StageSystem::StageSystem()
 {
@@ -12,9 +13,12 @@ void StageSystem::init()
 	music_changed = false;
 }
 
-void StageSystem::set_stage(Stage target)
+// int level = 0 will make it an optional parameter and default to 1
+void StageSystem::set_stage(Stage target, int level)
 {
 	current_stage = target;
+
+	std::cout << "THIS IS current_level" << level << std::endl;
 
 	switch (current_stage) {
 	case main_menu:
@@ -24,10 +28,10 @@ void StageSystem::set_stage(Stage target)
 		set_overworld();
 		break;
 	case cutscene:
-		set_cutscene();
+		set_cutscene(level);
 		break;
 	case turn_based:
-		set_turn_based();
+		set_turn_based(level);
 		break;
 	case minigame:
 		set_minigame();
@@ -72,8 +76,9 @@ void StageSystem::set_overworld()
 	}
 }
 
-void StageSystem::set_cutscene()
+void StageSystem::set_cutscene(int level_num)
 {
+	current_level = level_num;
 	// Set all overworld entities to not be shown
 	// Keep entities live since we still might need them
 	for (Entity entity : registry.overWorld.entities) {
@@ -89,8 +94,11 @@ void StageSystem::set_cutscene()
 	}
 }
 
-void StageSystem::set_turn_based()
+void StageSystem::set_turn_based(int level_num)
 {
+	// Because turn_based always comes after cutscene, use the current_level global variable 
+	// to decide which turn_based to initialise/set.
+	
 	// Remove all components from cutscenes
 	for (Entity entity : registry.cutscenes.entities) {
 		registry.remove_all_components_of(entity);

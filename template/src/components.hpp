@@ -43,7 +43,7 @@ struct LevelNode
 // Player component
 struct Player
 {
-
+	int level_num; // This is the level that the character is hovering at in the overworld, NOT the level of the character
 };
 
 // Eagles have a hard shell

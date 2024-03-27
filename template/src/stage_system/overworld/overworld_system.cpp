@@ -4,6 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <world_init.hpp>
+#include <thread>
+
+// Justin: NOTE THAT SOME OF THE FUNCTOINALITY IS ALSO IN world_system.cpp
+
 
 OverworldSystem::OverworldSystem() : 
 	overworld_tutorial(false)
@@ -43,7 +47,10 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 
 void OverworldSystem::handle_player_movement(int key, int action, float player_speed) {
 
-	bool player_at_target;
+	// used to check when to set velocities to 0;
+	float remaining_distance_x = 0.f;
+	
+	float remaining_distance_y = 0.f;
 
 	for (int i = 0; i < registry.players.size(); i++) {
 		Motion& player_motion = registry.motions.get(registry.players.entities[i]);
@@ -54,6 +61,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 		//if (!player_in_bounds(&player_motion, is_x)) {
 		//	action = GLFW_RELEASE;
 		//}
+		float nearest_left_dist = std::numeric_limits<float>::max();
+		float nearest_right_dist = std::numeric_limits<float>::max();
 
 		// Make every key press find the nearest level and then just go there. If left or right, prioritize x nearness. if up or down, prioritize y nearness, If tie, prioritize x.
 		if (action == GLFW_PRESS || action == GLFW_REPEAT) {
@@ -71,8 +80,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			}
 
 			// Initialize variables to track the nearest nodes.
-			float nearest_left_dist = std::numeric_limits<float>::max();
-			float nearest_right_dist = std::numeric_limits<float>::max();
 			LevelNode nearest_left_node;
 			LevelNode nearest_right_node;
 			bool found_left_node = false;
@@ -97,8 +104,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					found_right_node = true;
 				}
 			}
-
-
+			
 			//// Go through all levelNodes:
 			//vec2 nearest_levelNode_pos = vec2(0.f, 0.f);
 			//float curr_best_dist = 9999.f;
@@ -145,24 +151,62 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			// just do left and right for now
 			else if (key == GLFW_KEY_LEFT) {
 				if (found_left_node && player_motion.position.x != leftmost_x) {
+					
 					// Move player to the nearest left node if not already at the leftmost node.
 					player_motion.position.x = nearest_left_node.position.x;
-					/*while (player_motion.position.x != nearest_left_node.position.x) {
-						player_motion.velocity.x = -10;
-					}*/
-					std::cout << "Moved player to nearest left node at: (x, y): " << nearest_left_node.position.x << ", " << nearest_left_node.position.y << std::endl;
+
+					std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
+
+					registry.players.components[i].level_num = nearest_left_node.level_number;
+					/*remaining_distance_x = nearest_left_dist;
+					player_motion.velocity.x = -player_speed;
+					*/
+
+					// TRYING TO MAKE A LOOP THAT WILL MAKE THE CHARACTER MOVE AND NOT JUST TELEPORT
+					//std::cout << "I GOT HERE" << std::endl;
+					//std::thread myThread([nearest_left_dist, &player_motion, &nearest_left_node]() {
+					//	int update_nearest_left_dist = nearest_left_dist;
+					//	std::cout << "Thread is running..." << std::endl;
+
+					//	while (update_nearest_left_dist > 0) {
+					//		std::cout << "Thread is running..." << std::endl;
+					//		player_motion.position.x--;
+					//		update_nearest_left_dist = abs(player_motion.position.x - nearest_left_node.position.x);
+
+					//		std::cout << update_nearest_left_dist << std::endl;
+					//		// Break condition for the loop, if necessary.
+					//		// if (some_condition) break;
+					//	}
+
+					//});
+
+					//std::cout << "I GOT HERE 2" << std::endl;
+					//myThread.detach();
+					//std::cout << "I GOT HERE 3" << std::endl;
 				}
 			}
 			else if (key == GLFW_KEY_RIGHT) {
 				if (found_right_node && player_motion.position.x != rightmost_x) {
 					// Move player to the nearest right node if not already at the rightmost node.
 					player_motion.position.x = nearest_right_node.position.x;
-					std::cout << "Moved player to nearest right node at: (x, y): " << nearest_right_node.position.x << ", " << nearest_right_node.position.y << std::endl;
+					std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
+					registry.players.components[i].level_num = nearest_right_node.level_number;
+					
 				}
 			}
 
 		}
-		else if (action == GLFW_RELEASE) {
+
+		/*if (remaining_distance_x == 0) {
+			player_motion.velocity.x = 0;
+		}
+		else {
+			remaining_distance_x = player_motion.position.x - 
+			std::cout << "This value should go down: " << nearest_left_dist << std::endl;
+		}*/
+
+
+		/*else if (action == GLFW_RELEASE) {
 			if (key == GLFW_KEY_UP) {
 				player_motion.velocity.y = 0.0f;
 			}
@@ -175,7 +219,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			else if (key == GLFW_KEY_RIGHT) {
 				player_motion.velocity.x = 0.0f;
 			}
-		}
+		}*/
 	}
 }
 

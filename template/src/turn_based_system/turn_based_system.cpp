@@ -21,6 +21,11 @@ TurnBasedSystem::TurnBasedSystem() {
 
 void TurnBasedSystem::init(AISystem* ai_system) {
 	this->ai_system = ai_system;
+	for (int i = (int)registry.players.components.size() - 1; i >= 0; --i) {
+		std::cout << "I GOT HEREEEEE" << std::endl;
+		current_level = registry.players.components[0].level_num;
+	}
+	
 }
 
 void TurnBasedSystem::step(float elapsed_ms_since_last_update) {

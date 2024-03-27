@@ -168,7 +168,7 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 	return entity;
 }
 
-Entity createLevelNode(RenderSystem* renderer, LevelNode left_level, LevelNode right_level, vec2 position)
+Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
 {
 	auto entity = Entity();
 
@@ -190,6 +190,7 @@ Entity createLevelNode(RenderSystem* renderer, LevelNode left_level, LevelNode r
 	registry.overWorld.emplace(entity);
 	auto& levelNode = registry.levelNode.emplace(entity);
 	levelNode.position = position;
+	levelNode.level_number = level_num;
 
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,

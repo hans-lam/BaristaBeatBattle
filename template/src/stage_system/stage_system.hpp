@@ -26,19 +26,21 @@ public:
 
 	void set_music_changed();
 
-	void set_stage(Stage target);
+	void set_stage(Stage target, int level = 1);
 private: 
 	void set_main_menu();
 
 	void set_overworld(); 
 
-	void set_cutscene();
+	void set_cutscene(int level_num);
 
-	void set_turn_based();
+	void set_turn_based(int level_num);
 
 	void set_minigame();
 
 	Stage current_stage;
+
+	int current_level; // THIS HAS NOTHING TO DO WITH CHARACTER LEVEL, THIS IS JUST THE OVERWORLD LEVEL
 
 	bool music_changed;
 };
