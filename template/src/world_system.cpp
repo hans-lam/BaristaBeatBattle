@@ -325,17 +325,22 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		else {
 			combat_system->handle_turn_rendering();
-
+			
 			if (minigame_system->loaded) {
 				// trigger attack?
-				Entity charData = turn_based->get_active_character(); 
+				Entity charData = turn_based->get_active_character();
 				int current_score = minigame_system->get_score();
-
 				combat_system->handle_minigame_attack(charData, current_score);
 
 				minigame_system->loaded = false;
 			}
 		}
+	}
+
+	// Handle cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene) {
+		cutscene_system->handle_cutscene_render(renderer);
+
 	}
 
 	// Handle minigame stepping
@@ -419,7 +424,7 @@ void WorldSystem::restart_game() {
 	// Set Default values for systems
 	main_menu_system->init(stage_system);
 	overworld_system->init(stage_system);
-	cutscene_system->init(stage_system);
+	cutscene_system->init(stage_system, renderer);
 	combat_system->init(stage_system, turn_based);
 	minigame_system->init(stage_system, renderer);
 
@@ -453,6 +458,9 @@ void WorldSystem::restart_game() {
 
 	// Create Background for turn based battle
 	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+
+	// Create Background for cutscenes
+	createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create the main menu
 	createMainMenu(renderer, { window_width_px / 2.0, 150 });

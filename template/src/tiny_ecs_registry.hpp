@@ -50,6 +50,8 @@ public:
 	ComponentContainer<InjuredTimer> injuryTimers;
 	ComponentContainer<HealthOutline> healthOutlines;
 	ComponentContainer<HealthBarFill> healthBarFills;
+	ComponentContainer<CutsceneSlideComp> cutsceneSlideComp;
+
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -94,6 +96,7 @@ public:
 		registry_list.push_back(&injuryTimers);
 		registry_list.push_back(&healthOutlines);
 		registry_list.push_back(&healthBarFills);
+		registry_list.push_back(&cutsceneSlideComp);
 		
 	}
 

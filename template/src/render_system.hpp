@@ -76,7 +76,11 @@ class RenderSystem {
 			textures_path("bg_battle.png"),
 			textures_path("spritesheet.png"),
 			textures_path("health_bar_empty.png"),
-			textures_path("fill_bar.png")
+			textures_path("fill_bar.png"),
+			textures_path("cutscenebg.png"),
+			textures_path("cutsceneBox1.png"),
+			textures_path("cutsceneBox2.png"),
+			textures_path("cutsceneBox3.png"),
 
 	};
 
