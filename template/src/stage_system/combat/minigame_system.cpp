@@ -121,7 +121,7 @@ void MinigameSystem::load_cool_it() {
 	registry.textRenderRequests.get(render_text_map["practice"]).shown = true;
 
 	// create the normal state cup
-	createCup(renderer, { x_center, y_center }, curr_rhythm->rhythm_len, beat_error * 2);
+	createCup(renderer, { x_center + 100, y_center }, curr_rhythm->rhythm_len, beat_error * 2);
 	// creating perfect
 	createMiniResult(renderer, { x_center / 2, y_center / 2 + 100}, beat_error * 2, minigame_state::perfect);
 	// creating good

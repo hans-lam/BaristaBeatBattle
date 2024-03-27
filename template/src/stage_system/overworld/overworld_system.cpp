@@ -30,7 +30,7 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 		handle_player_movement(key, action, player_speed);
 	} 
 	// Attack key
-	else if (action == GLFW_PRESS && key == GLFW_KEY_A) {
+	else if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
 		player_attack();
 	}
 	// Tutorial key
