@@ -23,6 +23,10 @@ bool Ability::get_is_area_of_effect() {
 	return this->is_area_of_effect;
 }
 
+void Ability::set_power(int power) {
+	this->power = power;
+}
+
 void Ability::process_ability(Character* caller, Character* target) {
 	CharacterStatSheet* caller_stat_sheet = caller->get_character_stat_sheet();
 	CharacterStatSheet* target_stat_sheet = target->get_character_stat_sheet();

@@ -35,7 +35,19 @@ file(GLOB SOURCE_FILES src/*.cpp
     src/turn_based_system/ability_factory/*.cpp
     src/turn_based_system/ability_factory/*.hpp
     src/turn_based_system/character_factory/*.cpp
-    src/turn_based_system/character_factory/*.hpp)
+    src/turn_based_system/character_factory/*.hpp
+    src/persistence/*.cpp
+    src/persistence/*.hpp
+    src/stage_system/*.cpp
+    src/stage_system/*.hpp
+    src/stage_system/main_menu/*.cpp
+    src/stage_system/main_menu/*.hpp
+    src/stage_system/overworld/*.cpp
+    src/stage_system/overworld/*.hpp
+    src/stage_system/cutscene/*.cpp
+    src/stage_system/cutscene/*.hpp
+    src/stage_system/combat/*.cpp
+    src/stage_system/combat/*.hpp)
 
 
 #set(SOURCE_FILES 
@@ -96,6 +108,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 # External header-only libraries in the ext/
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
+target_include_directories(${PROJECT_NAME} PUBLIC ext/rapidjson)
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)

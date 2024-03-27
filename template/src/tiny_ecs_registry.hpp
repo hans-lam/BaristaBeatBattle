@@ -18,6 +18,7 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<Eatable> eatables;
 	ComponentContainer<Deadly> deadlys;
@@ -29,14 +30,28 @@ public:
 	ComponentContainer<Minigame> miniGame;
 	ComponentContainer<MiniGameTimer> miniGameTimer;
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
+	ComponentContainer<PersistenceFeedbackTimer> persistanceFeedbackTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
+	ComponentContainer<MainMenu> mainMenu;
+	ComponentContainer<OverWorld> overWorld;
+	ComponentContainer<TutorialBoard> tutorials;
+	ComponentContainer<CutScene> cutscenes;
+	ComponentContainer<TurnBased> turnBased;
+	ComponentContainer<MiniStage> miniStage;
+	ComponentContainer<MiniGameVisualizer> miniGameVisual;
+	ComponentContainer<LevelNode> levelNode;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
 	ComponentContainer<TurnBasedEnemy> turnBasedEnemies;
 	ComponentContainer<PartyMember> partyMembers;
 	ComponentContainer<TurnCounter*> turnCounter;
+	ComponentContainer<InjuredTimer> injuryTimers;
+	ComponentContainer<HealthOutline> healthOutlines;
+	ComponentContainer<HealthBarFill> healthBarFills;
+	ComponentContainer<CutsceneSlideComp> cutsceneSlideComp;
+
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -50,6 +65,7 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
+		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&eatables);
 		registry_list.push_back(&deadlys);
@@ -58,6 +74,14 @@ public:
 		registry_list.push_back(&colors);
 		registry_list.push_back(&backgrounds);
 		registry_list.push_back(&foregrounds);
+		registry_list.push_back(&mainMenu);
+		registry_list.push_back(&overWorld);
+		registry_list.push_back(&tutorials);
+		registry_list.push_back(&cutscenes);
+		registry_list.push_back(&turnBased);
+		registry_list.push_back(&miniStage);
+		registry_list.push_back(&miniGameVisual);
+		registry_list.push_back(&levelNode);
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);
@@ -68,6 +92,12 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&persistanceFeedbackTimer);
+		registry_list.push_back(&injuryTimers);
+		registry_list.push_back(&healthOutlines);
+		registry_list.push_back(&healthBarFills);
+		registry_list.push_back(&cutsceneSlideComp);
+		
 	}
 
 	void clear_all_components() {
@@ -90,8 +120,13 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		for (ContainerInterface* reg : registry_list) {
+			// preserve the character datas
+			if (reg != &characterDatas || !partyMembers.has(e)) {
+				reg->remove(e);
+			}
+		}
+			
 	}
 };
 

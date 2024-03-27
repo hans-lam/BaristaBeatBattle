@@ -5,10 +5,45 @@
 #include "../ext/stb_image/stb_image.h"
 #include "turn_based_system/character_system.hpp"
 
+struct MainMenu {
+
+};
+
+struct OverWorld {
+
+};
+
+struct CutScene {
+
+};
+
+struct TurnBased {
+
+};
+
+struct MiniStage {
+
+};
+
+struct TutorialBoard {
+
+};
+
+struct LevelNode
+{
+	vec2 position;
+	int level_number;
+	LevelNode* left_level;
+	LevelNode* right_level;
+	LevelNode* up_level;
+	LevelNode* down_level;
+
+};
+
 // Player component
 struct Player
 {
-	//Character* thisPlayer;
+	int level_num; // This is the level that the character is hovering at in the overworld, NOT the level of the character
 };
 
 // Eagles have a hard shell
@@ -56,7 +91,7 @@ struct Menu
 
 struct Minigame
 {
-	int score = 0;
+
 };
 
 struct CharacterData {
@@ -68,12 +103,24 @@ struct PartyMember {
 };
 
 struct TurnBasedEnemy {
-
+	int experience_value = 0;
 };
 
 struct TurnCounter {
 	int placement = 0;
 	int speed_value = 0;
+};
+
+struct HealthOutline {
+};
+
+struct CutsceneSlideComp {
+
+};
+
+struct HealthBarFill {
+	float percent_filled = 1.0f;
+	Entity associated_char;
 };
 
 // All data relevant to the shape and motion of entities
@@ -123,17 +170,42 @@ struct AttackTimer
 	float counter_ms = 700; // might change this number
 };
 
+enum class minigame_state {
+	normal,
+	perfect,
+	good,
+	fail
+};
+
+struct InjuredTimer
+{
+	float counter_ms = 3000;
+	float redness_factor = 1.0f;
+};
+
 struct MiniGameTimer
 {
-	float counter_ms = 10000;
+	float counter_ms = 12000;
 	float inter_timer = 500;
-	bool inter_state = false;
+	minigame_state cup_state = minigame_state::normal;
 };
 
 struct MiniGameResTimer
 {
 	float counter_ms = 250;
+	minigame_state res_state = minigame_state::normal;
 };
+
+struct MiniGameVisualizer
+{
+	minigame_state res_state = minigame_state::good;
+};
+
+struct PersistenceFeedbackTimer
+{
+	float counter_ms = 1000;
+};
+
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex
@@ -193,16 +265,27 @@ enum class TEXTURE_ASSET_ID {
 	ATTACKBUTTON = GAMEOVERBOARD + 1,
 	ITEMBUTTON = ATTACKBUTTON + 1,
 	RESTBUTTON = ITEMBUTTON + 1,
-	MINIGAMECUP = RESTBUTTON + 1,
-	MINIGAMEINTER = MINIGAMECUP + 1,
-	MINIGAMESUCCESS = MINIGAMEINTER + 1,
-	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	MINIGAMECOOLPERFECT = RESTBUTTON + 1,
+	MINIGAMECOOLGOOD = MINIGAMECOOLPERFECT + 1,
+	MINIGAMECOOLCLOUD = MINIGAMECOOLGOOD + 1,
+	MINIGAMECUP = MINIGAMECOOLCLOUD + 1,
+	MINIGAMECUPGOOD = MINIGAMECUP + 1,
+	MINIGAMECUPBAD = MINIGAMECUPGOOD + 1,
+	MINIGAMEPERFECT = MINIGAMECUPBAD + 1,
+	MINIGAMEGOOD = MINIGAMEPERFECT + 1,
+	MINIGAMEFAIL = MINIGAMEGOOD + 1,
 	BGSCROLL = MINIGAMEFAIL + 1,
 	FGSCROLL = BGSCROLL + 1,
 	FGLIGHT = FGSCROLL + 1,
 	BGBATTLE = FGLIGHT + 1,
 	PLAYER = BGBATTLE + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	HEALTHOUTLINE = PLAYER + 1,
+	HEALTHFILL = HEALTHOUTLINE + 1,
+	BGCUTSECNE = HEALTHFILL + 1,
+	CUTSCENETEXTBOX1 = BGCUTSECNE +1,
+	CUTSCENETEXTBOX2 = CUTSCENETEXTBOX1 + 1,
+	CUTSCENETEXTBOX3 = CUTSCENETEXTBOX2 + 1,
+	TEXTURE_COUNT = CUTSCENETEXTBOX3 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -215,7 +298,9 @@ enum class EFFECT_ASSET_ID {
 	BACKGROUND = WIND + 1,
 	FOREGROUND = BACKGROUND + 1,
 	LIGHTS = FOREGROUND + 1,
-	EFFECT_COUNT = LIGHTS + 1
+	BATTLE = LIGHTS + 1,
+	BATTLEBAR = BATTLE + 1,
+	EFFECT_COUNT = BATTLEBAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -234,6 +319,16 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
-	bool shown = true;
+	bool shown = false;
+};
+
+
+struct TextRenderRequest {
+	std::string text;
+	vec2 position = { 0,0 };
+	float scale;
+	vec3 color;
+	glm::mat4 trans;
+	bool shown = false;
 };
 

@@ -9,6 +9,9 @@ Character::Character(std::string name, CharacterStatSheet* stats) {
 	this->character_name = name;
 	this->stats = stats;
 	this->current_health_points = stats->get_max_health();
+
+	level = 1;
+	curr_experience_points = 0;
 }
 
 void Character::add_ability(Ability* ability) {

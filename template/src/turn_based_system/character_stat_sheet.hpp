@@ -1,9 +1,12 @@
 #pragma once
 
+#include "string"
+
 class CharacterStatSheet {
 public:
 
-	CharacterStatSheet(int max_health_,
+	CharacterStatSheet(std::string character_name_,
+		int max_health_,
 		int strength_,
 		int magic_,
 		int defense_,
@@ -25,6 +28,7 @@ public:
 	int get_speed();
 
 private:
+	std::string character_name;
 	int max_health;
 	int strength;
 	int magic;

@@ -13,7 +13,11 @@ public:
 
 	Entity construct_americano(Entity entity);
 
+	Entity construct_london(Entity entity);
+
 	Entity construct_enemy(Entity entity, int level);
 };
+
+int does_character_data_already_exist(Entity entity, std::string name);
 
 extern CharacterFactory character_factory;

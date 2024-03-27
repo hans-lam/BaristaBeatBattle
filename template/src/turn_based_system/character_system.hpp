@@ -32,6 +32,8 @@ public:
 
 	Ability* get_ability_by_name(std::string name);
 
+	int level;
+	int curr_experience_points;
 
 private:
 	std::string character_name;
