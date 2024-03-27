@@ -63,7 +63,7 @@ Entity create_earl(RenderSystem* renderer, vec2 pos);
 Entity create_london(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
 Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos);
-Entity create_cutscene_text_box(RenderSystem* renderer, vec2 pos, vec2 textPos, std::string text, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
+Entity create_cutscene_text_box(RenderSystem* renderer, int selection,  vec2 pos, vec2 textPos, std::string text, std::string text2, std::string text3,  float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
 Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character);
 
 Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);

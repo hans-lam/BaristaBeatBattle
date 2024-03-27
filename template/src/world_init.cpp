@@ -316,7 +316,7 @@ Entity createBackgroundBattle(RenderSystem* renderer, vec2 position) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGBATTLE,
-		 EFFECT_ASSET_ID::BACKGROUND,
+		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
@@ -344,7 +344,7 @@ Entity createBackgroundCutscene(RenderSystem* renderer, vec2 position) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGCUTSECNE ,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
@@ -712,7 +712,7 @@ Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associate
 }
 
 
-Entity create_cutscene_text_box(RenderSystem* renderer, vec2 pos, vec2 textPos, std::string text, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
+Entity create_cutscene_text_box(RenderSystem* renderer, int selection, vec2 pos, vec2 textPos, std::string text, std::string text2, std::string text3 , float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -729,16 +729,46 @@ Entity create_cutscene_text_box(RenderSystem* renderer, vec2 pos, vec2 textPos, 
 	motion.scale = vec2({ TEXTBOX_WIDTH, TEXTBOX_HEIGHT });
 
 	//add the text
-	createText( text, textPos,  scale,  color,  trans, current_stage);
+	/*Entity text1 = createText( text, textPos,  scale,  color,  trans, current_stage);
+	Entity text2 = createText(text2, { textPos.x, textPos.y-40}, scale, color, trans, current_stage);
+	Entity text3 = createText(text3, { textPos.x, textPos.y -80 }, scale, color, trans, current_stage);
+*/
 
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	registry.cutscenes.emplace(entity);
-	RenderRequest & rq = registry.renderRequests.insert(
+	
+	if (selection == 1) {
+		RenderRequest&		rq = registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX1,
+			 EFFECT_ASSET_ID::BATTLE,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+		rq.shown = true;
+	}
+	else if (selection == 2) {
+		RenderRequest& 		rq = registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX2,
+			 EFFECT_ASSET_ID::BATTLE,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+		rq.shown = true;
+	}
+	else if (selection == 3) {
+		RenderRequest&		rq = registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX3,
+			 EFFECT_ASSET_ID::BATTLE,
+			 GEOMETRY_BUFFER_ID::SPRITE });
+		rq.shown = true;
+	}
+	else {
+	RenderRequest& rq = registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX,
+		{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX3,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rq.shown = true;
-
+	}
+	
 	return entity;
 }
