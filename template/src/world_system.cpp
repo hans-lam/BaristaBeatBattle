@@ -45,8 +45,14 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(cutscene_music);
 	if (turn_based_music != nullptr)
 		Mix_FreeMusic(turn_based_music); 
+	if (minigame_select_music != nullptr)
+		Mix_FreeMusic(minigame_select_music);
+	if (minigame_practice_metronome != nullptr)
+		Mix_FreeMusic(minigame_practice_metronome);
 	if (minigame_music != nullptr)
 		Mix_FreeMusic(minigame_music); 
+
+	// Destroy sound effect components
 	if (change_selection_effect != nullptr)
 		Mix_FreeChunk(change_selection_effect);
 	if (chicken_dead_sound != nullptr)
@@ -120,12 +126,15 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
+	// load music
 	main_menu_music = Mix_LoadMUS(audio_path("main_menu_music.wav").c_str());
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
 	cutscene_music = Mix_LoadMUS(audio_path("cutscene_music.wav").c_str());
 	turn_based_music = Mix_LoadMUS(audio_path("turn_based.wav").c_str());
+	minigame_select_music = Mix_LoadMUS(audio_path("minigame_select.wav").c_str());
+	minigame_practice_metronome = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
-	//minigame_music = Mix_LoadMUS(audio_path("metronome.wav").c_str());
+	// load sound effects
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
@@ -134,10 +143,14 @@ GLFWwindow* WorldSystem::create_window() {
 	if (background_music == nullptr || turn_based_music == nullptr || minigame_music == nullptr || 
 			chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
+			audio_path("main_menu_music.wav").c_str(),
 			audio_path("music.wav").c_str(),
+			audio_path("cutscene_music.wav").c_str(),
 			audio_path("turn_based.wav").c_str(),
+			audio_path("minigame_select.wav").c_str(),
 			audio_path("120bpmwithmetronome.wav").c_str(),
-			// audio_path("metronome.wav").c_str(),
+			audio_path("metronome.wav").c_str(),
+			audio_path("change_selection_effect.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
 			audio_path("chicken_eat.wav").c_str(), 
 			audio_path("attack.wav").c_str());
@@ -171,8 +184,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
 	stage_music_map[StageSystem::Stage::overworld] = background_music;
 	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
-	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music;
-	stage_music_map[StageSystem::Stage::minigame] = minigame_music;
+
+	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music; 
+	stage_music_map[StageSystem::Stage::minigame] = minigame_select_music;
 
 	// Set all states to default
     restart_game();
@@ -311,9 +325,52 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		else {
 			combat_system->handle_turn_rendering();
+
+			if (minigame_system->loaded) {
+				// trigger attack?
+				Entity charData = turn_based->get_active_character(); 
+				int current_score = minigame_system->get_score();
+
+				combat_system->handle_minigame_attack(charData, current_score);
+
+				minigame_system->loaded = false;
+			}
 		}
 	}
 
+	// Handle minigame stepping
+	if (curr_stage == StageSystem::Stage::minigame) {
+		if (minigame_system->get_not_started()) {
+			if (!(minigame_system->initialized)) {
+				minigame_system->handle_set_rhythm();
+				minigame_system->reset_values(true);
+				minigame_system->initialized = true;
+			}
+		}
+		else {
+			if (minigame_system->get_practice()) {
+				// playing practice "music"
+				if (!(minigame_system->practice_music_start)) {
+					Mix_PlayMusic(minigame_practice_metronome, -1);
+					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					minigame_system->practice_music_start = true;
+				}
+			}
+			else {
+				// playing minigame "music"
+				if (!(minigame_system->minigame_music_start)) {
+					Mix_PlayMusic(minigame_music, -1);
+					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					minigame_system->minigame_music_start = true;
+				}
+			}
+			minigame_system->time_since_last_press += elapsed_ms_since_last_update;
+			minigame_system->minigame_overall_timer += elapsed_ms_since_last_update;
+
+			minigame_system->minigame_step(elapsed_ms_since_last_update);
+		}
+	}
+  
 	// Handle main menu feedback timer
 	if (curr_stage == StageSystem::Stage::main_menu) {
 		float min_persistence_counter_ms = 1000.f;
@@ -334,70 +391,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
-
-	//// Countdown minigame for ending
-	//if (stage == 2) {
-	//	bool ended = false;
-	//	float minigame_timer_counter_ms = 10000.f;
-	//	for (Entity entity : registry.miniGameTimer.entities) {
-	//		// progress timer
-	//		MiniGameTimer& counter = registry.miniGameTimer.get(entity);
-	//		counter.counter_ms -= elapsed_ms_since_last_update;
-	//		if (counter.counter_ms < minigame_timer_counter_ms) {
-	//			minigame_timer_counter_ms = counter.counter_ms;
-	//		}
-
-	//		if (counter.inter_state) {
-	//			counter.inter_timer -= elapsed_ms_since_last_update;
-
-	//			if (counter.inter_timer < 0) {
-	//				registry.renderRequests.remove(entity);
-	//				registry.renderRequests.insert(
-	//					entity,
-	//					{ TEXTURE_ASSET_ID::MINIGAMECUP,
-	//					EFFECT_ASSET_ID::TEXTURED,
-	//					GEOMETRY_BUFFER_ID::SPRITE }
-	//				);
-
-	//				counter.inter_state = false;
-	//				counter.inter_timer = 500.f;
-	//			}
-	//		}
-
-	//		// stop minigame once timer expires
-	//		if (counter.counter_ms < 0) {
-	//			// Change turn-based values here to deal damage based on score
-	//			Minigame& minigame = registry.miniGame.get(entity);
-	//			std::cout << "SCORE: " << minigame.score << '\n';
-
-	//			registry.remove_all_components_of(entity);
-	//			ended = true;
-
-	//			// Assign score to ability
-	//			Entity active_char_entity = turn_based->get_active_character();
-	//			// We need an ability rather than "Basic Attack" in order to multiply the ability's power by minigame.score
-	//			handle_attack(active_char_entity, "Basic Attack");
-	//		}
-	//	}
-
-	//	for (Entity entity : registry.miniGameResTimer.entities) {
-	//		if (ended) {
-	//			registry.remove_all_components_of(entity);
-	//			change_stage(1);
-	//			break;
-	//		}
-	//
-	//		if (registry.renderRequests.has(entity)) {
-	//			MiniGameResTimer& counter = registry.miniGameResTimer.get(entity);
-	//			counter.counter_ms -= elapsed_ms_since_last_update;
-
-	//			if (counter.counter_ms < 0) {
-	//				registry.renderRequests.remove(entity);
-	//				counter.counter_ms = 250.f;
-	//			}
-	//		}
-	//	}
-	//}
 
 	return true;
 }
@@ -428,7 +421,7 @@ void WorldSystem::restart_game() {
 	overworld_system->init(stage_system);
 	cutscene_system->init(stage_system);
 	combat_system->init(stage_system, turn_based);
-	minigame_system->init(stage_system);
+	minigame_system->init(stage_system, renderer);
 
 	// Reset the game speed
 	current_speed = 1.f;
@@ -546,9 +539,7 @@ void WorldSystem::handle_level_collisions() {
 						registry.remove_all_components_of(enemies);
 					}
 
-					// Stage = 1 maps to turn based
 					// TODO: SHOULD MAP TO DIFFERENT LEVELS
-
 					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
 					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
 
@@ -594,116 +585,6 @@ bool WorldSystem::is_over() const {
 //	return in_bounds;
 //}
 
-void WorldSystem::handle_mini(int bpm) {
-	bool hit = false;
-	// Assuming that the bpm is based on quarter notes and it's 4/4
-	for (Entity entity : registry.miniGameTimer.entities) {
-		MiniGameTimer& timer = registry.miniGameTimer.get(entity); 
-		Minigame& minigame = registry.miniGame.get(entity);
-
-		std::cout << timer.counter_ms << '\n';
-
-		// measure duration is in ms 
-		int beat_duration = (60000 / bpm);
-		int measure_duration = beat_duration * 4;
-		float beat_error = beat_duration / 2;
-
-		float modded = (int) timer.counter_ms % measure_duration;
-
-		std::cout << modded << '\n';
-
-		// trying to hit every first beat
-		if (modded <= beat_error && !(timer.counter_ms < 0 + beat_error)) {
-			std::cout << "YOU HIT IT early" << '\n';
-		}
-		else if (modded >= (measure_duration - beat_error)) {
-			std::cout << "YOU HIT IT late" << '\n';
-		}
-		else {
-			std::cout << "Not quite my tempo." << '\n';
-			break;
-		}
-
-		minigame.score += 1;
-		// changing cup's texture
-		if (!(timer.inter_state)) {
-			registry.renderRequests.remove(entity);
-			registry.renderRequests.insert(
-				entity,
-				{ TEXTURE_ASSET_ID::MINIGAMEINTER,
-				EFFECT_ASSET_ID::TEXTURED,
-				GEOMETRY_BUFFER_ID::SPRITE }
-			);
-			timer.inter_state = true;
-		} 
-		hit = true;
-	}
-
-	// Changing the result value 
-	for (Entity entity : registry.miniGameResTimer.entities) {
-		registry.renderRequests.remove(entity); 
-
-		if (hit) {
-			registry.renderRequests.insert(
-				entity,
-				{ TEXTURE_ASSET_ID::MINIGAMESUCCESS,
-				EFFECT_ASSET_ID::TEXTURED,
-				GEOMETRY_BUFFER_ID::SPRITE }
-			);
-		} 
-		else {
-			registry.renderRequests.insert(
-				entity,
-				{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
-				EFFECT_ASSET_ID::TEXTURED,
-				GEOMETRY_BUFFER_ID::SPRITE }
-			);
-		}
-	}
-}
-
-void WorldSystem::change_stage(int level) {
-	if (level == 0) {
-		return;
-	} 
-	else if (level == 1) {
-		stage = 1;
-		// Anything  we need to set upon changing back should go here or in step
-		// Remove all minigame entities 
-		for (Entity entity : registry.miniGame.entities) {
-			registry.remove_all_components_of(entity);
-		}
-		// Replace all previous entities from render requests
-
-		for (Entity entity : registry.motions.entities) {
-			if (registry.renderRequests.has(entity)) {
-				RenderRequest& render = registry.renderRequests.get(entity);
-				render.shown = true;
-			}
-		}
-		
-		
-	}
-	else if (level == 2) {
-		stage = 2;
-		// Play music
-		Mix_PlayMusic(minigame_music, -1);
-		// Anything else we need to set upon changing to mini-game mode should go here or in step
-		// Remove all previous entities from render requests
-		for (Entity entity : registry.motions.entities) {
-			if (registry.renderRequests.has(entity)) {
-				RenderRequest& render = registry.renderRequests.get(entity);
-				render.shown = false;
-			}
-		}
-		createCup(renderer, { window_width_px / 2, window_height_px / 2 });
-		createMiniResult(renderer, { window_width_px / 4, window_height_px / 2 });
-	}
-}
-
-
-
-
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	switch (stage_system->get_current_stage()) {
@@ -735,16 +616,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		break;
 	}
 
-	// Minigame 
-	if (action == GLFW_PRESS && key == GLFW_KEY_D) {
-		if (stage == 2)
-			handle_mini(120);
-	}
-
-
 	// Going to Main Menu manually
-
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		minigame_system->reset_values(true);
+		minigame_system->initialized = false;
 		stage_system->set_stage(StageSystem::Stage::main_menu);
 	}
 

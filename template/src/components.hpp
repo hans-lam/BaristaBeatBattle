@@ -91,7 +91,7 @@ struct Menu
 
 struct Minigame
 {
-	int score = 0;
+
 };
 
 struct CharacterData {
@@ -166,6 +166,13 @@ struct AttackTimer
 	float counter_ms = 700; // might change this number
 };
 
+enum class minigame_state {
+	normal,
+	perfect,
+	good,
+	fail
+};
+
 struct InjuredTimer
 {
 	float counter_ms = 3000;
@@ -174,14 +181,20 @@ struct InjuredTimer
 
 struct MiniGameTimer
 {
-	float counter_ms = 10000;
+	float counter_ms = 12000;
 	float inter_timer = 500;
-	bool inter_state = false;
+	minigame_state cup_state = minigame_state::normal;
 };
 
 struct MiniGameResTimer
 {
 	float counter_ms = 250;
+	minigame_state res_state = minigame_state::normal;
+};
+
+struct MiniGameVisualizer
+{
+	minigame_state res_state = minigame_state::good;
 };
 
 struct PersistenceFeedbackTimer
@@ -247,10 +260,15 @@ enum class TEXTURE_ASSET_ID {
 	ATTACKBUTTON = GAMEOVERBOARD + 1,
 	ITEMBUTTON = ATTACKBUTTON + 1,
 	RESTBUTTON = ITEMBUTTON + 1,
-	MINIGAMECUP = RESTBUTTON + 1,
-	MINIGAMEINTER = MINIGAMECUP + 1,
-	MINIGAMESUCCESS = MINIGAMEINTER + 1,
-	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	MINIGAMECOOLPERFECT = RESTBUTTON + 1,
+	MINIGAMECOOLGOOD = MINIGAMECOOLPERFECT + 1,
+	MINIGAMECOOLCLOUD = MINIGAMECOOLGOOD + 1,
+	MINIGAMECUP = MINIGAMECOOLCLOUD + 1,
+	MINIGAMECUPGOOD = MINIGAMECUP + 1,
+	MINIGAMECUPBAD = MINIGAMECUPGOOD + 1,
+	MINIGAMEPERFECT = MINIGAMECUPBAD + 1,
+	MINIGAMEGOOD = MINIGAMEPERFECT + 1,
+	MINIGAMEFAIL = MINIGAMEGOOD + 1,
 	BGSCROLL = MINIGAMEFAIL + 1,
 	FGSCROLL = BGSCROLL + 1,
 	FGLIGHT = FGSCROLL + 1,
@@ -302,6 +320,6 @@ struct TextRenderRequest {
 	float scale;
 	vec3 color;
 	glm::mat4 trans;
-	bool shown = true;
+	bool shown = false;
 };
 

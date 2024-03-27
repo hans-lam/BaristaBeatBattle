@@ -26,7 +26,7 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 
 void MainMenuSystem::handle_menu_keys(int key, int action) {
 	// order for main menu is:
-	// new_game -> load_game -> options -> credits 
+	// new_game -> load_game -> options -> tutorials -> credits 
 	if (action == GLFW_RELEASE) {
 		switch (key) {
 			case GLFW_KEY_UP:
@@ -49,9 +49,6 @@ void MainMenuSystem::handle_menu_keys(int key, int action) {
 				handle_option();
 				break;
 		}
-
-
-		std::cout << selected_option << '\n';
 	}
 }
 

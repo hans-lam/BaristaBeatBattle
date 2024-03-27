@@ -54,10 +54,7 @@ public:
 	// check if player is in world bounds
 	bool player_in_bounds(Motion* motion, bool is_x);
 
-	void handle_mini(int bpm);
-
 	void create_overworld_levels(int num_levels);
-
 private:
 	// setting fps
 	void set_fps(float elapsed_ms_since_last_update);
@@ -70,9 +67,6 @@ private:
 
 	// restart level
 	void restart_game();
-
-	// change stage 
-	void change_stage(int level);
 
 	// OpenGL window handle
 	GLFWwindow* window;
@@ -100,6 +94,8 @@ private:
 	Mix_Music* background_music;
 	Mix_Music* cutscene_music;
 	Mix_Music* turn_based_music;
+	Mix_Music* minigame_select_music;
+	Mix_Music* minigame_practice_metronome;
 	Mix_Music* minigame_music;
 
 	// Sound Effects
