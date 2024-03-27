@@ -47,6 +47,8 @@ private:
 
 	AISystem* ai_system;
 
+	int current_level;
+
 };
 
 extern bool out_of_combat;

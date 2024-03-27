@@ -168,6 +168,40 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 	return entity;
 }
 
+Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+	
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = vec2(0.f,0.f);
+	motion.position = position;
+
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+
+	registry.overWorld.emplace(entity);
+	auto& levelNode = registry.levelNode.emplace(entity);
+	levelNode.position = position;
+	levelNode.level_number = level_num;
+
+	RenderRequest& rr = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::ENEMYDRINK,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	return entity;
+}
+
 Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 {
 	auto menuEnt = Entity();

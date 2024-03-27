@@ -29,10 +29,21 @@ struct TutorialBoard {
 
 };
 
+struct LevelNode
+{
+	vec2 position;
+	int level_number;
+	LevelNode* left_level;
+	LevelNode* right_level;
+	LevelNode* up_level;
+	LevelNode* down_level;
+
+};
+
 // Player component
 struct Player
 {
-
+	int level_num; // This is the level that the character is hovering at in the overworld, NOT the level of the character
 };
 
 // Eagles have a hard shell

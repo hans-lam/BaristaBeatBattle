@@ -46,6 +46,8 @@ public:
 	// Check for collisions
 	void handle_collisions();
 
+	void handle_level_collisions();
+
 	// Should the game be over ?
 	bool is_over()const;
 
@@ -53,6 +55,9 @@ public:
 	bool player_in_bounds(Motion* motion, bool is_x);
 
 	void handle_mini(int bpm);
+
+	void create_overworld_levels(int num_levels);
+
 private:
 	// setting fps
 	void set_fps(float elapsed_ms_since_last_update);
