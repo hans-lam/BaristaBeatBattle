@@ -325,11 +325,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		else {
 			combat_system->handle_turn_rendering();
-			// Handle cutscene stepping
-			if (curr_stage == StageSystem::Stage::cutscene) {
-				cutscene_system->handle_cutscene_render(renderer);
-
-			}
+			
 			if (minigame_system->loaded) {
 				// trigger attack?
 				Entity charData = turn_based->get_active_character();
@@ -339,6 +335,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				minigame_system->loaded = false;
 			}
 		}
+	}
+
+	// Handle cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene) {
+		cutscene_system->handle_cutscene_render(renderer);
+
 	}
 
 	// Handle minigame stepping

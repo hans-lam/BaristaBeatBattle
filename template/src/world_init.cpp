@@ -750,6 +750,7 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 		break;
 	case StageSystem::Stage::cutscene:
 		registry.cutscenes.emplace(entity);
+		textRenderRequest.shown = true;
 		break;
 	case StageSystem::Stage::turn_based:
 		registry.turnBased.emplace(entity); 

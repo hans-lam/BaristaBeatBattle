@@ -108,7 +108,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 				cutscene_slide++;
 				printf("You entered: %d", cutscene_slide);
 			}
-			if (cutscene_slide == 4) {
+			if (cutscene_slide >= 4) {
 				std::cout << "GO TO TURN BASED\n";
 				skip_cutscene = false;
 				cutscene_done = false;
