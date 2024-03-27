@@ -279,46 +279,47 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		assert(registry.screenStates.components.size() <= 1);
 		ScreenState& screen = registry.screenStates.components[0];
 
-	// process attacks
-	float min_attack_counter_ms = 700.f;
-	for (Entity entity : registry.attackTimers.entities) {
-		// progress timer
-		AttackTimer& counter = registry.attackTimers.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-		if (counter.counter_ms < min_attack_counter_ms) {
-			min_attack_counter_ms = counter.counter_ms;
-		}
-
-		// stop attack once timer expires
-		if (counter.counter_ms < 0) {
-			registry.attackTimers.remove(entity);
-			return true;
-		}
-	}
-
-	// deal with injury graphics
-	// i do not know why this does not work if its in turn based system
-	float min_injury_counter_ms = 3000.f;
-	for (Entity entity : registry.injuryTimers.entities) {
-		// progress timer, 
-		InjuredTimer& counter = registry.injuryTimers.get(entity);
-		counter.counter_ms -= elapsed_ms_since_last_update;
-		//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
-		counter.redness_factor -= 1.f / 200.f; 
-		if (counter.counter_ms < min_injury_counter_ms) {
-			min_injury_counter_ms = counter.counter_ms;
-		}
-
-		// stop shaking the attacked character after 3 seconds
-		if (counter.counter_ms < 0) {
-			//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
-			registry.injuryTimers.remove(entity);
-		}
-	}
 	}
 
 	// Handle turn based stepping
 	if (curr_stage == StageSystem::Stage::turn_based) {
+		// process attacks
+		float min_attack_counter_ms = 700.f;
+		for (Entity entity : registry.attackTimers.entities) {
+			// progress timer
+			AttackTimer& counter = registry.attackTimers.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			if (counter.counter_ms < min_attack_counter_ms) {
+				min_attack_counter_ms = counter.counter_ms;
+			}
+
+			// stop attack once timer expires
+			if (counter.counter_ms < 0) {
+				registry.attackTimers.remove(entity);
+				return true;
+			}
+		}
+
+		// deal with injury graphics
+		// i do not know why this does not work if its in turn based system
+		float min_injury_counter_ms = 3000.f;
+		for (Entity entity : registry.injuryTimers.entities) {
+			// progress timer, 
+			InjuredTimer& counter = registry.injuryTimers.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+			counter.redness_factor -= 1.f / 200.f;
+			if (counter.counter_ms < min_injury_counter_ms) {
+				min_injury_counter_ms = counter.counter_ms;
+			}
+
+			// stop shaking the attacked character after 3 seconds
+			if (counter.counter_ms < 0) {
+				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+				registry.injuryTimers.remove(entity);
+			}
+		}
+
 		if (out_of_combat) {
 			combat_system->handle_level(renderer);
 		}

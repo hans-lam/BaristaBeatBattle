@@ -140,8 +140,14 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
-		if (!registry.attackTimers.has(get_entity_given_character(caller))) {
-			registry.attackTimers.emplace(get_entity_given_character(caller));
+		Entity caller_entity = get_entity_given_character(caller);
+		if (registry.attackTimers.has(caller_entity)) {
+			// registry.injuryTimers.remove(receiving_entity);
+			AttackTimer& attack = registry.attackTimers.get(caller_entity);
+			attack.counter_ms = 700.f;
+		}
+		else {
+			registry.attackTimers.emplace(caller_entity);
 		}
 		for (Character* receiving_character : recipients) {
 

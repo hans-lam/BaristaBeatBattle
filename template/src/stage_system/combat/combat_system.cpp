@@ -226,14 +226,26 @@ void CombatSystem::handle_tutorial() {
 void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* level) {
 
 	int j = 0;
+	float dy = -75.f;
 	for (Entity party_member_entity : level->allies) {
 		// Creating Menu entity 
-		vec2 menu_pos = { BASE_X_VALUE + 200, window_height_px - (j + 1) * 200 };
+		vec2 menu_pos = { BASE_X_VALUE + 300, window_height_px - (j + 1) * 200 };
 		Entity menuEnt = createMenu(renderer, menu_pos, party_member_entity);
 		Menu& menu = registry.menu.get(menuEnt);
 
 		j++;
+
+		vec2 posn = registry.motions.get(party_member_entity).position;
+		create_health_bar_outline(renderer, posn + vec2(25.f, dy));
+		create_health_bar_fill(renderer, posn + vec2(50.f, dy), party_member_entity);
 	}
+
+	for (Entity enemy_member : level->enemies) {
+		vec2 posn = registry.motions.get(enemy_member).position;
+		create_health_bar_outline(renderer, posn + vec2(-25.f, dy));
+		create_health_bar_fill(renderer, posn + vec2(0.f, dy), enemy_member);
+	}
+
 
 }
 
