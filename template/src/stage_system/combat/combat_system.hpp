@@ -38,6 +38,10 @@ public:
 		this->selected_level = (CombatLevel)(level - 1);
 	}
 
+	int get_combat_level() {
+		return selected_level;
+	}
+
 private:
 	void init_combat_data_for_level(RenderSystem* renderer, Level* level);
 
