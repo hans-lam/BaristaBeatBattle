@@ -100,6 +100,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 				skip_cutscene = false;
 				cutscene_done = false;
 				handle_cutscene();
+				cutscene_slide = 1;
 			}
 		}
 		if (key == GLFW_KEY_N) {
@@ -113,6 +114,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 				skip_cutscene = false;
 				cutscene_done = false;
 				handle_cutscene();
+				cutscene_slide = 1;
 			}
 		}
 
