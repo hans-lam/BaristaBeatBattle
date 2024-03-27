@@ -103,6 +103,10 @@ struct TurnCounter {
 struct HealthOutline {
 };
 
+struct CutsceneSlideComp {
+
+};
+
 struct HealthBarFill {
 	float percent_filled = 1.0f;
 	Entity associated_char;
@@ -172,6 +176,7 @@ struct MiniGameResTimer
 {
 	float counter_ms = 250;
 };
+
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex
@@ -243,8 +248,8 @@ enum class TEXTURE_ASSET_ID {
 	HEALTHOUTLINE = PLAYER + 1,
 	HEALTHFILL = HEALTHOUTLINE + 1,
 	BGCUTSECNE = HEALTHFILL + 1,
-	BGTEXTBOX = BGCUTSECNE +1,
-	TEXTURE_COUNT = BGTEXTBOX + 1
+	CUTSCENETEXTBOX = BGCUTSECNE +1,
+	TEXTURE_COUNT = CUTSCENETEXTBOX + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

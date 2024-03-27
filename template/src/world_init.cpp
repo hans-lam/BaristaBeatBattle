@@ -344,7 +344,7 @@ Entity createBackgroundCutscene(RenderSystem* renderer, vec2 position) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGCUTSECNE ,
-		 EFFECT_ASSET_ID::BACKGROUND,
+		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
@@ -707,6 +707,38 @@ Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associate
 		{ TEXTURE_ASSET_ID::HEALTHFILL,
 		 EFFECT_ASSET_ID::BATTLEBAR,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+
+Entity create_cutscene_text_box(RenderSystem* renderer, vec2 pos, vec2 textPos, std::string text, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = pos;
+
+	// scale the background
+	motion.scale = vec2({ TEXTBOX_WIDTH, TEXTBOX_HEIGHT });
+
+	//add the text
+	createText( text, textPos,  scale,  color,  trans, current_stage);
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.cutscenes.emplace(entity);
+	RenderRequest & rq = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rq.shown = true;
 
 	return entity;
 }

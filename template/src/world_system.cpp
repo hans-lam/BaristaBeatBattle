@@ -298,6 +298,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Handle cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene) {
+		cutscene_system->handle_cutscene_render(renderer);
+		
+	}
+
 	//// Countdown minigame for ending
 	//if (stage == 2) {
 	//	bool ended = false;
@@ -376,7 +382,7 @@ void WorldSystem::restart_game() {
 	// Set Default values for systems
 	main_menu_system->init(stage_system);
 	overworld_system->init(stage_system);
-	cutscene_system->init(stage_system);
+	cutscene_system->init(stage_system, renderer);
 	combat_system->init(stage_system, turn_based);
 	minigame_system->init(stage_system);
 
