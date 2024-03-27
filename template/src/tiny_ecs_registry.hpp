@@ -30,6 +30,7 @@ public:
 	ComponentContainer<Minigame> miniGame;
 	ComponentContainer<MiniGameTimer> miniGameTimer;
 	ComponentContainer<MiniGameResTimer> miniGameResTimer;
+	ComponentContainer<PersistenceFeedbackTimer> persistanceFeedbackTimer;
 	ComponentContainer<Background> backgrounds;
 	ComponentContainer<Foreground> foregrounds;
 	ComponentContainer<MainMenu> mainMenu;
@@ -88,6 +89,7 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&persistanceFeedbackTimer);
 		registry_list.push_back(&injuryTimers);
 		registry_list.push_back(&healthOutlines);
 		registry_list.push_back(&healthBarFills);

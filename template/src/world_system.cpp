@@ -302,8 +302,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.injuryTimers.remove(entity);
 		}
 	}
-
-
 	}
 
 	// Handle turn based stepping
@@ -313,6 +311,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		else {
 			combat_system->handle_turn_rendering();
+		}
+	}
+
+	// Handle main menu feedback timer
+	if (curr_stage == StageSystem::Stage::main_menu) {
+		float min_persistence_counter_ms = 1000.f;
+		for (Entity entity : registry.persistanceFeedbackTimer.entities) {
+			// progress timer
+			PersistenceFeedbackTimer& counter = registry.persistanceFeedbackTimer.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			if (counter.counter_ms < min_persistence_counter_ms) {
+				min_persistence_counter_ms = counter.counter_ms;
+			}
+
+			// stop attack once timer expires
+			if (counter.counter_ms < 0) {
+				if (registry.textRenderRequests.has(entity)) {
+					registry.textRenderRequests.remove(entity);
+				}
+				registry.persistanceFeedbackTimer.remove(entity);
+			}
 		}
 	}
 
@@ -443,7 +462,7 @@ void WorldSystem::restart_game() {
 	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create the main menu
-	createMainMenu(renderer, { 0, 0 });
+	createMainMenu(renderer, { window_width_px / 2.0, 150 });
 
 	// Create tutorials
 	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
