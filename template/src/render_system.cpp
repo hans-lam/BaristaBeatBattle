@@ -150,6 +150,29 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		assert(in_color_loc > -1);
 		gl_has_errors();
 
+		// is the injury timer on
+		GLint injured_uloc = glGetUniformLocation(program, "is_injured");
+		GLfloat redness_uloc = glGetUniformLocation(program, "redness");
+		GLuint counter_uloc = glGetUniformLocation(program, "counter");
+		assert(counter_uloc >= 0);
+		assert(injured_uloc >= 0);
+		assert(redness_uloc >= 0);
+
+		gl_has_errors();
+
+		if (registry.injuryTimers.has(entity)) {
+			InjuredTimer& injury = registry.injuryTimers.get(entity);
+			glUniform1i(injured_uloc, 1);
+			glUniform1f(redness_uloc, injury.redness_factor);
+			glUniform1f(counter_uloc, (3000.f - injury.counter_ms) / 3000.f);
+		}
+		else {
+			glUniform1i(injured_uloc, 0);
+			glUniform1f(redness_uloc, 0.0);
+		}
+
+		gl_has_errors();
+
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::BACKGROUND || render_request.used_effect == EFFECT_ASSET_ID::FOREGROUND ||
 		render_request.used_effect == EFFECT_ASSET_ID::LIGHTS || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {

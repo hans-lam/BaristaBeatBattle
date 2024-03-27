@@ -754,11 +754,14 @@ Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos) {
 
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	registry.healthOutlines.emplace(entity);
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTHOUTLINE,
 		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
@@ -782,11 +785,14 @@ Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associate
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	HealthBarFill& fill = registry.healthBarFills.emplace(entity);
 	fill.associated_char = associated_character;
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTHFILL,
 		 EFFECT_ASSET_ID::BATTLEBAR,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
