@@ -111,10 +111,14 @@ void MinigameSystem::load_cool_it() {
 
 	// create the normal state cup
 	createCup(renderer, { x_center, y_center }, curr_rhythm->rhythm_len, beat_error * 2);
+	// creating perfect
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 100}, beat_error, minigame_state::perfect);
+	// creating good
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 200}, beat_error, minigame_state::good);
 	// creating fail
-	createMiniResult(renderer, { x_center / 2, y_center / 2 }, beat_error, true);
-	// creating success
-	createMiniResult(renderer, { x_center / 2, y_center / 2 }, beat_error, false);
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 300 }, beat_error, minigame_state::fail);
+	// creating cool cloud
+	createMiniResult(renderer, { x_center / 2 + 700, y_center / 2 + 200 }, beat_error, minigame_state::normal);
 }
 
 void MinigameSystem::load_pour_it() {
@@ -139,7 +143,7 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 		MiniGameTimer& timer = registry.miniGameTimer.get(entity);
 
 		// handle interpolated image state
-		if (timer.inter_state) {
+		if (!(timer.cup_state == minigame_state::normal)) {
 			timer.inter_timer -= elapsed_ms_since_last_update;
 
 			// reset cup image
@@ -153,7 +157,7 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 					GEOMETRY_BUFFER_ID::SPRITE }
 				); 
 				rr.shown = true;
-				timer.inter_state = false;
+				timer.cup_state = minigame_state::normal;
 				timer.inter_timer = beat_error;
 			}
 		}
@@ -294,18 +298,28 @@ void MinigameSystem::handle_mini() {
 
 		// change cup's state on a hit
 		if (hit || perfect_hit) {
-			// change cup to interpolated state if hit and not already different state
-			if (!(timer.inter_state)) {
+			if (!(timer.cup_state == minigame_state::fail)) {
 				registry.renderRequests.remove(entity);
 				RenderRequest& rr = registry.renderRequests.insert(
 					entity,
-					{ TEXTURE_ASSET_ID::MINIGAMEINTER,
+					{ TEXTURE_ASSET_ID::MINIGAMECUPGOOD,
 					EFFECT_ASSET_ID::TEXTURED,
 					GEOMETRY_BUFFER_ID::SPRITE }
 				);
 				rr.shown = true;
-				timer.inter_state = true;
+				timer.cup_state = minigame_state::good;
 			}
+		}
+		else {
+			registry.renderRequests.remove(entity);
+			RenderRequest& rr = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::MINIGAMECUPBAD,
+				EFFECT_ASSET_ID::TEXTURED,
+				GEOMETRY_BUFFER_ID::SPRITE }
+			);
+			rr.shown = true;
+			timer.cup_state = minigame_state::fail;
 		}
 	}
 
@@ -313,18 +327,31 @@ void MinigameSystem::handle_mini() {
 	for (Entity entity : registry.miniGameResTimer.entities) {
 		MiniGameResTimer& res = registry.miniGameResTimer.get(entity);
 
-		if (hit || perfect_hit) {
-			// set fail to not be shown
-			if (res.fail) {
-				registry.renderRequests.get(entity).shown = false;
+		// Rendering cloud
+		if (res.res_state == minigame_state::normal) {
+			registry.renderRequests.get(entity).shown = true;
+			continue;
+		}
+
+		// rendering results
+		if (hit) {
+			if (res.res_state == minigame_state::good) {
+				registry.renderRequests.get(entity).shown = true;
 			}
 			else {
+				registry.renderRequests.get(entity).shown = false;
+			}
+		} 
+		else if (perfect_hit) {
+			if (res.res_state == minigame_state::perfect) {
 				registry.renderRequests.get(entity).shown = true;
+			}
+			else {
+				registry.renderRequests.get(entity).shown = false;
 			}
 		}
 		else {
-			// set success to not be shown
-			if (res.fail) {
+			if (res.res_state == minigame_state::fail) {
 				registry.renderRequests.get(entity).shown = true;
 			}
 			else {

@@ -12,8 +12,8 @@ const float EAGLE_BB_WIDTH = 0.6f * 300.f;
 const float EAGLE_BB_HEIGHT = 0.6f * 300.f;
 const float MENU_WIDTH = 0.6f * 700.f; 
 const float MENU_HEIGHT = 0.6f * 280.f;
-const float CUP_WIDTH = 0.6f * 700.f;
-const float CUP_HEIGHT = 0.6f * 550.f;
+const float CUP_WIDTH = 0.8f * 700.f;
+const float CUP_HEIGHT = 0.8f * 550.f;
 const float BG_WIDTH = 2000.f;
 const float BG_HEIGHT = 350.f;
 const float FG_WIDTH = 2000.f;
@@ -28,7 +28,9 @@ Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
 Entity createCup(RenderSystem* renderer, vec2 pos, float length, float inter_timer);
 // minigame result
-Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_counter, bool mini_fail);
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_counter, minigame_state mini_res);
+// minigame hit indicator 
+Entity createMiniIndicator(RenderSystem* renderer, vec2 pos);
 // the enemy
 Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy

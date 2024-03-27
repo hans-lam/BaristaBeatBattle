@@ -89,7 +89,7 @@ Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float in
 	return entity;
 }
 
-Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_counter, bool mini_fail) {
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_counter, minigame_state mini_result) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -105,26 +105,51 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 	MiniGameResTimer& res = registry.miniGameResTimer.emplace(entity);
 	res.counter_ms = interpolate_counter;
 
-	if (mini_fail) {
+	switch (mini_result) {
+	case minigame_state::perfect:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEPERFECT,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	case minigame_state::good:
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEGOOD,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	case minigame_state::fail:
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
-		res.fail = true;
-	}
-	else {
+		break;
+	case minigame_state::normal:
 		registry.renderRequests.insert(
 			entity,
-			{ TEXTURE_ASSET_ID::MINIGAMESUCCESS,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLCLOUD,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
-		res.fail = false;
+		motion.scale = { motion.scale.x * 2, motion.scale.y * 2 };
+		break;
 	}
+	res.res_state = mini_result;
 
 	return entity;
+}
+
+// minigame hit indicator 
+Entity createMiniIndicator(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+
 }
 
 Entity createEagle(RenderSystem* renderer, vec2 position)

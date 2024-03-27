@@ -147,17 +147,24 @@ struct AttackTimer
 	float counter_ms = 700; // might change this number
 };
 
+enum class minigame_state {
+	normal,
+	perfect,
+	good,
+	fail
+};
+
 struct MiniGameTimer
 {
 	float counter_ms = 12000;
 	float inter_timer = 500;
-	bool inter_state = false;
+	minigame_state cup_state;
 };
 
 struct MiniGameResTimer
 {
 	float counter_ms = 250;
-	bool fail = false;
+	minigame_state res_state;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -218,10 +225,15 @@ enum class TEXTURE_ASSET_ID {
 	ATTACKBUTTON = GAMEOVERBOARD + 1,
 	ITEMBUTTON = ATTACKBUTTON + 1,
 	RESTBUTTON = ITEMBUTTON + 1,
-	MINIGAMECUP = RESTBUTTON + 1,
-	MINIGAMEINTER = MINIGAMECUP + 1,
-	MINIGAMESUCCESS = MINIGAMEINTER + 1,
-	MINIGAMEFAIL = MINIGAMESUCCESS + 1,
+	MINIGAMECOOLPERFECT = RESTBUTTON + 1,
+	MINIGAMECOOLGOOD = MINIGAMECOOLPERFECT + 1,
+	MINIGAMECOOLCLOUD = MINIGAMECOOLGOOD + 1,
+	MINIGAMECUP = MINIGAMECOOLCLOUD + 1,
+	MINIGAMECUPGOOD = MINIGAMECUP + 1,
+	MINIGAMECUPBAD = MINIGAMECUPGOOD + 1,
+	MINIGAMEPERFECT = MINIGAMECUPBAD + 1,
+	MINIGAMEGOOD = MINIGAMEPERFECT + 1,
+	MINIGAMEFAIL = MINIGAMEGOOD + 1,
 	BGSCROLL = MINIGAMEFAIL + 1,
 	FGSCROLL = BGSCROLL + 1,
 	FGLIGHT = FGSCROLL + 1,
