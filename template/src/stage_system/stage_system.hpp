@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tiny_ecs_registry.hpp"
+
 // Stage System for handling stage switching
 class StageSystem
 {
@@ -27,6 +29,10 @@ public:
 	void set_music_changed();
 
 	void set_stage(Stage target, int level = 1);
+
+
+	void set_render_shown(Entity entity, bool show_render, bool tutorial);
+
 private: 
 	void set_main_menu();
 

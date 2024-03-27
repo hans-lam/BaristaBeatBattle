@@ -18,6 +18,7 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<Eatable> eatables;
 	ComponentContainer<Deadly> deadlys;
@@ -39,11 +40,15 @@ public:
 	ComponentContainer<MiniStage> miniStage;
 	ComponentContainer<LevelNode> levelNode;
 
+
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
 	ComponentContainer<TurnBasedEnemy> turnBasedEnemies;
 	ComponentContainer<PartyMember> partyMembers;
 	ComponentContainer<TurnCounter*> turnCounter;
+	ComponentContainer<InjuredTimer> injuryTimers;
+	ComponentContainer<HealthOutline> healthOutlines;
+	ComponentContainer<HealthBarFill> healthBarFills;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -57,6 +62,7 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
+		registry_list.push_back(&textRenderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&eatables);
 		registry_list.push_back(&deadlys);
@@ -82,6 +88,10 @@ public:
 		registry_list.push_back(&miniGame);
 		registry_list.push_back(&miniGameTimer);
 		registry_list.push_back(&miniGameResTimer);
+		registry_list.push_back(&injuryTimers);
+		registry_list.push_back(&healthOutlines);
+		registry_list.push_back(&healthBarFills);
+		
 	}
 
 	void clear_all_components() {
@@ -104,8 +114,13 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		for (ContainerInterface* reg : registry_list) {
+			// preserve the character datas
+			if (reg != &characterDatas || !partyMembers.has(e)) {
+				reg->remove(e);
+			}
+		}
+			
 	}
 };
 

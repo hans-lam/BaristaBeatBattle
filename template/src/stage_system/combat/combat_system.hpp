@@ -12,7 +12,10 @@ public:
 		level_one, 
 		level_two,
 		level_three, 
-		final_level
+		level_four,
+		level_five,
+		level_six,
+		level_seven
 	};
 
 	enum SoundMapping {
@@ -30,7 +33,7 @@ public:
 	void handle_turn_rendering();
 
 private:
-	void create_level_one(RenderSystem* renderer);
+	void init_combat_data_for_level(RenderSystem* renderer, Level* level);
 
 	void handle_tutorial();
 

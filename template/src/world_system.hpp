@@ -32,7 +32,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg, 
+	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg,
 		StageSystem* stage_system_arg, MainMenuSystem* main_menu_system_arg,
 		OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
 		CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg);

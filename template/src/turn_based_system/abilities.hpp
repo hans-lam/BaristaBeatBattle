@@ -16,7 +16,7 @@ public:
 	bool get_is_physical();
 	bool get_is_area_of_effect();
 
-	void process_ability(Character* caller, Character* target);
+	virtual void process_ability(Character* caller, Character* target);
 
 	
 

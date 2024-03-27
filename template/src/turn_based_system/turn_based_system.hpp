@@ -9,6 +9,7 @@
 #include "../ai_system.hpp"
 #include "level_select_system.hpp"
 #include "../world_init.hpp"
+#include "experience.hpp"
 
 
 class TurnBasedSystem {
@@ -35,6 +36,8 @@ public:
 	Entity get_active_character() {
 		return active_character;
 	}
+
+	HealthBarFill& get_health_bar_given_entity(Entity receiving_character);
 
 private:
 

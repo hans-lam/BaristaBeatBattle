@@ -51,42 +51,48 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
-	{
-		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
-		gl_has_errors();
-		assert(in_texcoord_loc >= 0);
+	//if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
+	//{
+	//	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	//	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	//	gl_has_errors();
+	//	assert(in_texcoord_loc >= 0);
 
-		//glGenVertexArrays(1, &dummy_VAO);
-		glBindVertexArray(dummy_VAO);
+	//	//glGenVertexArrays(1, &dummy_VAO);
+	//	glBindVertexArray(dummy_VAO);
 
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-							  sizeof(TexturedVertex), (void *)0);
-		gl_has_errors();
+	//	glEnableVertexAttribArray(in_position_loc);
+	//	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+	//						  sizeof(TexturedVertex), (void *)0);
+	//	gl_has_errors();
 
-		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(
-			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-			(void *)sizeof(
-				vec3)); // note the stride to skip the preceeding vertex position
+	//	glEnableVertexAttribArray(in_texcoord_loc);
+	//	glVertexAttribPointer(
+	//		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+	//		(void *)sizeof(
+	//			vec3)); // note the stride to skip the preceeding vertex position
 
-		// Enabling and binding texture to slot 0
-		glActiveTexture(GL_TEXTURE0);
-		gl_has_errors();
+	//	// Enabling and binding texture to slot 0
+	//	glActiveTexture(GL_TEXTURE0);
+	//	gl_has_errors();
 
-		assert(registry.renderRequests.has(entity));
-		GLuint texture_id =
-			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+	//	assert(registry.renderRequests.has(entity));
+	//	GLuint texture_id =
+	//		texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 
-		glBindTexture(GL_TEXTURE_2D, texture_id);
-		gl_has_errors();
-	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
+	//	glBindTexture(GL_TEXTURE_2D, texture_id);
+	//	gl_has_errors();
+	//}
+	//else 
+		
+	if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
+		gl_has_errors();
+
+		GLuint time_uloc = glGetUniformLocation(program, "time");
+		glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 		gl_has_errors();
 
 		GLint curr_frame_uloc = glGetUniformLocation(program, "curr_frame");
@@ -108,10 +114,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 				glUniform1i(curr_frame_uloc, 6);	// moving left
 			}
 			else if (player_velocity.y > 0.f) {
-				glUniform1i(curr_frame_uloc, 2);	// moving left
+				glUniform1i(curr_frame_uloc, 2);	// moving up
 			}
 			else if (player_velocity.y < 0.f) {
-				glUniform1i(curr_frame_uloc, 8);	// moving left
+				glUniform1i(curr_frame_uloc, 8);	// moving down
 			}
 			else {
 				glUniform1i(curr_frame_uloc, 0);	// idle
@@ -146,9 +152,10 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::BACKGROUND || render_request.used_effect == EFFECT_ASSET_ID::FOREGROUND ||
-		render_request.used_effect == EFFECT_ASSET_ID::LIGHTS) {
+		render_request.used_effect == EFFECT_ASSET_ID::LIGHTS || render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		
 		gl_has_errors();
 		assert(in_texcoord_loc >= 0);
 
@@ -183,6 +190,107 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::BATTLE) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+
+		//glGenVertexArrays(1, &dummy_VAO);
+		glBindVertexArray(dummy_VAO);
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(
+			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+			(void*)sizeof(
+				vec3)); // note the stride to skip the preceeding vertex position
+
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id =
+			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
+
+		// is the injury timer on
+		GLint injured_uloc = glGetUniformLocation(program, "is_injured");
+		GLfloat redness_uloc = glGetUniformLocation(program, "redness");
+		GLuint counter_uloc = glGetUniformLocation(program, "counter");
+		assert(counter_uloc >= 0);
+		assert(injured_uloc >= 0);
+		assert(redness_uloc >= 0);
+
+		gl_has_errors();
+
+		if (registry.injuryTimers.has(entity)) {
+			InjuredTimer& injury = registry.injuryTimers.get(entity);
+			glUniform1i(injured_uloc, 1);
+			glUniform1f(redness_uloc, injury.redness_factor);
+			glUniform1f(counter_uloc, (3000.f - injury.counter_ms) / 3000.f);
+		}
+		else {
+			glUniform1i(injured_uloc, 0);
+			glUniform1f(redness_uloc, 0.0);
+		}
+
+		gl_has_errors();
+
+		
+	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::BATTLEBAR) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+
+		//glGenVertexArrays(1, &dummy_VAO);
+		glBindVertexArray(dummy_VAO);
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(
+			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+			(void*)sizeof(
+				vec3)); // note the stride to skip the preceeding vertex position
+
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id =
+			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
+
+		// update percent_filled
+		GLfloat percent_filled_uloc = glGetUniformLocation(program, "percent_filled");
+		assert(percent_filled_uloc >= 0);
+
+		gl_has_errors();
+
+		glUniform1f(percent_filled_uloc, registry.healthBarFills.get(entity).percent_filled);
+
+		gl_has_errors();
+
+
+		}
 	else
 	{
 		assert(false && "Type of render request not supported");
@@ -193,9 +301,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
 	glUniform3fv(color_uloc, 1, (float *)&color);
 	gl_has_errors();
-
-	//glGenVertexArrays(1, &dummy_VAO);
-	//glBindVertexArray(dummy_VAO);
 
 	// Get number of indices from index buffer, which has elements uint16_t
 	GLint size = 0;
@@ -225,6 +330,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 // wind
 void RenderSystem::drawToScreen()
 {
+
+	glBindVertexArray(dummy_VAO);
 	// Setting shaders
 	// get the wind texture, sprite mesh, and program
 	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WIND]);
@@ -317,6 +424,7 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 							  // sprites back to front
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
+	glBindVertexArray(dummy_VAO);
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
@@ -325,6 +433,12 @@ void RenderSystem::draw(StageSystem::Stage current_stage)
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, projection_2D);
+	}
+
+
+	for (TextRenderRequest request : registry.textRenderRequests.components) {
+		if (request.shown)
+			renderText(request.text, request.position.x, request.position.y, request.scale, request.color, request.trans);
 	}
 
 	// Truely render to the screen

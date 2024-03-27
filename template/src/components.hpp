@@ -103,12 +103,20 @@ struct PartyMember {
 };
 
 struct TurnBasedEnemy {
-
+	int experience_value = 0;
 };
 
 struct TurnCounter {
 	int placement = 0;
 	int speed_value = 0;
+};
+
+struct HealthOutline {
+};
+
+struct HealthBarFill {
+	float percent_filled = 1.0f;
+	Entity associated_char;
 };
 
 // All data relevant to the shape and motion of entities
@@ -156,6 +164,12 @@ struct DeathTimer
 struct AttackTimer
 {
 	float counter_ms = 700; // might change this number
+};
+
+struct InjuredTimer
+{
+	float counter_ms = 3000;
+	float redness_factor = 1.0f;
 };
 
 struct MiniGameTimer
@@ -237,7 +251,9 @@ enum class TEXTURE_ASSET_ID {
 	FGLIGHT = FGSCROLL + 1,
 	BGBATTLE = FGLIGHT + 1,
 	PLAYER = BGBATTLE + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	HEALTHOUTLINE = PLAYER + 1,
+	HEALTHFILL = HEALTHOUTLINE + 1,
+	TEXTURE_COUNT = HEALTHFILL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -250,7 +266,9 @@ enum class EFFECT_ASSET_ID {
 	BACKGROUND = WIND + 1,
 	FOREGROUND = BACKGROUND + 1,
 	LIGHTS = FOREGROUND + 1,
-	EFFECT_COUNT = LIGHTS + 1
+	BATTLE = LIGHTS + 1,
+	BATTLEBAR = BATTLE + 1,
+	EFFECT_COUNT = BATTLEBAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -270,5 +288,15 @@ struct RenderRequest {
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool shown = false;
+};
+
+
+struct TextRenderRequest {
+	std::string text;
+	vec2 position = { 0,0 };
+	float scale;
+	vec3 color;
+	glm::mat4 trans;
+	bool shown = true;
 };
 

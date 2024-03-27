@@ -1,12 +1,14 @@
 #include "character_stat_sheet.hpp"
 
 
-CharacterStatSheet::CharacterStatSheet(int max_health_ = 0,
+CharacterStatSheet::CharacterStatSheet(std::string character_name_,
+	int max_health_ = 0,
 	int strength_ = 0,
 	int magic_ = 0,
 	int defense_ = 0,
 	int magic_resist_ = 0,
 	int speed_ = 0) :
+	character_name(character_name_),
 	max_health(max_health_),
 	strength(strength_),
 	magic(magic_),

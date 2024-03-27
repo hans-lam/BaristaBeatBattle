@@ -38,6 +38,9 @@ class RenderSystem {
 	GLuint m_font_VAO;
 	GLuint m_font_VBO;
 
+	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+	unsigned int font_default_size = 24;
+
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
 	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
@@ -66,7 +69,9 @@ class RenderSystem {
 			textures_path("fg.png"),
 			textures_path("fglight.png"),
 			textures_path("bg_battle.png"),
-			textures_path("spritesheet.png")
+			textures_path("spritesheet.png"),
+			textures_path("health_bar_empty.png"),
+			textures_path("fill_bar.png")
 
 	};
 
@@ -81,6 +86,8 @@ class RenderSystem {
 		shader_path("background"),
 		shader_path("foreground"),
 		shader_path("lights"),
+		shader_path("battle"),
+		shader_path("battlebar"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -100,7 +107,7 @@ public:
 
 	void initializeGlMeshes();
 
-	bool fontInit(const std::string& font_filename, unsigned int font_default_size);
+	bool fontInit();
 	Mesh& getMesh(GEOMETRY_BUFFER_ID id) { return meshes[(int)id]; };
 
 	void initializeGlGeometryBuffers();

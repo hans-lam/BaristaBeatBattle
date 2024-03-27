@@ -55,7 +55,6 @@ int main()
 	// setup fonts 
 	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
 	unsigned int font_default_size = 48;
-	renderer.fontInit(font_filename, font_default_size);
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -75,6 +74,7 @@ int main()
 		//world.handle_collisions();
 		world.handle_level_collisions();
 		renderer.draw(stage_system.get_current_stage());
+		
 	}
 
 	return EXIT_SUCCESS;
