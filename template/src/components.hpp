@@ -149,7 +149,7 @@ struct AttackTimer
 
 struct MiniGameTimer
 {
-	float counter_ms = 10000;
+	float counter_ms = 12000;
 	float inter_timer = 500;
 	bool inter_state = false;
 };
@@ -157,6 +157,7 @@ struct MiniGameTimer
 struct MiniGameResTimer
 {
 	float counter_ms = 250;
+	bool fail = false;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -268,6 +269,6 @@ struct TextRenderRequest {
 	float scale;
 	vec3 color;
 	glm::mat4 trans;
-	bool shown = true;
+	bool shown = false;
 };
 

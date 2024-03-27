@@ -59,7 +59,7 @@ Entity createBug(RenderSystem* renderer, vec2 position)
 	return entity;
 }
 
-Entity createCup(RenderSystem* renderer, vec2 pos) {
+Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -76,7 +76,9 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	// Place in minigame
 	registry.miniGame.emplace(entity);
 	// Place in minigame timer for ryhthym calcs
-	registry.miniGameTimer.emplace(entity);
+	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
+	mgt.counter_ms = rhythm_length; 
+	mgt.inter_timer = inter_timer;
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::MINIGAMECUP,
@@ -87,7 +89,7 @@ Entity createCup(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_counter, bool mini_fail) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -100,13 +102,28 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos) {
 
 	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 	// place in minigame result
-	registry.miniGameResTimer.emplace(entity);
-	RenderRequest& render = registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
-		EFFECT_ASSET_ID::TEXTURED,
-		GEOMETRY_BUFFER_ID::SPRITE }
-	);
+	MiniGameResTimer& res = registry.miniGameResTimer.emplace(entity);
+	res.counter_ms = interpolate_counter;
+
+	if (mini_fail) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		res.fail = true;
+	}
+	else {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMESUCCESS,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		res.fail = false;
+	}
+
 	return entity;
 }
 
@@ -577,6 +594,7 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 	switch (current_stage) {
 	case StageSystem::Stage::main_menu: 
 		registry.mainMenu.emplace(entity); 
+		textRenderRequest.shown = true;
 		break;
 	case StageSystem::Stage::overworld:
 		registry.overWorld.emplace(entity); 
@@ -588,7 +606,8 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 		registry.turnBased.emplace(entity); 
 		break;
 	case StageSystem::Stage::minigame:
-		registry.miniGame.emplace(entity);
+		registry.miniStage.emplace(entity);
+		// textRenderRequest.shown = true;
 		break;
 	}
 

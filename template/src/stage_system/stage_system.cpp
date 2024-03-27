@@ -89,6 +89,9 @@ void StageSystem::set_main_menu()
 	for (Entity entity : registry.miniStage.entities) {
 		set_render_shown(entity, false, false);
 	}
+	for (Entity entity : registry.miniGame.entities) {
+		set_render_shown(entity, false, false);
+	}
 }
 
 void StageSystem::set_overworld()
@@ -136,6 +139,9 @@ void StageSystem::set_turn_based()
 	for (Entity entity : registry.miniStage.entities) {
 		set_render_shown(entity, false, false);
 	}
+	for (Entity entity : registry.miniGame.entities) {
+		set_render_shown(entity, false, false);
+	}
 
 	// Set turn based entities to be rendered
 	for (Entity entity : registry.turnBased.entities) {
@@ -152,6 +158,6 @@ void StageSystem::set_minigame()
 
 	// Set minigame based entities to be rendered 
 	for (Entity entity : registry.miniStage.entities) {
-
+		set_render_shown(entity, true, false);
 	}
 }

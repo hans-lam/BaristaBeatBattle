@@ -26,9 +26,9 @@ Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character)
 // the prey
 Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
-Entity createCup(RenderSystem* renderer, vec2 pos);
+Entity createCup(RenderSystem* renderer, vec2 pos, float length, float inter_timer);
 // minigame result
-Entity createMiniResult(RenderSystem* renderer, vec2 pos);
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_counter, bool mini_fail);
 // the enemy
 Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy

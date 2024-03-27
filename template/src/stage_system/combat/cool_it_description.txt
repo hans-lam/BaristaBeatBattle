@@ -1,0 +1,4 @@
+Welcome to Cool It! The goal of this minigame: 
+to cool the tea on the 2nd and 4th beats of the music.
+Press 'D' to try cooling the tea. 
+If you press it on the right beat, your score will increase!
