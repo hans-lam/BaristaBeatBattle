@@ -14,13 +14,14 @@ MinigameSystem::MinigameSystem() :
 	minigame_music_start(false), 
 	time_since_last_press(0.0f),
 	minigame_overall_timer(0.0f), 
-	initialized(false)
+	initialized(false), 
+	loaded(false)
 {}
 
 void MinigameSystem::init(StageSystem* stage_system_arg, RenderSystem* renderer_arg) {
 	stage_system = stage_system_arg; 
 	renderer = renderer_arg;
-	reset_values();
+	reset_values(true);
 
 	// Minigame texts
 	minigame_text_map[cool_it] = createText("Cool It!", { x_center - 400, y_center },
@@ -99,14 +100,14 @@ void MinigameSystem::load_cool_it() {
 			initial_y -= 25;
 
 			// add the text to the map
-			description_text_map[line] = current_text;
+			render_text_map[line] = current_text;
 		}
 	}
 	myfile.close();
 
-	practice_text_entity = createText("Currently in PRACTICE MODE. Press 'S' to start!", {10, 10},
+	render_text_map["practice"] = createText("Currently in PRACTICE MODE. Press 'S' to start!", {10, 10},
 		1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
-	registry.textRenderRequests.get(practice_text_entity).shown = true;
+	registry.textRenderRequests.get(render_text_map["practice"]).shown = true;
 
 	// create the normal state cup
 	createCup(renderer, { x_center, y_center }, curr_rhythm->rhythm_len, beat_error * 2);
@@ -160,12 +161,13 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 		// set ended to true once timer reaches rhythm length
 		if (minigame_overall_timer >= timer.counter_ms) {
 			if (!practice) {
-				// change the cup to not be shown
-				registry.renderRequests.get(entity).shown = false;
+				// delete the cup
+				registry.remove_all_components_of(entity);
 
 				ended = true;
 
-				// trigger an attack on enemies
+				// load an attack on enemies
+				loaded = true;
 			}
 		}
 	}
@@ -175,9 +177,9 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 		if (registry.renderRequests.has(entity)) {
 			RenderRequest& rr = registry.renderRequests.get(entity);
 
-			// if minigame is over, set all results to not be shown
+			// if minigame is over, delete all the results
 			if (ended && !practice) {
-				rr.shown = false;
+				registry.remove_all_components_of(entity);
 			}
 			else {
 				// handling result timer
@@ -195,32 +197,40 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Handling for score 
+	if (registry.textRenderRequests.has(render_text_map["score"])) {
+		TextRenderRequest& trr = registry.textRenderRequests.get(render_text_map["score"]);
+		trr.text = "Score: " + std::to_string(score);
+	}
+
 	// end minigame
 	if (ended && !practice) {
 		std::cout << "SCORE: " << score << '\n';
 
 		// Reset initial values
-		reset_values();
+		reset_values(false);
 		initialized = false;
 
 		stage_system->set_stage(StageSystem::Stage::turn_based);
 	}
 }
 
-void MinigameSystem::reset_values() {
+void MinigameSystem::reset_values(bool is_hard_reset) {
 	not_started = true;
 	practice = true;
 	selected_game = cool_it;
-	score = 0;
 	practice_music_start = false;
 	minigame_music_start = false;
 	time_since_last_press = 0.0f;
 	minigame_overall_timer = 0.0f;
 
-	// Clear practice_text 
-	registry.remove_all_components_of(practice_text_entity);
-	// clear description text map
-	for (auto const& x : description_text_map)
+	if (is_hard_reset) {
+		loaded = false;
+		score = 0;
+	}
+
+	// clear text map
+	for (auto const& x : render_text_map)
 	{
 		registry.remove_all_components_of(x.second);
 	}
@@ -273,10 +283,12 @@ void MinigameSystem::handle_mini() {
 		if (!practice) {
 			// Score will only increment after first two measures 
 			if (minigame_overall_timer > measure_duration * 2) {
-				if (hit)
+				if (hit) {
 					score++;
-				else if (perfect_hit)
+				}
+				else if (perfect_hit) {
 					score += 2;
+				}
 			}
 		}
 
@@ -352,8 +364,13 @@ void MinigameSystem::handle_minigame_key(int key, int action) {
 				if (key == GLFW_KEY_S) {
 					practice = false;
 					// change the practice text
-					registry.textRenderRequests.get(practice_text_entity).text = 
+					registry.textRenderRequests.get(render_text_map["practice"]).text =
 						"You get two measures to get the timing, good luck!";
+					// add score text
+					render_text_map["score"] = createText("Score: " + std::to_string(score), {window_width_px - 125, window_height_px - 25},
+						1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+					registry.textRenderRequests.get(render_text_map["score"]).shown = true;
+
 					// reset timer for key presses
 					time_since_last_press = 0.0f;
 					// reset overall timer 

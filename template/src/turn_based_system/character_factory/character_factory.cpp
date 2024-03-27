@@ -14,11 +14,13 @@ Entity CharacterFactory::construct_chai(Entity entity) {
 
 	Ability* basic_attack = ability_factory->construct_basic_attack();
 	Ability* rest = ability_factory->construct_rest();
+	Ability* pour = ability_factory->construct_pour_it();
 	
 
 	Character* chai_character_obj = new Character(name, character_stat);
 	chai_character_obj->add_ability(basic_attack);
 	chai_character_obj->add_ability(rest);
+	chai_character_obj->add_ability(pour);
 
 	CharacterData characterData = CharacterData();
 	characterData.characterData = chai_character_obj;

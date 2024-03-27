@@ -34,6 +34,10 @@ public:
 		return this->practice;
 	}
 
+	int get_score() const {
+		return this->score;
+	}
+
 	void handle_game_selection();
 
 	void load_cool_it();
@@ -41,6 +45,7 @@ public:
 	void load_milk_it();
 
 	bool initialized;
+	bool loaded;
 	bool practice_music_start;
 	bool minigame_music_start;
 	float time_since_last_press;
@@ -50,7 +55,7 @@ public:
 
 	void handle_mini();
 
-	void reset_values();
+	void reset_values(bool is_hard_reset);
 private:
 	void set_current_game_color(vec3 color);
 
@@ -79,8 +84,9 @@ private:
 	MinigameRhythm* curr_rhythm;
 
 	bool practice;
-	std::map<std::string, Entity> description_text_map;
-	Entity practice_text_entity;
+	std::map<std::string, Entity> render_text_map;
+	// score = curr_score / max_score for fractional damage calc
+	// can be implemented at a later date
 	int score;
 	int beat_duration;
 	int beat_error;

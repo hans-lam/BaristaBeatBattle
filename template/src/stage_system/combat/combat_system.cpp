@@ -64,8 +64,6 @@ CombatSystem::SoundMapping CombatSystem::handle_selection() {
 				else if (opComponent.option == "rest") {
 					// TODO USE REST ABILITY
 
-					// set stage to 2, which is mini-game mapping
-
 					play_sound = handle_attack(active_char_entity, "rest");
 
 				}
@@ -93,6 +91,14 @@ void CombatSystem::handle_combat_over() {
 			registry.remove_all_components_of(entity);
 		}
 	}
+}
+
+void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {
+	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
+	Ability* minigame_ability = active_char->get_ability_by_name("pour");
+	minigame_ability->set_power(score);
+
+	handle_attack(active_char_entity, "pour");
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity, std::string ability) {

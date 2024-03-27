@@ -18,6 +18,8 @@ public:
 
 	void process_ability(Character* caller, Character* target);
 
+	void set_power(int power);
+
 	
 
 private:

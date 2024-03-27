@@ -29,6 +29,8 @@ public:
 
 	void handle_turn_rendering();
 
+	void handle_minigame_attack(Entity active_char, int score);
+
 private:
 	void create_level_one(RenderSystem* renderer);
 

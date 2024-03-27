@@ -291,6 +291,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		else {
 			combat_system->handle_turn_rendering();
+
+			if (minigame_system->loaded) {
+				// trigger attack?
+				Entity charData = turn_based->get_active_character(); 
+				int current_score = minigame_system->get_score();
+
+				combat_system->handle_minigame_attack(charData, current_score);
+
+				minigame_system->loaded = false;
+			}
 		}
 	}
 
@@ -299,7 +309,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (minigame_system->get_not_started()) {
 			if (!(minigame_system->initialized)) {
 				minigame_system->handle_set_rhythm();
-				minigame_system->reset_values();
+				minigame_system->reset_values(true);
 				minigame_system->initialized = true;
 			}
 		}
@@ -411,7 +421,6 @@ void WorldSystem::handle_collisions() {
 						registry.remove_all_components_of(enemies);
 					}
 
-					// Stage = 1 maps to turn based
 					stage_system->set_stage(StageSystem::Stage::cutscene);
 				}
 			}
@@ -487,7 +496,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Going to Main Menu manually
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		minigame_system->reset_values();
+		minigame_system->reset_values(true);
 		minigame_system->initialized = false;
 		stage_system->set_stage(StageSystem::Stage::main_menu);
 	}
