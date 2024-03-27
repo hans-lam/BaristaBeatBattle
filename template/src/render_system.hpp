@@ -81,6 +81,8 @@ class RenderSystem {
 			textures_path("cutsceneBox1.png"),
 			textures_path("cutsceneBox2.png"),
 			textures_path("cutsceneBox3.png"),
+			textures_path("earlgrey.png"),
+			textures_path("americano.png"),
 
 	};
 
