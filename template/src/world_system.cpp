@@ -171,7 +171,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 
 	this->main_menu_system = main_menu_system_arg;
 	this->overworld_system = overworld_system_arg;
-	// overworld_system->init(stage_system_arg);
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
 	this->minigame_system = minigame_system_arg;

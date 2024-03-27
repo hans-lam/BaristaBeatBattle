@@ -140,7 +140,9 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
 	if (chance_hit < HIT_CHANCE) {
-		registry.attackTimers.emplace(get_entity_given_character(caller));
+		if (!registry.attackTimers.has(get_entity_given_character(caller))) {
+			registry.attackTimers.emplace(get_entity_given_character(caller));
+		}
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);
