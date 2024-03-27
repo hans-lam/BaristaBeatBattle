@@ -322,6 +322,34 @@ Entity createBackgroundBattle(RenderSystem* renderer, vec2 position) {
 	return entity;
 }
 
+
+Entity createBackgroundCutscene(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = position;
+
+	// scale the background
+	motion.scale = vec2({ 1700, window_height_px });
+
+	registry.cutscenes.emplace(entity);
+	registry.backgrounds.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::BGCUTSECNE ,
+		 EFFECT_ASSET_ID::BACKGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createMainMenu(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
 

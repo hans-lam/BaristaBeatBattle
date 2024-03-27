@@ -43,6 +43,8 @@ Entity createBackgroundScroller(RenderSystem* renderer, vec2 position);
 Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLight);
 // minigame background
 Entity createBackgroundBattle(RenderSystem* renderer, vec2 position);
+// cutscene background 
+Entity createBackgroundCutscene(RenderSystem* renderer, vec2 position);
 // Main Menu
 Entity createMainMenu(RenderSystem* renderer, vec2 position);
 // Tutorial

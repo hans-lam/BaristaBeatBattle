@@ -411,6 +411,9 @@ void WorldSystem::restart_game() {
 	// Create Background for turn based battle
 	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
+	// Create Background for cutscenes
+	createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+
 	// Create the main menu
 	createMainMenu(renderer, { 0, 0 });
 
