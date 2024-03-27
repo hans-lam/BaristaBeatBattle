@@ -74,6 +74,8 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		std::cout << ai_character->get_name() << "'s targeting " << target_character->get_name() << " best they have the lowest health!" << "\n";
 
 		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
+	
+
 	}
 
 	

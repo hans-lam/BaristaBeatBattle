@@ -16,18 +16,21 @@ void CombatSystem::init(StageSystem* stage_system_arg, TurnBasedSystem* turn_bas
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int action) {
-	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_T) {
-			handle_tutorial();
-		}
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-			// handle changing of menu here
-			return handle_menu(key);
-		}
-		if (key == GLFW_KEY_ENTER) {
-			return handle_selection();
-		}
+	if (out_of_combat) return SoundMapping::no_sound;
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+		handle_tutorial();
 	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_DOWN) {
+		return handle_menu(key);
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
+		return handle_selection();
+	}
+
+
 	return SoundMapping::no_sound;
 }
 
@@ -86,6 +89,7 @@ CombatSystem::SoundMapping CombatSystem::handle_selection() {
 
 				if (opComponent.option == "attack") {
 					handle_attack(active_char_entity, "Basic Attack");
+					break;
 				}
 				else if (opComponent.option == "rest") {
 					// TODO USE REST ABILITY
@@ -116,7 +120,34 @@ void CombatSystem::handle_combat_over() {
 		if (registry.players.has(entity)) {
 			registry.remove_all_components_of(entity);
 		}
+
 	}
+
+	for (Entity entity : registry.healthBarFills.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.healthOutlines.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.menu.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.menuOptions.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.injuryTimers.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.turnBasedEnemies.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+
 }
 
 void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {
@@ -151,7 +182,7 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 			// delete all enemies	
 			handle_combat_over();
 			// move selected level to next level
-			selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
+			//selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
 			stage_system->set_stage(StageSystem::Stage::overworld);
 		}
 	}

@@ -28,7 +28,7 @@ Level* LevelFactory::construct_level_two(RenderSystem* renderer, vec2 base_ally_
 	level_two->allies.push_back(chai_entity);
 
 	Entity earl_entity = create_earl(renderer, base_enemy_position);
-	Entity americano_entity = create_americano(renderer, base_enemy_position);
+	Entity americano_entity = create_americano(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
 
 	level_two->enemies.push_back(earl_entity);
 	level_two->enemies.push_back(americano_entity);

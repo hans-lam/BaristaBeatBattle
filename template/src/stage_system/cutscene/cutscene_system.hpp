@@ -20,6 +20,9 @@ public:
 	void handle_cutscene_render(RenderSystem* renderer);
 
 	Entity createCharPic(RenderSystem* renderer, vec2 pos);
+
+	bool cutscene_rendered = false;
+
 private:
 	const float min_slide_counter_ms = 10000.f;
 

@@ -12,6 +12,7 @@ void CutSceneSystem::init(StageSystem* stage_system_arg, RenderSystem * renderer
 	stage_system = stage_system_arg;
 	cutscene_done = false;
 	skip_cutscene = false;
+	cutscene_rendered = false;
 }
 
 void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
@@ -25,6 +26,9 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
 
 
+	if (this->cutscene_rendered) {
+		return;
+	}
 	switch (cutscene_slide) {
 	case 1: 
 		
@@ -55,6 +59,8 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 		cutscene_done = false;
 		handle_cutscene();
 	}
+
+	this->cutscene_rendered = true;
 	
 
 
@@ -132,6 +138,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 }
 
 void CutSceneSystem::handle_cutscene() {
+	cutscene_rendered = false;
 	stage_system->set_stage(StageSystem::Stage::turn_based);
 }
 
