@@ -37,7 +37,7 @@ WorldSystem::WorldSystem()
 
 WorldSystem::~WorldSystem() {
 	// Destroy music components
-	if (main_menu_music != nullptr) 
+	if (main_menu_music != nullptr)
 		Mix_FreeMusic(main_menu_music);
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
@@ -171,6 +171,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 
 	this->main_menu_system = main_menu_system_arg;
 	this->overworld_system = overworld_system_arg;
+	// overworld_system->init(stage_system_arg);
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
 	this->minigame_system = minigame_system_arg;
@@ -181,8 +182,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 
 	// Setting up the stage to music map
 	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
-	stage_music_map[StageSystem::Stage::overworld] = background_music; 
+	stage_music_map[StageSystem::Stage::overworld] = background_music;
 	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
+
 	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music; 
 	stage_music_map[StageSystem::Stage::minigame] = minigame_select_music;
 
@@ -231,57 +233,89 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
-	// Handle overworld stepping 
+	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
+		
 		// Remove entities that leave the screen on the left side
 		// Iterate backwards to be able to remove without unterfering with the next object to visit
 		// (the containers exchange the last element with the current)
 		for (int i = (int)motions_registry.components.size() - 1; i >= 0; --i) {
 			Motion& motion = motions_registry.components[i];
 			if (motion.position.x + abs(motion.scale.x) < 0.f) {
-				if (!registry.players.has(motions_registry.entities[i]) && 
+				if (!registry.players.has(motions_registry.entities[i]) &&
 					!registry.backgrounds.has(motions_registry.entities[i])) // don't remove the player or background
 					registry.remove_all_components_of(motions_registry.entities[i]);
 			}
 		}
 
-		if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-			// Reset timer
-			next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-			// Create enemy drink with random initial velocity, position
-			Entity test = createEnemyDrink(renderer,
-				// TODO: make negative velocity possible
-				vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-				// TODO: fix to spawn from only the edges
-				vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		}
+		create_overworld_levels(5);
+		// This helper is replacing the block that spawns in enemies. 
+
+
+		// This block spawns in enemies
+		// 
+		//if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+		//	// Reset timer
+		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		//	// Create enemy drink with random initial velocity, position
+		//	Entity test = createEnemyDrink(renderer,
+		//		// TODO: make negative velocity possible
+		//		vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
+		//		// TODO: fix to spawn from only the edges
+		//		vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		//}
+
+		//if (registry.levelNode.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
+		//	// Reset timer
+		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
+		//	// Create enemy drink with random initial velocity, position
+		//	Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
+		//	}
+
+
+
 
 		// Processing the chicken state
 		assert(registry.screenStates.components.size() <= 1);
 		ScreenState& screen = registry.screenStates.components[0];
 
-		// process attacks
-		float min_attack_counter_ms = 700.f;
-		for (Entity entity : registry.attackTimers.entities) {
-			// progress timer
-			AttackTimer& counter = registry.attackTimers.get(entity);
-			counter.counter_ms -= elapsed_ms_since_last_update;
-			if (counter.counter_ms < min_attack_counter_ms) {
-				min_attack_counter_ms = counter.counter_ms;
-			}
-
-			// handle attack
-			Motion& player_motion = registry.motions.get(entity);
-			player_motion.angle += M_PI / 12.0f;
-
-			// stop attack once timer expires
-			if (counter.counter_ms < 0) {
-				registry.attackTimers.remove(entity);
-				player_motion.angle = 0.f;
-				return true;
-			}
+	// process attacks
+	float min_attack_counter_ms = 700.f;
+	for (Entity entity : registry.attackTimers.entities) {
+		// progress timer
+		AttackTimer& counter = registry.attackTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		if (counter.counter_ms < min_attack_counter_ms) {
+			min_attack_counter_ms = counter.counter_ms;
 		}
+
+		// stop attack once timer expires
+		if (counter.counter_ms < 0) {
+			registry.attackTimers.remove(entity);
+			return true;
+		}
+	}
+
+	// deal with injury graphics
+	// i do not know why this does not work if its in turn based system
+	float min_injury_counter_ms = 3000.f;
+	for (Entity entity : registry.injuryTimers.entities) {
+		// progress timer, 
+		InjuredTimer& counter = registry.injuryTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+		counter.redness_factor -= 1.f / 200.f; 
+		if (counter.counter_ms < min_injury_counter_ms) {
+			min_injury_counter_ms = counter.counter_ms;
+		}
+
+		// stop shaking the attacked character after 3 seconds
+		if (counter.counter_ms < 0) {
+			//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+			registry.injuryTimers.remove(entity);
+		}
+	}
 	}
 
 	// Handle turn based stepping
@@ -336,10 +370,44 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			minigame_system->minigame_step(elapsed_ms_since_last_update);
 		}
 	}
+  
+	// Handle main menu feedback timer
+	if (curr_stage == StageSystem::Stage::main_menu) {
+		float min_persistence_counter_ms = 1000.f;
+		for (Entity entity : registry.persistanceFeedbackTimer.entities) {
+			// progress timer
+			PersistenceFeedbackTimer& counter = registry.persistanceFeedbackTimer.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			if (counter.counter_ms < min_persistence_counter_ms) {
+				min_persistence_counter_ms = counter.counter_ms;
+			}
+
+			// stop attack once timer expires
+			if (counter.counter_ms < 0) {
+				if (registry.textRenderRequests.has(entity)) {
+					registry.textRenderRequests.remove(entity);
+				}
+				registry.persistanceFeedbackTimer.remove(entity);
+			}
+		}
+	}
 
 	return true;
 }
+void WorldSystem::create_overworld_levels(int num_levels) {
+	// For now TODO: HELP
+	if (registry.levelNode.components.size() <= num_levels) {
+		// replace createEnemyDrink with createLevelNode
+		
+		for (int i = 0; i < num_levels; i++) {
+			// 1500 is window_width_px
+			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 600);
+			Entity test = createLevelNode(renderer, i+1, levelpos);
 
+		}
+		//std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+	}
+}
 // Reset the world state to its initial state
 void WorldSystem::restart_game() {
 	stage_system->set_stage(StageSystem::Stage::main_menu);
@@ -387,19 +455,69 @@ void WorldSystem::restart_game() {
 	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create the main menu
-	createMainMenu(renderer, { 0, 0 });
+	createMainMenu(renderer, { window_width_px / 2.0, 150 });
 
 	// Create tutorials
 	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 1);
 	createTutorialWindow(renderer, vec2(window_width_px / 2, window_height_px / 2), 2);
+
+	// TODO: MAKE IT SO THAT THE GAME SAVES THE LAST LEVEL THAT THE PLAYER WAS ON
+	if (registry.motions.has(registry.players.entities[0])) {
+		Motion& player_motion = registry.motions.get(registry.players.entities[0]);
+		std::cout << "THIS IS RUN" << std::endl;
+	}
+	//if (registry.levelNode.has(registry.levelNode.entities[0])) {
+	//	std::cout << "THESE ARE THE POSITION OF THE FIRST LEVELNODE" << std::endl;
+	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.x << std::endl;
+	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.y << std::endl;
+	//	//player_motion.position = registry.motions.get(registry.levelNode.entities[0]).position;
+	//}
 }
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
 	// Loop over all collisions detected by the physics system
+	//auto& collisionsRegistry = registry.collisions;
+	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+	//	// The entity and its collider
+	//	Entity entity = collisionsRegistry.entities[i];
+	//	Entity entity_other = collisionsRegistry.components[i].other;
+
+	//	// For now, we are only interested in collisions that involve the chicken
+	//	if (registry.players.has(entity)) {
+
+	//		// Checking Player - Attack collisions
+	//		if (registry.enemyDrinks.has(entity_other)) {
+	//			// initiate fight if player is attacking
+	//			if (registry.attackTimers.has(entity)) {
+	//				// Scream. we can replace this with a diff sound later
+	//				Mix_PlayChannel(-1, chicken_dead_sound, 0);
+
+	//				// potential problem: if we don't remove the enemy it might keep colliding and screaming
+	//				registry.remove_all_components_of(entity_other);
+
+	//				// We also need to kill all other eagles
+	//				for (Entity enemies : registry.enemyDrinks.entities) {
+	//					registry.remove_all_components_of(enemies);
+	//				}
+
+	//				// Stage = 1 maps to turn based
+	//				stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
+	//			}
+	//		}
+	//	}
+	//}
+
+	// Remove all collisions from this simulation step
+	registry.collisions.clear();
+}
+
+void WorldSystem::handle_level_collisions() {
+	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 		// The entity and its collider
+		
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
 
@@ -407,7 +525,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity)) {
 
 			// Checking Player - Attack collisions
-			if (registry.enemyDrinks.has(entity_other)) {
+			if (registry.levelNode.has(entity_other)) {
 				// initiate fight if player is attacking
 				if (registry.attackTimers.has(entity)) {
 					// Scream. we can replace this with a diff sound later
@@ -417,11 +535,15 @@ void WorldSystem::handle_collisions() {
 					registry.remove_all_components_of(entity_other);
 
 					// We also need to kill all other eagles
-					for (Entity enemies : registry.enemyDrinks.entities) {
+					for (Entity enemies : registry.levelNode.entities) {
 						registry.remove_all_components_of(enemies);
 					}
 
-					stage_system->set_stage(StageSystem::Stage::cutscene);
+					// TODO: SHOULD MAP TO DIFFERENT LEVELS
+					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
+					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
+
+					stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
 				}
 			}
 		}

@@ -9,6 +9,7 @@
 #include "../ai_system.hpp"
 #include "level_select_system.hpp"
 #include "../world_init.hpp"
+#include "experience.hpp"
 
 
 class TurnBasedSystem {
@@ -36,6 +37,8 @@ public:
 		return active_character;
 	}
 
+	HealthBarFill& get_health_bar_given_entity(Entity receiving_character);
+
 private:
 
 	Entity active_character = emptyEntity;
@@ -43,6 +46,8 @@ private:
 	bool waiting_for_player = false;
 
 	AISystem* ai_system;
+
+	int current_level;
 
 };
 

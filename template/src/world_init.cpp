@@ -233,6 +233,40 @@ Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,
+		 EFFECT_ASSET_ID::FOREGROUND,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	return entity;
+}
+
+Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+	
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = vec2(0.f,0.f);
+	motion.position = position;
+
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+
+	registry.overWorld.emplace(entity);
+	auto& levelNode = registry.levelNode.emplace(entity);
+	levelNode.position = position;
+	levelNode.level_number = level_num;
+
+	RenderRequest& rr = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::ENEMYDRINK,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
@@ -602,6 +636,38 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 
 	return entity;
 }
+
+Entity create_london(RenderSystem* renderer, vec2 pos) {
+
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = mesh.original_size * 300.f;
+	motion.scale.y *= -1; // point front to the right
+
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::PLAYER });
+
+	// give entity turn based components
+	character_factory.construct_london(entity);
+
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	return entity;
+}
+
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 
 	auto entity = Entity();
@@ -622,7 +688,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::ENEMYDRINK,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
@@ -665,6 +731,62 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 		// textRenderRequest.shown = true;
 		break;
 	}
+
+	return entity;
+}
+
+Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos) {
+	
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = pos;
+
+	// scale the background
+	motion.scale = vec2({ HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	registry.healthOutlines.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTHOUTLINE,
+		 EFFECT_ASSET_ID::BATTLE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.position = pos;
+
+	// scale the background
+	motion.scale = vec2({ FILL_WIDTH, FILL_HEIGHT });
+
+	// Create and (empty) Eagle component to be able to refer to all eagles
+	HealthBarFill& fill = registry.healthBarFills.emplace(entity);
+	fill.associated_char = associated_character;
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTHFILL,
+		 EFFECT_ASSET_ID::BATTLEBAR,
+		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }

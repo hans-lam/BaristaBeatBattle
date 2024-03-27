@@ -32,7 +32,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg, 
+	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg,
 		StageSystem* stage_system_arg, MainMenuSystem* main_menu_system_arg,
 		OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
 		CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg);
@@ -46,11 +46,15 @@ public:
 	// Check for collisions
 	void handle_collisions();
 
+	void handle_level_collisions();
+
 	// Should the game be over ?
 	bool is_over()const;
 
 	// check if player is in world bounds
 	bool player_in_bounds(Motion* motion, bool is_x);
+
+	void create_overworld_levels(int num_levels);
 private:
 	// setting fps
 	void set_fps(float elapsed_ms_since_last_update);
