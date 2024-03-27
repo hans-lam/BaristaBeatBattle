@@ -80,7 +80,7 @@ struct Menu
 
 struct Minigame
 {
-	int score = 0;
+
 };
 
 struct CharacterData {
@@ -158,13 +158,18 @@ struct MiniGameTimer
 {
 	float counter_ms = 12000;
 	float inter_timer = 500;
-	minigame_state cup_state;
+	minigame_state cup_state = minigame_state::normal;
 };
 
 struct MiniGameResTimer
 {
 	float counter_ms = 250;
-	minigame_state res_state;
+	minigame_state res_state = minigame_state::normal;
+};
+
+struct MiniGameVisualizer
+{
+	minigame_state res_state = minigame_state::good;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)

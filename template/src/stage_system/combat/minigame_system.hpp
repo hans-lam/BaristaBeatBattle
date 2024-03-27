@@ -56,6 +56,8 @@ public:
 	void handle_mini();
 
 	void reset_values(bool is_hard_reset);
+
+	minigame_state calc_modded_beats();
 private:
 	void set_current_game_color(vec3 color);
 

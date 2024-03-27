@@ -95,10 +95,10 @@ void CombatSystem::handle_combat_over() {
 
 void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {
 	Character* active_char = registry.characterDatas.get(active_char_entity).characterData;
-	Ability* minigame_ability = active_char->get_ability_by_name("pour");
+	Ability* minigame_ability = active_char->get_ability_by_name("cool");
 	minigame_ability->set_power(score);
 
-	handle_attack(active_char_entity, "pour");
+	handle_attack(active_char_entity, "cool");
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity, std::string ability) {

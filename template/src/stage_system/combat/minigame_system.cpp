@@ -68,9 +68,19 @@ void MinigameSystem::handle_game_selection() {
 		break;
 	case pour_it:
 		load_pour_it();
+		// Reset initial values
+		reset_values(false);
+		initialized = false;
+
+		stage_system->set_stage(StageSystem::Stage::turn_based);
 		break;
 	case milk_it:
 		load_milk_it();
+		// Reset initial values
+		reset_values(false);
+		initialized = false;
+
+		stage_system->set_stage(StageSystem::Stage::turn_based);
 		break;
 	}
 
@@ -82,7 +92,8 @@ void MinigameSystem::handle_game_selection() {
 		}
 	}
 
-	not_started = false;
+	if (initialized)
+		not_started = false;
 }
 
 void MinigameSystem::load_cool_it() {
@@ -112,21 +123,25 @@ void MinigameSystem::load_cool_it() {
 	// create the normal state cup
 	createCup(renderer, { x_center, y_center }, curr_rhythm->rhythm_len, beat_error * 2);
 	// creating perfect
-	createMiniResult(renderer, { x_center / 2, y_center / 2 + 100}, beat_error, minigame_state::perfect);
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 100}, beat_error * 2, minigame_state::perfect);
 	// creating good
-	createMiniResult(renderer, { x_center / 2, y_center / 2 + 200}, beat_error, minigame_state::good);
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 200}, beat_error * 2, minigame_state::good);
 	// creating fail
-	createMiniResult(renderer, { x_center / 2, y_center / 2 + 300 }, beat_error, minigame_state::fail);
+	createMiniResult(renderer, { x_center / 2, y_center / 2 + 300 }, beat_error * 2, minigame_state::fail);
 	// creating cool cloud
-	createMiniResult(renderer, { x_center / 2 + 700, y_center / 2 + 200 }, beat_error, minigame_state::normal);
+	createMiniResult(renderer, { x_center / 2 + 700, y_center / 2 + 200 }, beat_error * 2, minigame_state::normal);
+	// creating minigame good visualizer
+	createMiniIndicator(renderer, { x_center / 2 + 700, y_center / 2 + 500 }, minigame_state::good);
+	// creating minigame perfect visualizer
+	createMiniIndicator(renderer, { x_center / 2 + 700, y_center / 2 + 500 }, minigame_state::perfect);
 }
 
 void MinigameSystem::load_pour_it() {
-	printf("NOT IMPLEMENTED YET SORRY!");
+	printf("POUR IT NOT IMPLEMENTED YET SORRY!");
 }
 
 void MinigameSystem::load_milk_it() {
-	printf("NOT IMPLEMENTED YET SORRY!");
+	printf("POUR IT NOT IMPLEMENTED YET SORRY!");
 }
 
 void MinigameSystem::set_current_game_color(vec3 color) {
@@ -201,6 +216,38 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// Handling for visualizer of when to hit
+	for (Entity entity : registry.miniGameVisual.entities) {
+		MiniGameVisualizer& visual = registry.miniGameVisual.get(entity);
+
+		if (registry.renderRequests.has(entity)) {
+			// if minigame is over, delete all the results
+			if (ended && !practice) {
+				registry.remove_all_components_of(entity);
+			}
+			else {
+				// check if we are on second or fourth beat right now
+				minigame_state hit_state = calc_modded_beats();
+				RenderRequest& rr = registry.renderRequests.get(entity);
+
+				// if perfect 
+				if (hit_state == minigame_state::perfect &&
+					visual.res_state == minigame_state::perfect) {
+					rr.shown = true;
+					// if good
+				}
+				else if (hit_state == minigame_state::good &&
+					visual.res_state == minigame_state::good) {
+					rr.shown = true;
+				}
+				// not time to show
+				else {
+					rr.shown = false;
+				}
+			}
+		}
+	}
+
 	// Handling for score 
 	if (registry.textRenderRequests.has(render_text_map["score"])) {
 		TextRenderRequest& trr = registry.textRenderRequests.get(render_text_map["score"]);
@@ -233,11 +280,54 @@ void MinigameSystem::reset_values(bool is_hard_reset) {
 		score = 0;
 	}
 
+	// default game selection colours map
+	for (auto const& x : minigame_text_map)
+	{
+		if (registry.textRenderRequests.has(x.second)) {
+			if (x.first == selected_game) {
+				registry.textRenderRequests.get(x.second).color = selected_color;
+			}
+			else {
+				registry.textRenderRequests.get(x.second).color = not_selected_color;
+			}
+		}
+	}
+
 	// clear text map
 	for (auto const& x : render_text_map)
 	{
 		registry.remove_all_components_of(x.second);
 	}
+}
+
+minigame_state MinigameSystem::calc_modded_beats() {
+	float modded = (int)minigame_overall_timer % measure_duration;
+
+	// For every second beat, the perfect value of modded is beat_duration
+		// So then beat_duration - beat_error <= modded <= beat_duration + beat_error for a hit
+	if (modded == beat_duration) {
+		return minigame_state::perfect;
+	}
+	else if (modded > (beat_duration - beat_error) && modded < beat_duration) {
+		return minigame_state::good;
+	}
+	else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
+		return minigame_state::good;
+	}
+
+	// For every fourth beat, the perfect value of modded is beat_duration * 3
+		// So then (beat_duration * 3) - beat_error <= modded <= (beat_duration * 3) + beat_error for a hit
+	if (modded == beat_duration * 3) {
+		return minigame_state::perfect;
+	}
+	else if (modded > (beat_duration * 3 - beat_error) && modded < beat_duration * 3) {
+		return minigame_state::good;
+	}
+	else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
+		return minigame_state::good;
+	}
+
+	return minigame_state::fail;
 }
 
 void MinigameSystem::handle_mini() {
@@ -253,33 +343,12 @@ void MinigameSystem::handle_mini() {
 		std::cout << minigame_overall_timer << '\n';
 		std::cout << modded << '\n';
 
-		// For every second beat, the perfect value of modded is beat_duration
-		// So then beat_duration - beat_error <= modded <= beat_duration + beat_error for a hit
-		if (modded == beat_duration) {
-			std::cout << "PERFECT 2nd HIT!\n";
-			perfect_hit = true;
-		}
-		else if (modded > (beat_duration - beat_error) && modded < beat_duration) {
-			std::cout << "2nd HIT, but slightly early\n";
-			hit = true;
-		} 
-		else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
-			std::cout << "2nd HIT, but slightly late\n";
-			hit = true;
-		}
+		minigame_state hit_state = calc_modded_beats(); 
 
-		// For every fourth beat, the perfect value of modded is beat_duration * 3
-		// So then (beat_duration * 3) - beat_error <= modded <= (beat_duration * 3) + beat_error for a hit
-		if (modded == beat_duration * 3) {
-			std::cout << "PERFECT 4th HIT!\n";
+		if (hit_state == minigame_state::perfect) {
 			perfect_hit = true;
 		}
-		else if (modded > (beat_duration * 3 - beat_error) && modded < beat_duration * 3) {
-			std::cout << "4th HIT, but slightly early\n";
-			hit = true;
-		}
-		else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
-			std::cout << "4th HIT, but slightly late\n";
+		else if (hit_state == minigame_state::good) {
 			hit = true;
 		}
 

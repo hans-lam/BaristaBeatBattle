@@ -146,10 +146,40 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 }
 
 // minigame hit indicator 
-Entity createMiniIndicator(RenderSystem* renderer, vec2 pos) {
+Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini_res) {
 	auto entity = Entity();
 
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
 
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
+	MiniGameVisualizer& visual = registry.miniGameVisual.emplace(entity);
+	visual.res_state = mini_res;
+
+	if (mini_res == minigame_state::good) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLGOOD,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+	}
+	else if (mini_res == minigame_state::perfect) {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+	}
+
+	return entity;
 }
 
 Entity createEagle(RenderSystem* renderer, vec2 position)

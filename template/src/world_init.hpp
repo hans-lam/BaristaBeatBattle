@@ -28,9 +28,9 @@ Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
 Entity createCup(RenderSystem* renderer, vec2 pos, float length, float inter_timer);
 // minigame result
-Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_counter, minigame_state mini_res);
+Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_timer, minigame_state mini_res);
 // minigame hit indicator 
-Entity createMiniIndicator(RenderSystem* renderer, vec2 pos);
+Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini_res);
 // the enemy
 Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy
