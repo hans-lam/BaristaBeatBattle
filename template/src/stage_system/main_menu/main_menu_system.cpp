@@ -88,10 +88,10 @@ void MainMenuSystem::handle_option()
 
 		for (Entity character_entity : registry.characterDatas.entities) {
 
-			if (registry.partyMembers.has(character_entity)) {
-				Character* character_data = registry.characterDatas.get(character_entity).characterData;
-				curr_characters.push_back(character_data);
-			}
+			
+			Character* character_data = registry.characterDatas.get(character_entity).characterData;
+			curr_characters.push_back(character_data);
+			
 
 		}
 
