@@ -173,6 +173,11 @@ struct MiniGameResTimer
 	float counter_ms = 250;
 };
 
+struct PersistenceFeedbackTimer
+{
+	float counter_ms = 1000;
+};
+
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
 struct ColoredVertex
 {
