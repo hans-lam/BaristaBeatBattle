@@ -261,7 +261,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 		else {
-			std::cout << "REACHED ELSE CASE" << std::endl;
+			// std::cout << "REACHED ELSE CASE" << std::endl;
 		}
 		
 		// Remove entities that leave the screen on the left side
