@@ -1,5 +1,6 @@
 #pragma once
 #include "stage_system/stage_system.hpp"
+#include "../../turn_based_system/level_factory.hpp"
 
 #include "render_system.hpp"
 #include "world_init.hpp"

@@ -36,6 +36,7 @@ CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int acti
 }
 
 void CombatSystem::handle_level(RenderSystem* renderer) {
+	level_factory->is_london_recruited = stage_system->is_london_recruited;
 	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
 	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
 	Level* level;
@@ -178,6 +179,7 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 			// For M4 refactor this to be a proper use of flagging
 			if (is_game_over == 1 && selected_level == level_four && registry.turnBasedEnemies.size() == 1) {
 				level_factory->is_london_recruited = true;
+				stage_system->is_london_recruited = true;
 			}
 
 			// delete all enemies	

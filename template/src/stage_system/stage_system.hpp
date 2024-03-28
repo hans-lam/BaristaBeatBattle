@@ -37,6 +37,12 @@ public:
 		return this->current_level;
 	}
 
+	void set_current_level(int current_level) {
+		this->current_level = current_level;
+	}
+
+	bool is_london_recruited = false;
+
 private: 
 	void set_main_menu();
 
