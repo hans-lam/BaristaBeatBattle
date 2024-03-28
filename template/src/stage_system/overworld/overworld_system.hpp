@@ -14,12 +14,15 @@ public:
 
 	void handle_overworld_keys(int key, int action, float player_speed); 
 
+	LevelNode nearest_left_node;
+	LevelNode nearest_right_node;
 private:
 	bool overworld_tutorial;
 	bool is_target_reached;
 	StageSystem* stage_system;
 	RenderSystem* renderer;
 	int current_level;
+	bool step();
 	//void create_overworld_levels();
 	void updatePlayerVelocityTowardsTarget(Motion& player_motion, LevelNode* target_node, float player_speed);
 
