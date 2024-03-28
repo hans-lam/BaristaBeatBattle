@@ -18,6 +18,11 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	// TODO: Change cutscene done to TRUE after some set amount of time
 	//Entity textBox;
 
+	if (cutscene_currently_rendered == 0) {
+		createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+	}
+	
+
 	Entity textBox;
 	Entity char1;
 	Entity char2;

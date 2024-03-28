@@ -345,6 +345,7 @@ void PhysicsSystem::step(float elapsed_ms)
 
 	
 	// Check for collisions between all moving entities
+	/*
     ComponentContainer<Motion> &motion_container = registry.motions;
 	for(uint i = 0; i<motion_container.components.size(); i++)
 	{
@@ -383,5 +384,6 @@ void PhysicsSystem::step(float elapsed_ms)
 			}
 		}
 	}
+	*/
 
 }
