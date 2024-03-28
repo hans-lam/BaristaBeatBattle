@@ -9,8 +9,9 @@
 // Justin: NOTE THAT SOME OF THE FUNCTOINALITY IS ALSO IN world_system.cpp
 
 
-OverworldSystem::OverworldSystem() : 
-	overworld_tutorial(false)
+OverworldSystem::OverworldSystem() :
+	overworld_tutorial(false),
+	current_level(3)
 {
 }
 
@@ -21,17 +22,17 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	//create_overworld_levels();
 	std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
 	
-			
 } 
 
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {
 	// Movement keys
-	if (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
+	if (action == GLFW_PRESS && (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN)) {
 		handle_player_movement(key, action, player_speed);
 	} 
 	// Attack key
 	else if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
-		player_attack();
+		//player_attack();
+		handle_level_selection();
 	}
 	// Tutorial key
 	else if (action == GLFW_PRESS && key == GLFW_KEY_T) {
@@ -154,6 +155,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					
 					// Move player to the nearest left node if not already at the leftmost node.
 					player_motion.position.x = nearest_left_node.position.x;
+					current_level = nearest_left_node.level_number;
 
 					std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
 
@@ -189,6 +191,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 				if (found_right_node && player_motion.position.x != rightmost_x) {
 					// Move player to the nearest right node if not already at the rightmost node.
 					player_motion.position.x = nearest_right_node.position.x;
+					current_level = nearest_right_node.level_number;
 					std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
 					registry.players.components[i].level_num = nearest_right_node.level_number;
 					
@@ -223,6 +226,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 	}
 }
 
+/*
 void OverworldSystem::player_attack() {
 	for (uint i = 0; i < registry.players.size(); i++) {
 		Entity entity = registry.players.entities[i];
@@ -230,6 +234,20 @@ void OverworldSystem::player_attack() {
 			registry.attackTimers.emplace(registry.players.entities[i]);
 		}
 	}
+}
+*/
+
+int my_test_it = 1;
+void OverworldSystem::handle_level_selection() {
+
+	for (Entity entity : registry.levelNode.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	
+
+	std::cout << " handle level selection " << my_test_it++ << std::endl;
+	stage_system->set_stage(StageSystem::Stage::cutscene, current_level);
 }
 
 void OverworldSystem::handle_tutorial() {

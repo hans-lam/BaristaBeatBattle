@@ -5,8 +5,14 @@
 const int VERTICAL_SPACE_BETWEEN_ALLIES = 150;
 const int VERTICAL_SPACE_BETWEEN_ENEMIES = 150;
 
+LevelFactory::LevelFactory() {
+	this->is_london_recruited = false;
+}
+	
+
 Level* LevelFactory::construct_level_one(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 	Level* level_one = new Level();
+	level_one->level_number = 1;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 
@@ -22,13 +28,14 @@ Level* LevelFactory::construct_level_one(RenderSystem* renderer, vec2 base_ally_
 Level* LevelFactory::construct_level_two(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_two = new Level();
+	level_two->level_number = 2;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 
 	level_two->allies.push_back(chai_entity);
 
 	Entity earl_entity = create_earl(renderer, base_enemy_position);
-	Entity americano_entity = create_americano(renderer, base_enemy_position);
+	Entity americano_entity = create_americano(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
 
 	level_two->enemies.push_back(earl_entity);
 	level_two->enemies.push_back(americano_entity);
@@ -41,6 +48,7 @@ Level* LevelFactory::construct_level_two(RenderSystem* renderer, vec2 base_ally_
 Level* LevelFactory::construct_level_three(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_three = new Level();
+	level_three->level_number = 3;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 	Entity earl_entity = create_earl(renderer, { base_ally_position .x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
@@ -63,7 +71,7 @@ Level* LevelFactory::construct_level_three(RenderSystem* renderer, vec2 base_all
 Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_four = new Level();
-
+	level_four->level_number = 4;
 
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
@@ -76,12 +84,19 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 
 	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	//Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
 	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
 
+	// temp here as we currently only have 5 levels
+	Entity possessed_london = create_london(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+
 	level_four->enemies.push_back(level_two_ground_a);
-	level_four->enemies.push_back(level_two_ground_b);
+	//level_four->enemies.push_back(level_two_ground_b);
+
+	level_four->enemies.push_back(possessed_london);
+
 	level_four->enemies.push_back(level_two_ground_c);
+
 
 	return level_four;
 
@@ -90,6 +105,7 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_five = new Level();
+	level_five->level_number = 5;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
@@ -108,6 +124,11 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	level_five->enemies.push_back(level_two_ground_b);
 	level_five->enemies.push_back(level_two_ground_c);
 
+	if (this->is_london_recruited) {
+		Entity london = create_london(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 3) });
+		level_five->allies.push_back(london);
+	}
+
 	return level_five;
 
 }
@@ -115,6 +136,7 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_six = new Level();
+	level_six->level_number = 6;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
@@ -139,7 +161,7 @@ Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_
 Level* LevelFactory::construct_level_seven(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 
 	Level* level_seven = new Level();
-
+	level_seven->level_number = 7;
 
 	Entity chai_entity = create_chai(renderer, base_ally_position);
 	Entity earl_entity = create_earl(renderer, { base_ally_position.x,base_ally_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });

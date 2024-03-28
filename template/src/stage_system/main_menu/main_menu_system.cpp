@@ -71,7 +71,7 @@ void MainMenuSystem::handle_option()
 	case load_game:
 		// popup game load option
 		printf("load_game: ");
-		data_manager->read_data("barista_beat_battle_save_data.json");
+		data_manager->read_data("barista_beat_battle_save_data.json", stage_system);
 		// TODO: show feedback to screen
 		feedback = createText("Done Loading!", { 10,10 }, 0.9f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu);
 		for (Entity& e : registry.persistanceFeedbackTimer.entities) {
@@ -88,14 +88,14 @@ void MainMenuSystem::handle_option()
 
 		for (Entity character_entity : registry.characterDatas.entities) {
 
-			if (registry.partyMembers.has(character_entity)) {
-				Character* character_data = registry.characterDatas.get(character_entity).characterData;
-				curr_characters.push_back(character_data);
-			}
+			
+			Character* character_data = registry.characterDatas.get(character_entity).characterData;
+			curr_characters.push_back(character_data);
+			
 
 		}
 
-		data_manager->write_data("barista_beat_battle_save_data.json", 1, curr_characters);
+		data_manager->write_data("barista_beat_battle_save_data.json", 1, curr_characters, stage_system->is_london_recruited);
 
 		// TODO: show feedback to screen
 		for (Entity& e : registry.persistanceFeedbackTimer.entities) {

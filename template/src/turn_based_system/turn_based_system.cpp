@@ -74,6 +74,8 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		std::cout << ai_character->get_name() << "'s targeting " << target_character->get_name() << " best they have the lowest health!" << "\n";
 
 		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
+	
+
 	}
 
 	
@@ -139,9 +141,10 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
-	if (chance_hit < HIT_CHANCE) {
+	if (ability->get_ability_name() == "rest" || chance_hit < HIT_CHANCE) {
 		Entity caller_entity = get_entity_given_character(caller);
-		if (registry.attackTimers.has(caller_entity)) {
+		
+		if (registry.attackTimers.has(caller_entity) && ability->get_ability_name() != "rest") {
 			// registry.injuryTimers.remove(receiving_entity);
 			AttackTimer& attack = registry.attackTimers.get(caller_entity);
 			attack.counter_ms = 700.f;
@@ -149,21 +152,25 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		else {
 			registry.attackTimers.emplace(caller_entity);
 		}
+		
 		for (Character* receiving_character : recipients) {
 
 			ability->process_ability(caller, receiving_character);
 			Entity receiving_entity = get_entity_given_character(receiving_character);
-			if (registry.injuryTimers.has(receiving_entity)) {
-				// registry.injuryTimers.remove(receiving_entity);
-				InjuredTimer& injury = registry.injuryTimers.get(receiving_entity);
-				injury.counter_ms = 3000.f;
-				injury.redness_factor = 1.f;
+			if (ability->get_ability_name() != "rest") {
+				if (registry.injuryTimers.has(receiving_entity)) {
+					// registry.injuryTimers.remove(receiving_entity);
+					InjuredTimer& injury = registry.injuryTimers.get(receiving_entity);
+					injury.counter_ms = 3000.f;
+					injury.redness_factor = 1.f;
+				}
+				else {
+					InjuredTimer& injury = registry.injuryTimers.emplace(receiving_entity);
+					injury.counter_ms = 3000.f;
+					//std::cout << "Current time: " << (3000.f - registry.injuryTimers.get(receiving_entity).counter_ms) /3000.f << '\n';
+				}
 			}
-			else {
-				InjuredTimer& injury = registry.injuryTimers.emplace(receiving_entity);
-				injury.counter_ms = 3000.f;
-				//std::cout << "Current time: " << (3000.f - registry.injuryTimers.get(receiving_entity).counter_ms) /3000.f << '\n';
-			}
+			
 
 			HealthBarFill& fill = get_health_bar_given_entity(receiving_entity);
 			fill.percent_filled = (float) receiving_character->get_current_health_points() / receiving_character->get_character_stat_sheet()->get_max_health();
@@ -203,6 +210,17 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		printf("Game Over! You won the fight!!");
 
 		return 1;
+	}
+
+	// TODO CREATE A FLAG SYSTEM
+	if (registry.turnBasedEnemies.size() == 1) {
+		Entity turn_based_enemy_entity = registry.turnBasedEnemies.entities[0];
+		Character* turn_based_enemy = registry.characterDatas.get(turn_based_enemy_entity).characterData;
+		if (turn_based_enemy->get_name() == "London") {
+			out_of_combat = true;
+			printf("London was the last enemy alive and has been recruited!");
+			return 1;
+		}
 	}
 
 	return 0;

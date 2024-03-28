@@ -18,13 +18,31 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	// TODO: Change cutscene done to TRUE after some set amount of time
 	//Entity textBox;
 
+	if (cutscene_currently_rendered == 0) {
+		createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+	}
+	
+
 	Entity textBox;
 	Entity char1;
 	Entity char2;
-	Entity instructionsText= createText("Press N to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0,1.0,1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
+	
+
+	if (cutscene_done) {
+		// transition to turn-based
+		std::cout << "GO TO TURN BASED\n";
+		skip_cutscene = false;
+		cutscene_done = false;
+		handle_cutscene();
+		return;
+	}
+
+	if (this->cutscene_slide == cutscene_currently_rendered) {
+		return;
+	}
+
+	Entity instructionsText = createText("Press N to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
 	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-
-
 	switch (cutscene_slide) {
 	case 1: 
 		
@@ -48,20 +66,15 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 		//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 		break;
 	}
-	if (cutscene_done) {
-		// transition to turn-based
-		std::cout << "GO TO TURN BASED\n";
-		skip_cutscene = false;
-		cutscene_done = false;
-		handle_cutscene();
-	}
 	
 
+	this->cutscene_currently_rendered = cutscene_slide;
 
 }
 
 Entity CutSceneSystem::createCharPic(RenderSystem * renderer, vec2 pos)
 {
+
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
@@ -104,6 +117,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 			}
 		}
 		if (key == GLFW_KEY_N) {
+
 			if (!cutscene_done) {
 				// transition to turn-based
 				cutscene_slide++;
@@ -119,7 +133,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 		}
 
 		if (key == GLFW_KEY_SPACE) {
-			if (!skip_cutscene) {
+ 			if (!skip_cutscene) {
 				std::cout << "SKIP CUTSCENE\n";
 				skip_cutscene = true;
 			}
@@ -132,6 +146,8 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 }
 
 void CutSceneSystem::handle_cutscene() {
+	cutscene_currently_rendered = 0;
+
 	stage_system->set_stage(StageSystem::Stage::turn_based);
 }
 

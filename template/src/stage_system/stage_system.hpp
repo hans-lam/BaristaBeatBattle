@@ -33,6 +33,16 @@ public:
 
 	void set_render_shown(Entity entity, bool show_render, bool tutorial);
 
+	int get_current_level() {
+		return this->current_level;
+	}
+
+	void set_current_level(int current_level) {
+		this->current_level = current_level;
+	}
+
+	bool is_london_recruited = false;
+
 private: 
 	void set_main_menu();
 

@@ -20,12 +20,16 @@ public:
 	void handle_cutscene_render(RenderSystem* renderer);
 
 	Entity createCharPic(RenderSystem* renderer, vec2 pos);
+
+	
+
 private:
 	const float min_slide_counter_ms = 10000.f;
 
 
 	StageSystem* stage_system;
 	int cutscene_slide = 1; 
+	int cutscene_currently_rendered = 0;
 	bool cutscene_done;
 	bool skip_cutscene;
 };

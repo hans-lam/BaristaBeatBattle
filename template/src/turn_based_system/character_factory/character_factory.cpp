@@ -1,11 +1,19 @@
 #include "character_factory.hpp"
 
-
 Entity CharacterFactory::construct_chai(Entity entity) {
 	std::string name = "Chai";
 
 	// if character data already exists use that
-	if (does_character_data_already_exist(entity, name)) return entity;
+	if (does_character_data_already_exist(entity, name)) {
+		Character* character_data = registry.characterDatas.get(entity).characterData;
+		Ability* basic_attack = ability_factory->construct_basic_attack();
+		Ability* rest = ability_factory->construct_rest();
+		Ability* pour = ability_factory->construct_pour_it();
+		character_data->add_ability(basic_attack);
+		character_data->add_ability(rest);
+		character_data->add_ability(pour);
+		return entity;
+	}
 	// else construct new data
 
 
@@ -42,7 +50,16 @@ Entity CharacterFactory::construct_earl(Entity entity) {
 	std::string name = "Earl";
 
 	// if character data already exists use that
-	if (does_character_data_already_exist(entity, name)) return entity;
+	if (does_character_data_already_exist(entity, name)) {
+		Character* character_data = registry.characterDatas.get(entity).characterData;
+		Ability* basic_attack = ability_factory->construct_basic_attack();
+		Ability* rest = ability_factory->construct_rest();
+		Ability* pour = ability_factory->construct_pour_it();
+		character_data->add_ability(basic_attack);
+		character_data->add_ability(rest);
+		character_data->add_ability(pour);
+		return entity;
+	}
 	// else construct new data
 
 	unsigned int earl_max_health = 20;
@@ -56,11 +73,14 @@ Entity CharacterFactory::construct_earl(Entity entity) {
 
 	Ability* basic_attack = ability_factory->construct_basic_attack();
 	Ability* rest = ability_factory->construct_rest();
+	Ability* pour = ability_factory->construct_pour_it();
+
 
 
 	Character* earl_character_obj = new Character(name, character_stat);
 	earl_character_obj->add_ability(basic_attack);
 	earl_character_obj->add_ability(rest);
+	earl_character_obj->add_ability(pour);
 
 	CharacterData characterData = CharacterData();
 	characterData.characterData = earl_character_obj;
@@ -73,7 +93,16 @@ Entity CharacterFactory::construct_americano(Entity entity) {
 	std::string name = "Americano";
 
 	// if character data already exists use that
-	if (does_character_data_already_exist(entity, name)) return entity;
+	if (does_character_data_already_exist(entity, name)) {
+		Character* character_data = registry.characterDatas.get(entity).characterData;
+		Ability* basic_attack = ability_factory->construct_basic_attack();
+		Ability* rest = ability_factory->construct_rest();
+		Ability* pour = ability_factory->construct_pour_it();
+		character_data->add_ability(basic_attack);
+		character_data->add_ability(rest);
+		character_data->add_ability(pour);
+		return entity;
+	}
 	// else construct new data
 
 	unsigned int americano_max_health = 45;
@@ -87,11 +116,13 @@ Entity CharacterFactory::construct_americano(Entity entity) {
 
 	Ability* basic_attack = ability_factory->construct_basic_attack();
 	Ability* rest = ability_factory->construct_rest();
+	Ability* pour = ability_factory->construct_pour_it();
 
 
 	Character* americano_character_obj = new Character(name, character_stat);
 	americano_character_obj->add_ability(basic_attack);
 	americano_character_obj->add_ability(rest);
+	americano_character_obj->add_ability(pour);
 
 
 	CharacterData characterData = CharacterData();
@@ -105,7 +136,16 @@ Entity CharacterFactory::construct_london(Entity entity) {
 	std::string name = "London";
 
 	// if character data already exists use that
-	if (does_character_data_already_exist(entity, name)) return entity;
+	if (does_character_data_already_exist(entity, name)) {
+		Character* character_data = registry.characterDatas.get(entity).characterData;
+		Ability* basic_attack = ability_factory->construct_basic_attack();
+		Ability* rest = ability_factory->construct_rest();
+		Ability* pour = ability_factory->construct_pour_it();
+		character_data->add_ability(basic_attack);
+		character_data->add_ability(rest);
+		character_data->add_ability(pour);
+		return entity;
+	}
 	// else construct new data
 
 	unsigned int london_max_health = 18;
@@ -119,11 +159,13 @@ Entity CharacterFactory::construct_london(Entity entity) {
 
 	Ability* basic_attack = ability_factory->construct_basic_attack();
 	Ability* rest = ability_factory->construct_rest();
+	Ability* pour = ability_factory->construct_pour_it();
 
 
 	Character* london_character_obj = new Character(name, character_stat);
 	london_character_obj->add_ability(basic_attack);
 	london_character_obj->add_ability(rest);
+	london_character_obj->add_ability(pour);
 
 
 	CharacterData characterData = CharacterData();

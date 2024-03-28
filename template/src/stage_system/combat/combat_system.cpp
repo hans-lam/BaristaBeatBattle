@@ -13,25 +13,30 @@ void CombatSystem::init(StageSystem* stage_system_arg, TurnBasedSystem* turn_bas
 	turn_based = turn_based_arg;
 	// This can change depending on how we implement saving/loading
 	selected_level = level_one;
+	level_factory = new LevelFactory();
 }
 
 CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int action) {
-	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_T) {
-			handle_tutorial();
-		}
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_DOWN) {
-			// handle changing of menu here
-			return handle_menu(key);
-		}
-		if (key == GLFW_KEY_ENTER) {
-			return handle_selection();
-		}
+	if (out_of_combat) return SoundMapping::no_sound;
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+		handle_tutorial();
 	}
+
+	if (action == GLFW_PRESS && (key == GLFW_KEY_DOWN || key == GLFW_KEY_UP) ) {
+		return handle_menu(key);
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
+		return handle_selection();
+	}
+
+
 	return SoundMapping::no_sound;
 }
 
 void CombatSystem::handle_level(RenderSystem* renderer) {
+	level_factory->is_london_recruited = stage_system->is_london_recruited;
 	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
 	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
 	Level* level;
@@ -86,6 +91,7 @@ CombatSystem::SoundMapping CombatSystem::handle_selection() {
 
 				if (opComponent.option == "attack") {
 					handle_attack(active_char_entity, "Basic Attack");
+					break;
 				}
 				else if (opComponent.option == "rest") {
 					// TODO USE REST ABILITY
@@ -104,18 +110,38 @@ CombatSystem::SoundMapping CombatSystem::handle_selection() {
 }
 
 void CombatSystem::handle_combat_over() {
-	for (Entity entity : registry.turnBased.entities) {
-		if (registry.turnBasedEnemies.has(entity)) {
-			registry.remove_all_components_of(entity); 
-		}
+	
+	for (Entity entity : registry.partyMembers.entities) {
+		registry.remove_all_components_of(entity);
+	}
 
-		// TODO: If we need to remove player/party members after each turn based encounter, do that here
-		if (registry.partyMembers.has(entity)) {
-			registry.remove_all_components_of(entity);
-		}
-		if (registry.players.has(entity)) {
-			registry.remove_all_components_of(entity);
-		}
+	for (Entity entity : registry.turnBasedEnemies.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+
+	for (Entity entity : registry.healthBarFills.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.healthOutlines.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.menu.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.menuOptions.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.injuryTimers.entities) {
+		registry.remove_all_components_of(entity);
+	}
+
+	for (Entity entity : registry.turnBasedEnemies.entities) {
+		registry.remove_all_components_of(entity);
 	}
 }
 
@@ -148,10 +174,18 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 		int is_game_over = turn_based->process_character_action(active_char->get_ability_by_name(ability), active_char, { target });
 
 		if (is_game_over != 0) {
+
+			// if level four ended with an enemy still there then london is required
+			// For M4 refactor this to be a proper use of flagging
+			if (is_game_over == 1 && selected_level == level_four && registry.turnBasedEnemies.size() == 1) {
+				level_factory->is_london_recruited = true;
+				stage_system->is_london_recruited = true;
+			}
+
 			// delete all enemies	
 			handle_combat_over();
 			// move selected level to next level
-			selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
+			//selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
 			stage_system->set_stage(StageSystem::Stage::overworld);
 		}
 	}
@@ -224,9 +258,18 @@ void CombatSystem::handle_tutorial() {
 }
 
 void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* level) {
+	// remove the level texts
+	for (Entity& e : registry.turnBased.entities) {
+		if (registry.textRenderRequests.has(e)) {
+			registry.textRenderRequests.remove(e);
+		}
+	}
+	Entity level_text = createText("Level " + std::to_string(level->level_number), {window_width_px / 2 - 100, window_height_px - 50}, 1.3f, vec3(1.0f, 1.0f, 1.0f), mat4(1.0f), StageSystem::Stage::turn_based);
+	registry.textRenderRequests.get(level_text).shown = true;
 
 	int j = 0;
 	float dy = -75.f;
+
 	for (Entity party_member_entity : level->allies) {
 		// Creating Menu entity 
 		vec2 menu_pos = { BASE_X_VALUE + 300, window_height_px - (j + 1) * 200 };
