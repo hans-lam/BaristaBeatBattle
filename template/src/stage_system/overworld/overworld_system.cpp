@@ -86,8 +86,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			}
 
 			// Initialize variables to track the nearest nodes.
-			LevelNode nearest_left_node;
-			LevelNode nearest_right_node;
+			nearest_left_node;
+			nearest_right_node;
 			bool found_left_node = false;
 			bool found_right_node = false;
 
@@ -110,7 +110,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					found_right_node = true;
 				}
 			}
-			
 			//// Go through all levelNodes:
 			//vec2 nearest_levelNode_pos = vec2(0.f, 0.f);
 			//float curr_best_dist = 9999.f;
@@ -146,8 +145,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			//	}
 			//	
 			//}
-
-
 			if (key == GLFW_KEY_UP) {
 				//player_motion.velocity.y = -player_speed;
 			}
@@ -159,15 +156,16 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 				if (found_left_node && player_motion.position.x != leftmost_x) {
 					
 					// Move player to the nearest left node if not already at the leftmost node.
-					player_motion.position.x = nearest_left_node.position.x;
-					current_level = nearest_left_node.level_number;
+					/*player_motion.position.x = nearest_left_node.position.x;
+					current_level = nearest_left_node.level_number;*/
 
 					// std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
+					current_level = nearest_left_node.level_number; 
 
 					registry.players.components[i].level_num = nearest_left_node.level_number;
-					/*remaining_distance_x = nearest_left_dist;
+					remaining_distance_x = nearest_left_dist;
 					player_motion.velocity.x = -player_speed;
-					*/
+					
 
 					// TRYING TO MAKE A LOOP THAT WILL MAKE THE CHARACTER MOVE AND NOT JUST TELEPORT
 					//std::cout << "I GOT HERE" << std::endl;
@@ -195,7 +193,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			else if (key == GLFW_KEY_RIGHT) {
 				if (found_right_node && player_motion.position.x != rightmost_x) {
 					// Move player to the nearest right node if not already at the rightmost node.
-					player_motion.position.x = nearest_right_node.position.x;
+					//player_motion.position.x = nearest_right_node.position.x;
+					player_motion.velocity.x = player_speed;
 					current_level = nearest_right_node.level_number;
 					// std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
 					registry.players.components[i].level_num = nearest_right_node.level_number;

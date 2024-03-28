@@ -14,6 +14,8 @@ public:
 
 	void handle_overworld_keys(int key, int action, float player_speed); 
 
+	LevelNode nearest_left_node;
+	LevelNode nearest_right_node;
 private:
 	bool overworld_tutorial;
 	bool is_target_reached;
