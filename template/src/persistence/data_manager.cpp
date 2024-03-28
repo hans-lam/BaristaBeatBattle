@@ -2,22 +2,25 @@
 
 const string PATH_TO_SAVE_FILE = "../../../data/persistence/";
 
-void DataManager::write_data(std::string file_name, int current_level, vector<Character*> character_datas) {
+void DataManager::write_data(std::string file_name, int current_level, vector<Character*> character_datas, bool is_london_recruited) {
 
 	StringBuffer s;
 	Writer<StringBuffer> writer(s);
 
 	writer.StartObject();
-	write_general_game_data(&writer, current_level);
+
+	write_general_game_data(&writer, current_level, is_london_recruited);
 	write_party_members(&writer, character_datas);
 	writer.EndObject();
 
 	handle_file_write(file_name, s.GetString());
 }
 
-void DataManager::write_general_game_data(Writer<StringBuffer>* writer, int current_level) {
+void DataManager::write_general_game_data(Writer<StringBuffer>* writer, int current_level, bool is_london_recruited) {
 	writer->Key("current_level");
 	writer->Int(current_level);
+	writer->Key("is_london_recruited");
+	writer->Bool(is_london_recruited);
 }
 
 void DataManager::write_party_members(Writer<StringBuffer>* writer, vector<Character*> character_datas) {
@@ -52,12 +55,19 @@ void DataManager::write_party_members(Writer<StringBuffer>* writer, vector<Chara
 	writer->EndArray();
 }
 
-void DataManager::read_data(string file_name) {
+void DataManager::read_data(string file_name, StageSystem* stage_system) {
 	Document doc = handle_file_read(file_name);
 
 	if (doc.HasMember("current_level") && doc["current_level"].IsInt()) {
 		int current_level = doc["current_level"].GetInt();
 		std::cout << "Current Level: " << current_level << std::endl;
+		stage_system->set_current_level(current_level);
+	}
+
+	if (doc.HasMember("is_london_recruited") && doc["is_london_recruited"].IsBool()) {
+		int is_london_recruited = doc["is_london_recruited"].GetBool();
+		std::cout << "Is Londond Recruited? " << is_london_recruited << std::endl;
+		stage_system->is_london_recruited = is_london_recruited;
 	}
 
 	if (doc.HasMember("party_member_data")
