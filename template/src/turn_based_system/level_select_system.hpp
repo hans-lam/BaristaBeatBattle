@@ -5,7 +5,7 @@
 
 class Level {
 public:
-
+	int level_number;
 	std::vector<Entity> allies;
 	std::vector<Entity> enemies;
 };

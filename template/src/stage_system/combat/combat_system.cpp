@@ -260,9 +260,18 @@ void CombatSystem::handle_tutorial() {
 }
 
 void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* level) {
+	// remove the level texts
+	for (Entity& e : registry.turnBased.entities) {
+		if (registry.textRenderRequests.has(e)) {
+			registry.textRenderRequests.remove(e);
+		}
+	}
+	Entity level_text = createText("Level " + std::to_string(level->level_number), {window_width_px / 2 - 100, window_height_px - 50}, 1.3f, vec3(1.0f, 1.0f, 1.0f), mat4(1.0f), StageSystem::Stage::turn_based);
+	registry.textRenderRequests.get(level_text).shown = true;
 
 	int j = 0;
 	float dy = -75.f;
+
 	for (Entity party_member_entity : level->allies) {
 		// Creating Menu entity 
 		vec2 menu_pos = { BASE_X_VALUE + 300, window_height_px - (j + 1) * 200 };
