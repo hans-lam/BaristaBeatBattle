@@ -622,8 +622,8 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::AMERICANO, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
-			GEOMETRY_BUFFER_ID::PLAYER });
+			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
 	// give entity turn based components
@@ -655,8 +655,8 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::EARL, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
-			GEOMETRY_BUFFER_ID::PLAYER });
+			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
 	// give entity turn based components
