@@ -6,3 +6,4 @@
 /template/out/build/x64-Debug
 /template/.vs
 /template/ext/project_path.hpp
+/template/data/persistence/*

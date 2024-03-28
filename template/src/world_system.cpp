@@ -235,6 +235,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
+
+		// check the position of the player to see if it is at the next level and if so, set velocities to 0.
+		// Not sure if player_chicken is being used
+		/*if (registry.players.has(player_chicken)) {
+			registry.players.get(player_chicken);
+		}*/
+		
+		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
+			// check using nearest_node from the overworld_system
+			float x_pos_near_left = overworld_system->nearest_left_node.position.x;
+			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
+
+			}
+		}
+		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
+			// check using nearest_node from the overworld_system
+			float x_pos_near_right = overworld_system->nearest_right_node.position.x;
+			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
+
+			}
+		}
+		else {
+			// std::cout << "REACHED ELSE CASE" << std::endl;
+		}
 		
 		// Remove entities that leave the screen on the left side
 		// Iterate backwards to be able to remove without unterfering with the next object to visit
@@ -477,7 +505,7 @@ void WorldSystem::restart_game() {
 	// TODO: MAKE IT SO THAT THE GAME SAVES THE LAST LEVEL THAT THE PLAYER WAS ON
 	if (registry.motions.has(registry.players.entities[0])) {
 		Motion& player_motion = registry.motions.get(registry.players.entities[0]);
-		std::cout << "THIS IS RUN" << std::endl;
+		// std::cout << "THIS IS RUN" << std::endl;
 	}
 	//if (registry.levelNode.has(registry.levelNode.entities[0])) {
 	//	std::cout << "THESE ARE THE POSITION OF THE FIRST LEVELNODE" << std::endl;

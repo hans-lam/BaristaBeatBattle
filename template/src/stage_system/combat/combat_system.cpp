@@ -19,15 +19,15 @@ void CombatSystem::init(StageSystem* stage_system_arg, TurnBasedSystem* turn_bas
 CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int action) {
 	if (out_of_combat) return SoundMapping::no_sound;
 
-	if (action == GLFW_PRESS && key == GLFW_KEY_T) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_T) {
 		handle_tutorial();
 	}
 
-	if (action == GLFW_PRESS && (key == GLFW_KEY_DOWN || key == GLFW_KEY_UP) ) {
+	if (action == GLFW_RELEASE && (key == GLFW_KEY_DOWN || key == GLFW_KEY_UP) ) {
 		return handle_menu(key);
 	}
 
-	if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ENTER) {
 		return handle_selection();
 	}
 
