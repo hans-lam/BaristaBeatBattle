@@ -271,6 +271,9 @@ Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
+	Entity level_text = createText(std::to_string(level_num), position - vec2(0,200), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld);
+	registry.textRenderRequests.get(level_text).shown = true;
+
 	return entity;
 }
 
