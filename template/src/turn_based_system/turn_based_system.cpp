@@ -141,7 +141,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
-	if (chance_hit < HIT_CHANCE) {
+	if (ability->get_ability_name() == "rest" || chance_hit < HIT_CHANCE) {
 		Entity caller_entity = get_entity_given_character(caller);
 		
 		if (registry.attackTimers.has(caller_entity) && ability->get_ability_name() != "rest") {
