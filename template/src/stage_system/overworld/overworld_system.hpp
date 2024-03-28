@@ -20,6 +20,7 @@ private:
 	StageSystem* stage_system;
 	RenderSystem* renderer;
 	int current_level;
+	bool step();
 	//void create_overworld_levels();
 	void updatePlayerVelocityTowardsTarget(Motion& player_motion, LevelNode* target_node, float player_speed);
 

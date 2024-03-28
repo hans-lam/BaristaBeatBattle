@@ -14,11 +14,12 @@ MainMenuSystem::MainMenuSystem() :
 void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
 	selected_option = new_game;
+	tutorial_on = false;
 	const int basex = window_width_px / 2 - 200;
 	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
 	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
 	menu_text_map[save_game] = createText("Save Game", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
-	menu_text_map[tutorials] = createText("Tutorials", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
 	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
 
 	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 300,window_height_px / 2 + 100 }, 3.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu);
@@ -108,6 +109,24 @@ void MainMenuSystem::handle_option()
 		registry.persistanceFeedbackTimer.emplace(feedback);
 		break;
 	case tutorials:
+		if (tutorial_on == false) {
+			tutorial_on = true;
+			tutorial.push_back(createText("Welcome to our game! To get started, use the enter key and up down buttons", {10, 870}, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+			tutorial.push_back(createText("1) use the enter key and up down buttons to make a selection", { 10, 840 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+			tutorial.push_back(createText("2) click on \'NEW GAME\' ", { 10, 810 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+			tutorial.push_back(createText("3) select a level on the overworld ", { 10, 780 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+			tutorial.push_back(createText("      with the left and right buttons", { 10, 750 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+		} else if (tutorial_on) {
+			
+			tutorial_on = false;
+			for (Entity tut : tutorial) {
+				if (registry.textRenderRequests.has(tut)) {
+					registry.textRenderRequests.remove(tut);
+				}
+			}
+			
+			
+		}
 		printf("tutorials: "); 
 		break;
 	case credits:

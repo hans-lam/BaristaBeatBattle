@@ -24,6 +24,11 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	
 } 
 
+bool OverworldSystem::step() {
+	std::cout << "test" << std::endl;
+	return true;
+}
+
 void OverworldSystem::handle_overworld_keys(int key, int action, float player_speed) {
 	// Movement keys
 	if (action == GLFW_PRESS && (key == GLFW_KEY_LEFT || key == GLFW_KEY_RIGHT || key == GLFW_KEY_UP || key == GLFW_KEY_DOWN)) {
@@ -157,7 +162,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					player_motion.position.x = nearest_left_node.position.x;
 					current_level = nearest_left_node.level_number;
 
-					std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
+					// std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
 
 					registry.players.components[i].level_num = nearest_left_node.level_number;
 					/*remaining_distance_x = nearest_left_dist;
@@ -192,7 +197,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					// Move player to the nearest right node if not already at the rightmost node.
 					player_motion.position.x = nearest_right_node.position.x;
 					current_level = nearest_right_node.level_number;
-					std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
+					// std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
 					registry.players.components[i].level_num = nearest_right_node.level_number;
 					
 				}

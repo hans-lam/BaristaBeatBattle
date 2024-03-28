@@ -30,9 +30,12 @@ public:
 		return this->selected_option;
 	}
 private:
+
+	bool tutorial_on;
+
 	MenuOption selected_option;
 	StageSystem* stage_system;
-
+	std::vector<Entity> tutorial;
 	std::map<MenuOption, Entity> menu_text_map;
 	Entity main_menu_title;
 	glm::vec3 selected_color = glm::vec3(1.0, 0.0, 0.0);
