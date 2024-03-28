@@ -20,7 +20,7 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	overworld_tutorial = false;
 	// I dont think this call works
 	//create_overworld_levels();
-	std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
+	// std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
 	
 } 
 

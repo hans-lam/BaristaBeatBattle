@@ -505,7 +505,7 @@ void WorldSystem::restart_game() {
 	// TODO: MAKE IT SO THAT THE GAME SAVES THE LAST LEVEL THAT THE PLAYER WAS ON
 	if (registry.motions.has(registry.players.entities[0])) {
 		Motion& player_motion = registry.motions.get(registry.players.entities[0]);
-		std::cout << "THIS IS RUN" << std::endl;
+		// std::cout << "THIS IS RUN" << std::endl;
 	}
 	//if (registry.levelNode.has(registry.levelNode.entities[0])) {
 	//	std::cout << "THESE ARE THE POSITION OF THE FIRST LEVELNODE" << std::endl;
