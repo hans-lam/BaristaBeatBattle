@@ -142,10 +142,6 @@ void CombatSystem::handle_combat_over() {
 	for (Entity entity : registry.turnBasedEnemies.entities) {
 		registry.remove_all_components_of(entity);
 	}
-
-	for (Entity entity : registry.enemyDrinks.entities) {
-		registry.remove_all_components_of(entity);
-	}
 }
 
 void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {

@@ -450,11 +450,12 @@ Entity createBackgroundCutscene(RenderSystem* renderer, vec2 position) {
 
 	registry.cutscenes.emplace(entity);
 	registry.backgrounds.emplace(entity);
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGCUTSECNE ,
 		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
 
 	return entity;
 }
