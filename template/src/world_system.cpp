@@ -465,7 +465,7 @@ void WorldSystem::restart_game() {
 	createBackgroundBattle(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create Background for cutscenes
-	createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+	//createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 
 	// Create the main menu
 	createMainMenu(renderer, { window_width_px / 2.0, 150 });

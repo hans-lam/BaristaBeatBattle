@@ -13,7 +13,7 @@ Ability* AbilityFactory::construct_pour_it() {
 	beats.push_back(BeatInstance(2, 2));
 	beats.push_back(BeatInstance(5, 3));
 
-	Ability* pour_it = new BeatAbility("cool", true, false, beats);
+	Ability* pour_it = new Ability(0, "cool", true, false);
 
 	return pour_it;
 }

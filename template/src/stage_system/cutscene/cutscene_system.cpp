@@ -12,12 +12,16 @@ void CutSceneSystem::init(StageSystem* stage_system_arg, RenderSystem * renderer
 	stage_system = stage_system_arg;
 	cutscene_done = false;
 	skip_cutscene = false;
-	cutscene_rendered = false;
 }
 
 void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	// TODO: Change cutscene done to TRUE after some set amount of time
 	//Entity textBox;
+
+	if (cutscene_currently_rendered == 0) {
+		createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
+	}
+	
 
 	Entity textBox;
 	Entity char1;
@@ -33,7 +37,7 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 		return;
 	}
 
-	if (this->cutscene_rendered) {
+	if (this->cutscene_slide == cutscene_currently_rendered) {
 		return;
 	}
 
@@ -64,7 +68,7 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	}
 	
 
-	this->cutscene_rendered = true;
+	this->cutscene_currently_rendered = cutscene_slide;
 
 }
 
@@ -113,6 +117,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 			}
 		}
 		if (key == GLFW_KEY_N) {
+
 			if (!cutscene_done) {
 				// transition to turn-based
 				cutscene_slide++;
@@ -141,9 +146,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 }
 
 void CutSceneSystem::handle_cutscene() {
-	cutscene_rendered = false;
-
-
+	cutscene_currently_rendered = 0;
 
 	stage_system->set_stage(StageSystem::Stage::turn_based);
 }
