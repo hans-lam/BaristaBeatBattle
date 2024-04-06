@@ -241,28 +241,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		/*if (registry.players.has(player_chicken)) {
 			registry.players.get(player_chicken);
 		}*/
+
+		overworld_system->updatePlayerVelocityTowardsTarget(elapsed_ms_since_last_update);
 		
-		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
-			// check using nearest_node from the overworld_system
-			float x_pos_near_left = overworld_system->nearest_left_node.position.x;
-			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
-
-			}
-		}
-		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
-			// check using nearest_node from the overworld_system
-			float x_pos_near_right = overworld_system->nearest_right_node.position.x;
-			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
-
-			}
-		}
-		else {
-			// std::cout << "REACHED ELSE CASE" << std::endl;
-		}
 		
 		// Remove entities that leave the screen on the left side
 		// Iterate backwards to be able to remove without unterfering with the next object to visit
@@ -439,11 +420,16 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 		
 		for (int i = 0; i < num_levels; i++) {
 			// 1500 is window_width_px
-			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 600);
+			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
 			Entity test = createLevelNode(renderer, i+1, levelpos);
-
+			
+			// set the first levelnode to 3 just for testing, DELETE AND FIX THIS LATERRRRR:
+			if (i == 2) {
+				overworld_system->prev_node = registry.levelNode.get(test);
+			}
+			
 		}
-		//std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+		
 	}
 }
 // Reset the world state to its initial state
