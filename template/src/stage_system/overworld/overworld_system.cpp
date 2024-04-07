@@ -10,8 +10,10 @@
 
 
 OverworldSystem::OverworldSystem() :
-	overworld_tutorial(false),
-	current_level(3)
+	overworld_tutorial(false)
+
+	// THERE IS SOMETHING ABOUT THIS SO I COMMENTED THIS OUT:
+	//current_level(3)
 {
 }
 
@@ -111,6 +113,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					found_right_node = true;
 				}
 			}
+
+			
 			//// Go through all levelNodes:
 			//vec2 nearest_levelNode_pos = vec2(0.f, 0.f);
 			//float curr_best_dist = 9999.f;
@@ -154,7 +158,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			}
 			// just do left and right for now
 			else if (key == GLFW_KEY_LEFT) {
-				if (found_left_node && player_motion.position.x != leftmost_x) {
+				if (found_left_node && player_motion.position.x != leftmost_x && !registry.animations.has(registry.players.entities[0])) {
 					
 					// Move player to the nearest left node if not already at the leftmost node.
 					/*player_motion.position.x = nearest_left_node.position.x;
@@ -162,9 +166,20 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 
 					// std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
 
+					// This next line actually just handles the animation because the movement is just an assignment of position 
+					// values, not the velocity thing anymore. This is very hacky and should be fixed at some point. 
+					player_motion.velocity.x = -player_speed;
+
+					prev_level = current_level;
+					prev_node.position = player_motion.position;
+
 					current_level = nearest_left_node.level_number; 
 					nearest_node = nearest_left_node;
+					
+					std::cout << "NEAREST NODE, I EXPECT IT TO BE 150 450 in the second press of left: " << nearest_node.position.x << ", " << nearest_node.position.y << std::endl;
+
 					registry.players.components[i].level_num = nearest_left_node.level_number;
+					
 					remaining_distance_x = nearest_left_dist;
 
 					dist_remaining = nearest_left_dist;
@@ -174,50 +189,39 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 
 					stored_static_dist_remaining = nearest_left_dist;
 
-					player_motion.velocity.x = -player_speed;
-
 					// Add to animation registry:
 
 					addToAnimation(registry.players.entities[0]);
 					
-
-					// TRYING TO MAKE A LOOP THAT WILL MAKE THE CHARACTER MOVE AND NOT JUST TELEPORT
-					//std::cout << "I GOT HERE" << std::endl;
-					//std::thread myThread([nearest_left_dist, &player_motion, &nearest_left_node]() {
-					//	int update_nearest_left_dist = nearest_left_dist;
-					//	std::cout << "Thread is running..." << std::endl;
-
-					//	while (update_nearest_left_dist > 0) {
-					//		std::cout << "Thread is running..." << std::endl;
-					//		player_motion.position.x--;
-					//		update_nearest_left_dist = abs(player_motion.position.x - nearest_left_node.position.x);
-
-					//		std::cout << update_nearest_left_dist << std::endl;
-					//		// Break condition for the loop, if necessary.
-					//		// if (some_condition) break;
-					//	}
-
-					//});
-
-					//std::cout << "I GOT HERE 2" << std::endl;
-					//myThread.detach();
-					//std::cout << "I GOT HERE 3" << std::endl;
 				}
 			}
 			else if (key == GLFW_KEY_RIGHT) {
-				if (found_right_node && player_motion.position.x != rightmost_x) {
+				if (found_right_node && player_motion.position.x != rightmost_x && !registry.animations.has(registry.players.entities[0])) {
 					// Move player to the nearest right node if not already at the rightmost node.
 					//player_motion.position.x = nearest_right_node.position.x;
+					
+					// This next line actually just handles the animation because the movement is just an assignment of position 
+					// values, not the velocity thing anymore. This is very hacky and should be fixed at some point. 
 					player_motion.velocity.x = player_speed;
+
+					prev_level = current_level;
+					prev_node.position = player_motion.position;
+
 					current_level = nearest_right_node.level_number;
 					nearest_node = nearest_right_node;
-					// std::cout << "THIS IS RIGHT: " << nearest_right_node.level_number << std::endl;
+
 					registry.players.components[i].level_num = nearest_right_node.level_number;
 
-					dist_remaining = nearest_right_dist;
-					stored_static_dist_remaining = nearest_right_dist;
+					remaining_distance_y = nearest_right_dist;
 
-					
+					dist_remaining = nearest_right_dist;
+
+					// TESTING:
+					std::cout << dist_remaining << std::endl;
+
+					stored_static_dist_remaining = nearest_left_dist;
+
+					addToAnimation(registry.players.entities[0]);
 					
 				}
 			}
@@ -299,7 +303,8 @@ Entity OverworldSystem::addToAnimation(Entity entity) {
 	auto& animation = registry.animations.emplace(entity);
 	animation.start_pos = prev_node.position;
 	animation.end_pos = nearest_node.position;
-	animation.total_ms = 3000.0f;
+
+	animation.total_ms = 1500.0f;
 	animation.current_ms = 0.0f;;
 
 
@@ -308,58 +313,27 @@ Entity OverworldSystem::addToAnimation(Entity entity) {
 
 void OverworldSystem::update_time(float elapsed_time) {
 	curr_time_global_var = elapsed_time;
-	std::cout << "THIS SHOULD BE UPDATEING EVERYTIME??? VALUE of curr_time_global_var: " << curr_time_global_var << std::endl;
+	
 }
 
 
 void OverworldSystem::updatePlayerVelocityTowardsTarget(float elapsed_ms) {
 
 
-	// This function is called in the step function in world_system.cpp
-	// 
-	// I RECENTLY COMMENTED THIS OUT
-	//if (registry.motions.get(registry.players.entities[0]).velocity.x != 0)  {
-	//	float normalized_distance = 1 - (dist_remaining / stored_static_dist_remaining);// starts from 0, goes to 1
-
-	//	// move some distance based on getBezierPath:
-	//	
-	//	vec2 new_dist = getBezierPath(prev_node.position.x, prev_node.position.y, nearest_node.position.x, nearest_node.position.y, normalized_distance);
-
-	//	float dist_travelled = 0.f;
-
-	//	if (registry.motions.has(registry.players.entities[0])) {
-
-	//		dist_travelled = sqrt(pow((new_dist.x - registry.motions.get(registry.players.entities[0]).position.x), 2) + pow((new_dist.y - registry.motions.get(registry.players.entities[0]).position.y), 2));;
-	//		std::cout << "new_dist.x: "<< new_dist.x << std::endl;
-	//		std::cout << "new_dist.y: " << new_dist.y << std::endl;
-	//		registry.motions.get(registry.players.entities[0]).position.x = new_dist.x;
-	//		registry.motions.get(registry.players.entities[0]).position.y = new_dist.y;
-
-	//	}
-
-	//	// update dist_remaining based on dist traveled;
-
-	//	dist_remaining = dist_remaining - dist_travelled;
-	// RECENTLY COMMENTED OUTTT
-
-
-	//}
+	// There used to be functionality that updated position based on getBezierPath, the bezier curve function is now in step() of world_system.cpp
 	
-
+		// THIS IS REALLY IMPORTANT TO SNAP THE CHARACTER TO A THING:
 		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
 			// check using nearest_node from the overworld_system
 			float x_pos_near_left = this->nearest_left_node.position.x;
 
 			// move the player based on bezier:
 			float step_seconds = elapsed_ms / 1000.f;
-
-
-
 			// registry.motions.get(registry.players.entities[0]).position.x = getBezierPath()
+			std::cout << "got here 1" << std::endl;
+			if (10 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
 
-			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-
-
+				std::cout << "got here 2" << std::endl;
 				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
 				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
 
@@ -367,8 +341,10 @@ void OverworldSystem::updatePlayerVelocityTowardsTarget(float elapsed_ms) {
 		}
 		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
 			// check using nearest_node from the overworld_system
+			std::cout << "got here 11" << std::endl;
 			float x_pos_near_right = this->nearest_right_node.position.x;
-			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+			if (10 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+				std::cout << "got here 12" << std::endl;
 				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
 				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
 
@@ -377,10 +353,44 @@ void OverworldSystem::updatePlayerVelocityTowardsTarget(float elapsed_ms) {
 		else {
 			// std::cout << "REACHED ELSE CASE" << std::endl;
 		}
+
+		//if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
+		//	// check using nearest_node from the overworld_system
+		//	float x_pos_near_left = this->nearest_left_node.position.x;
+
+		//	// move the player based on bezier:
+		//	float step_seconds = elapsed_ms / 1000.f;
+		//	// registry.motions.get(registry.players.entities[0]).position.x = getBezierPath()
+
+		//	if (0 == abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+
+
+		//		registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+		//		registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
+
+		//	}
+		//}
+		//else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
+		//	// check using nearest_node from the overworld_system
+		//	float x_pos_near_right = this->nearest_right_node.position.x;
+		//	if (0 ==  abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+		//		registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+		//		registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
+
+		//	}
+		//}
+		//else {
+		//	// std::cout << "REACHED ELSE CASE" << std::endl;
+		//}
 }
 
 // This function takes in 2 points and a float time in range [0, 1] and returns the position in a path  
 vec2 OverworldSystem::getBezierPath(float start_x, float start_y, float end_x, float end_y, float time) {
+
+	std::cout << "start_x: " << start_x << std::endl;
+	std::cout << "start_y: " << start_y << std::endl;
+	std::cout << "end_x: " << end_x << std::endl;
+	std::cout << "end_y: " << end_y << std::endl;
 	// create 4 new values to represent the 2 new points to make this cubic bezier curve:
 
 	// The x values will be equal to the midpoint of start_x and end_x:

@@ -37,6 +37,7 @@ private:
 	StageSystem* stage_system;
 	RenderSystem* renderer;
 	int current_level; // gets updated when handle_movement receives a key press
+	LevelNode* current_levelNode;
 	int prev_level; // stores prev level
 	bool step();
 	//void create_overworld_levels();
