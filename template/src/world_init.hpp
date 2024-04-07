@@ -29,16 +29,12 @@ const float TEXTBOX_HEIGHT = 300.f;
 Entity createChicken(RenderSystem* renderer, vec2 pos);
 // Menu
 Entity createMenu(RenderSystem* renderer, vec2 pos, Entity associated_character);
-// the prey
-Entity createBug(RenderSystem* renderer, vec2 position);
 // minigame
 Entity createCup(RenderSystem* renderer, vec2 pos, float length, float inter_timer);
 // minigame result
 Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_timer, minigame_state mini_res);
 // minigame hit indicator 
 Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini_res);
-// the enemy
-Entity createEagle(RenderSystem* renderer, vec2 position);
 // the real enemy
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
 // the background scroller
@@ -57,8 +53,6 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window);
 Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 scale, float angle);
-// a egg
-Entity createEgg(vec2 pos, vec2 size);
 
 Entity create_chai(RenderSystem* renderer, vec2 pos);
 Entity create_americano(RenderSystem* renderer, vec2 pos);
@@ -69,4 +63,4 @@ Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos);
 Entity create_cutscene_text_box(RenderSystem* renderer, int selection,  vec2 pos, vec2 textPos, std::string text, std::string text2, std::string text3,  float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
 Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character);
 
-Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
+Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage, bool isStatic);

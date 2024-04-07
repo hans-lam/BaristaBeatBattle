@@ -241,8 +241,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		/*if (registry.players.has(player_chicken)) {
 			registry.players.get(player_chicken);
 		}*/
+
+		Motion& motion = registry.motions.get(registry.players.entities[0]);
 		
-		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
+		if (0 > motion.velocity.x) {
 			// check using nearest_node from the overworld_system
 			float x_pos_near_left = overworld_system->nearest_left_node.position.x;
 			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
@@ -251,7 +253,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 			}
 		}
-		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
+		else if (0 < motion.velocity.x) {
 			// check using nearest_node from the overworld_system
 			float x_pos_near_right = overworld_system->nearest_right_node.position.x;
 			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
