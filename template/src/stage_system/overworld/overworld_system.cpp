@@ -175,6 +175,10 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					stored_static_dist_remaining = nearest_left_dist;
 
 					player_motion.velocity.x = -player_speed;
+
+					// Add to animation registry:
+
+					addToAnimation(registry.players.entities[0]);
 					
 
 					// TRYING TO MAKE A LOOP THAT WILL MAKE THE CHARACTER MOVE AND NOT JUST TELEPORT
@@ -213,6 +217,7 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					dist_remaining = nearest_right_dist;
 					stored_static_dist_remaining = nearest_right_dist;
 
+					
 					
 				}
 			}
@@ -288,72 +293,94 @@ void OverworldSystem::handle_tutorial() {
 	}
 }
 
+Entity OverworldSystem::addToAnimation(Entity entity) {
+
+	// Initialize the animation:
+	auto& animation = registry.animations.emplace(entity);
+	animation.start_pos = prev_node.position;
+	animation.end_pos = nearest_node.position;
+	animation.total_ms = 3000.0f;
+	animation.current_ms = 0.0f;;
+
+
+	return entity;
+}
+
+void OverworldSystem::update_time(float elapsed_time) {
+	curr_time_global_var = elapsed_time;
+	std::cout << "THIS SHOULD BE UPDATEING EVERYTIME??? VALUE of curr_time_global_var: " << curr_time_global_var << std::endl;
+}
+
+
 void OverworldSystem::updatePlayerVelocityTowardsTarget(float elapsed_ms) {
 
+
 	// This function is called in the step function in world_system.cpp
-	if (registry.motions.get(registry.players.entities[0]).velocity.x != 0)  {
-		float normalized_distance = 1 - (dist_remaining - 1 / stored_static_dist_remaining);// starts from 0, goes to 1
+	// 
+	// I RECENTLY COMMENTED THIS OUT
+	//if (registry.motions.get(registry.players.entities[0]).velocity.x != 0)  {
+	//	float normalized_distance = 1 - (dist_remaining / stored_static_dist_remaining);// starts from 0, goes to 1
 
-		// move some distance based on getBezierPath:
-		
-		std::pair<float, float> new_dist = getBezierPath(prev_node.position.x, prev_node.position.y, nearest_node.position.x, nearest_node.position.y, normalized_distance);
+	//	// move some distance based on getBezierPath:
+	//	
+	//	vec2 new_dist = getBezierPath(prev_node.position.x, prev_node.position.y, nearest_node.position.x, nearest_node.position.y, normalized_distance);
 
-		float dist_travelled = 0.f;
+	//	float dist_travelled = 0.f;
 
-		if (registry.motions.has(registry.players.entities[0])) {
+	//	if (registry.motions.has(registry.players.entities[0])) {
 
-			dist_travelled = sqrt(pow((new_dist.first - registry.motions.get(registry.players.entities[0]).position.x), 2) + pow((new_dist.second - registry.motions.get(registry.players.entities[0]).position.y), 2));;
-			std::cout << "new_dist.first: "<< new_dist.first << std::endl;
-			std::cout << "new_dist.second: " << new_dist.second << std::endl;
-			registry.motions.get(registry.players.entities[0]).position.x = new_dist.first;
-			registry.motions.get(registry.players.entities[0]).position.y = new_dist.second;
+	//		dist_travelled = sqrt(pow((new_dist.x - registry.motions.get(registry.players.entities[0]).position.x), 2) + pow((new_dist.y - registry.motions.get(registry.players.entities[0]).position.y), 2));;
+	//		std::cout << "new_dist.x: "<< new_dist.x << std::endl;
+	//		std::cout << "new_dist.y: " << new_dist.y << std::endl;
+	//		registry.motions.get(registry.players.entities[0]).position.x = new_dist.x;
+	//		registry.motions.get(registry.players.entities[0]).position.y = new_dist.y;
 
-		}
+	//	}
 
-		// update dist_remaining based on dist traveled;
+	//	// update dist_remaining based on dist traveled;
 
-		dist_remaining = dist_remaining - dist_travelled;
+	//	dist_remaining = dist_remaining - dist_travelled;
+	// RECENTLY COMMENTED OUTTT
 
 
-
-	}
+	//}
 	
 
-	if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
-		// check using nearest_node from the overworld_system
-		float x_pos_near_left = this->nearest_left_node.position.x;
+		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
+			// check using nearest_node from the overworld_system
+			float x_pos_near_left = this->nearest_left_node.position.x;
 
-		// move the player based on bezier:
-		float step_seconds = elapsed_ms / 1000.f;
-
-
-
-		// registry.motions.get(registry.players.entities[0]).position.x = getBezierPath()
-
-		if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+			// move the player based on bezier:
+			float step_seconds = elapsed_ms / 1000.f;
 
 
-			registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-			registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
 
+			// registry.motions.get(registry.players.entities[0]).position.x = getBezierPath()
+
+			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+
+
+				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
+
+			}
 		}
-	}
-	else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
-		// check using nearest_node from the overworld_system
-		float x_pos_near_right = this->nearest_right_node.position.x;
-		if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-			registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-			registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
+		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
+			// check using nearest_node from the overworld_system
+			float x_pos_near_right = this->nearest_right_node.position.x;
+			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
+				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
+				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
 
+			}
 		}
-	}
-	else {
-		// std::cout << "REACHED ELSE CASE" << std::endl;
-	}
+		else {
+			// std::cout << "REACHED ELSE CASE" << std::endl;
+		}
 }
 
 // This function takes in 2 points and a float time in range [0, 1] and returns the position in a path  
-std::pair<float, float> OverworldSystem::getBezierPath(float start_x, float start_y, float end_x, float end_y, float time) {
+vec2 OverworldSystem::getBezierPath(float start_x, float start_y, float end_x, float end_y, float time) {
 	// create 4 new values to represent the 2 new points to make this cubic bezier curve:
 
 	// The x values will be equal to the midpoint of start_x and end_x:
@@ -377,40 +404,40 @@ std::pair<float, float> OverworldSystem::getBezierPath(float start_x, float star
 	   "up" point then becomes the second bezier curve because start_y is above end_y.
 	*/
 
-	// std::pair<float, float> first_bezier; is always just start_x and start_y
-	std::pair<float, float> second_bezier;
-	std::pair<float, float> third_bezier;
-	// std::pair<float, float> fourth_bezier; is always just end_x and end_y
+	// vec2 first_bezier; is always just start_x and start_y
+	vec2 second_bezier = vec2( 0.0f, 0.0f );
+	vec2 third_bezier = vec2(0.0f, 0.0f);
+	// vec2 fourth_bezier; is always just end_x and end_y
 
 
 	if (start_y < end_y) {
-		// second_bezier.first corresponds with the x value 
-		second_bezier.first = down_x;
-		second_bezier.second = down_y;
+		// second_bezier.x corresponds with the x value 
+		second_bezier.x = down_x;
+		second_bezier.y = down_y;
 
-		third_bezier.first = up_x;
-		third_bezier.second = up_y;
+		third_bezier.x = up_x;
+		third_bezier.y = up_y;
 	}
 	else if (end_y < start_y) {
-		second_bezier.first = up_x;
-		second_bezier.first = up_y;
+		second_bezier.x = up_x;
+		second_bezier.y = up_y;
 
-		third_bezier.first = down_x;
-		third_bezier.second = down_y;
+		third_bezier.x = down_x;
+		third_bezier.y = down_y;
 	}
 
 	// getting the x value
 	retval_x = std::pow(1 - time, 3) * start_x +
-		3 * std::pow(1 - time, 2) * time * second_bezier.first +
-		3 * (1 - time) * std::pow(time, 2) * third_bezier.first +
+		3 * std::pow(1 - time, 2) * time * second_bezier.x +
+		3 * (1 - time) * std::pow(time, 2) * third_bezier.x +
 		std::pow(time, 3) * end_x;
 
 	retval_y = std::pow(1 - time, 3) * start_y +
-		3 * std::pow(1 - time, 2) * time * second_bezier.second +
-		3 * (1 - time) * std::pow(time, 2) * third_bezier.second +
+		3 * std::pow(1 - time, 2) * time * second_bezier.y +
+		3 * (1 - time) * std::pow(time, 2) * third_bezier.y +
 		std::pow(time, 3) * end_y;
 
-	std::pair<float, float> retval { retval_x, retval_y };
+	vec2 retval { retval_x, retval_y };
 
 
 	return retval;

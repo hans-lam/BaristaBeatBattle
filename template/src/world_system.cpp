@@ -195,6 +195,7 @@ void WorldSystem::set_fps(float elapsed_ms_since_last_update) {
 	// Updating window title with fps
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
+
 	frames_since_prev_second++;
 
 	if (elapsed_seconds.count() >= 0.5f) {
@@ -232,6 +233,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
+	// to pass time into overworld system.
+	overworld_system->update_time(elapsed_ms_since_last_update);
+
 	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
@@ -243,6 +247,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}*/
 
 		overworld_system->updatePlayerVelocityTowardsTarget(elapsed_ms_since_last_update);
+
+		// This is tied with the addToAnimation() calls in the key press functions in OverworldSystem
+		if (registry.animations.has(registry.players.entities[0])) {
+			for (Entity entity_in_animation : registry.animations.entities) {
+				Animation& animation_component = registry.animations.get(entity_in_animation);
+				Motion& motion_component = registry.motions.get(entity_in_animation);
+				
+				float t = animation_component.current_ms / animation_component.total_ms;
+				std::cout << "I AM GETTING HERE, the value of \"t\" is = " << t << std::endl;
+
+							
+
+
+				vec2 newpos = overworld_system->getBezierPath(animation_component.start_pos.x, animation_component.start_pos.y, animation_component.end_pos.x, animation_component.end_pos.x, t);
+				// std::cout << "I AM GETTING HERE, newpos.x = " << newpos.x << std::endl;
+				// std::cout << "I AM GETTING HERE, newpos.y = " << newpos.y << std::endl;
+				motion_component.position = newpos;
+				
+				animation_component.current_ms += elapsed_ms_since_last_update;
+				
+				std::cout << "This is current_ms value = " << animation_component.current_ms << std::endl;
+
+
+				if (animation_component.current_ms > animation_component.total_ms) {
+					registry.animations.remove(entity_in_animation);
+				}
+			}
+		}
 		
 		
 		// Remove entities that leave the screen on the left side

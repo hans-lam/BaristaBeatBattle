@@ -10,14 +10,20 @@ class OverworldSystem
 public:
 	OverworldSystem(); 
 
+	void update_time(float elapsed_time);
+
+	float curr_time_global_var;
+
 	void init(StageSystem* stage_system_arg);
 
-	void handle_overworld_keys(int key, int action, float player_speed); 
+	void handle_overworld_keys(int key, int action, float player_speed);
 	void updatePlayerVelocityTowardsTarget(float elapsed_ms);
-	std::pair<float, float> getBezierPath(float start_x, float start_y, float end_x, float end_y, float time);
+	vec2 getBezierPath(float start_x, float start_y, float end_x, float end_y, float time);
 
 	LevelNode nearest_left_node;
 	LevelNode nearest_right_node;
+
+	float movement_time = 3.0;
 	
 	LevelNode nearest_node; // used to generalize omg im so sorry this is realyl bad code
 	LevelNode prev_node; //used in the calcualtion of bezier movement
@@ -37,9 +43,12 @@ private:
 	
 
 	// helpers for button presses
-	void handle_player_movement(int key, int action, float player_speed); 
+	void handle_player_movement(int key, int action, float player_speed);
 	//void player_attack();
 	void handle_level_selection();
 	void handle_tutorial();
+
+	// emplaces into animation registry with proper fields.
+	Entity addToAnimation(Entity entity);
 
 };
