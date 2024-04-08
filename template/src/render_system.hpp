@@ -38,7 +38,7 @@ class RenderSystem {
 	GLuint m_font_VAO;
 	GLuint m_font_VBO;
 
-	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+	std::string font_filename = "..//..//..//data//fonts//MonsterFriendFore.otf";
 	unsigned int font_default_size = 24;
 
 	// Make sure these paths remain in sync with the associated enumerators.

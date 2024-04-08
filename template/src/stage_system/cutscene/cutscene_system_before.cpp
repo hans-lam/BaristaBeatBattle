@@ -1,36 +1,36 @@
-#include "cutscene_system.hpp"
+#include "cutscene_system_before.hpp"
 #include "common.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-CutSceneSystem::CutSceneSystem() :
-	cutscene_done(false), 
+CutSceneSystemBefore::CutSceneSystemBefore() :
+	cutscene_done(false),
 	skip_cutscene(false)
 {}
 
-void CutSceneSystem::init(StageSystem* stage_system_arg, RenderSystem * renderer) {
+void CutSceneSystemBefore::init(StageSystem* stage_system_arg, RenderSystem* renderer) {
 	stage_system = stage_system_arg;
 	cutscene_done = false;
 	skip_cutscene = false;
 }
 
-void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
+void CutSceneSystemBefore::handle_cutscene_render(RenderSystem* renderer) {
 	// TODO: Change cutscene done to TRUE after some set amount of time
 	//Entity textBox;
 
 	if (cutscene_currently_rendered == 0) {
 		createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });
 	}
-	
+
 
 	Entity textBox;
 	Entity char1;
 	Entity char2;
-	
+
 
 	if (cutscene_done) {
-		// transition to turn-based
-		std::cout << "GO TO TURN BASED\n";
+		// transition to overworld
+		std::cout << "GO TO Overwolrd\n";
 		skip_cutscene = false;
 		cutscene_done = false;
 		handle_cutscene();
@@ -44,35 +44,35 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 	Entity instructionsText = createText("Press ENTER to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
 	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
 	switch (cutscene_slide) {
-	case 1: 
-		
-		textBox = create_cutscene_text_box(renderer, 1, vec2(750,700 ), vec2(415, 250), " Welcome to Brew Battle Cafe, a bustling place", "filled with beats, baristas, and battles alike  in the never " , " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
+	case 1:
+
+		textBox = create_cutscene_text_box(renderer, 1, vec2(750, 700), vec2(415, 250), " Welcome to Brew Battle Cafe, a bustling place", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
 		//
 		break;
-	case 2: 
-		
+	case 2:
 
-		textBox = create_cutscene_text_box(renderer, 2,  vec2(750, 700), vec2(415, 250), "TEST", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-		
+
+		textBox = create_cutscene_text_box(renderer, 2, vec2(750, 700), vec2(415, 250), "TEST", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
+
 		char1 = createCharPic(renderer, vec2(750, 500));
 		// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 		break;
 	case 3:
 		//registry.renderRequests.get(textBox).shown = false;
 		textBox = create_cutscene_text_box(renderer, 3, vec2(750, 700), vec2(415, 250), "TEST", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-		
+
 
 		char1 = createCharPic(renderer, vec2(750, 500));
 		//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 		break;
 	}
-	
+
 
 	this->cutscene_currently_rendered = cutscene_slide;
 
 }
 
-Entity CutSceneSystem::createCharPic(RenderSystem * renderer, vec2 pos)
+Entity CutSceneSystemBefore::createCharPic(RenderSystem* renderer, vec2 pos)
 {
 
 	auto entity = Entity();
@@ -104,12 +104,12 @@ Entity CutSceneSystem::createCharPic(RenderSystem * renderer, vec2 pos)
 	return entity;
 }
 
-void CutSceneSystem::handle_cutscene_keys(int key, int action) {
+void CutSceneSystemBefore::handle_cutscene_keys(int key, int action) {
 	if (action == GLFW_RELEASE) {
 		if (key == GLFW_KEY_S) {
 			if (cutscene_done) {
 				// transition to turn-based
-				std::cout << "GO TO TURN BASED\n";
+				std::cout << "GO TO overworld\n";
 				skip_cutscene = false;
 				cutscene_done = false;
 				handle_cutscene();
@@ -124,7 +124,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 				printf("You entered: %d", cutscene_slide);
 			}
 			if (cutscene_slide >= 4) {
-				std::cout << "GO TO TURN BASED\n";
+				std::cout << "GO TO overworld\n";
 				skip_cutscene = false;
 				cutscene_done = false;
 				handle_cutscene();
@@ -133,7 +133,7 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 		}
 
 		if (key == GLFW_KEY_SPACE) {
- 			if (!skip_cutscene) {
+			if (!skip_cutscene) {
 				std::cout << "SKIP CUTSCENE\n";
 				skip_cutscene = true;
 			}
@@ -145,9 +145,10 @@ void CutSceneSystem::handle_cutscene_keys(int key, int action) {
 	}
 }
 
-void CutSceneSystem::handle_cutscene() {
+void CutSceneSystemBefore::handle_cutscene() {
 	cutscene_currently_rendered = 0;
 
-	stage_system->set_stage(StageSystem::Stage::turn_based);
+
+	stage_system->set_stage(StageSystem::Stage::overworld);
 }
 
