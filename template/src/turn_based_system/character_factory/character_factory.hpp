@@ -20,4 +20,4 @@ public:
 
 int does_character_data_already_exist(Entity entity, std::string name);
 
-extern CharacterFactory character_factory;
+extern CharacterFactory* character_factory;
