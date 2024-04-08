@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = 0.80;
+const double HIT_CHANCE = 0.0; // originally 0.80, changed for miss testing
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
@@ -141,8 +141,8 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 
 		//ability->process_ability(caller, receiving_character);
 	double chance_hit = ((double)rand()) / RAND_MAX;
+	Entity caller_entity = get_entity_given_character(caller);
 	if (ability->get_ability_name() == "rest" || chance_hit < HIT_CHANCE) {
-		Entity caller_entity = get_entity_given_character(caller);
 		
 		if (registry.attackTimers.has(caller_entity) && ability->get_ability_name() != "rest") {
 			// registry.injuryTimers.remove(receiving_entity);
@@ -190,6 +190,9 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	}
 	else {
 		std::cout << caller->get_name() << " Missed!" << '\n';
+		if (!registry.missTimers.has(caller_entity)) {
+			registry.missTimers.emplace(caller_entity);
+		}
 	}
 
 	active_character = emptyEntity;
