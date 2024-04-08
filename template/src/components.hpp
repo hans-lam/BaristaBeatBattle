@@ -332,6 +332,7 @@ struct RenderRequest {
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool shown = false;
+	bool isStatic = false;
 };
 
 
@@ -342,5 +343,6 @@ struct TextRenderRequest {
 	vec3 color;
 	glm::mat4 trans;
 	bool shown = false;
+	bool isStatic = false;
 };
 

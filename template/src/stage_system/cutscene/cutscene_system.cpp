@@ -41,8 +41,8 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer) {
 		return;
 	}
 
-	Entity instructionsText = createText("Press N to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene);
+	Entity instructionsText = createText("Press N to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, false);
+	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, false);
 	switch (cutscene_slide) {
 	case 1: 
 		
