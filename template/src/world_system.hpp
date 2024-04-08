@@ -84,7 +84,7 @@ private:
 	float current_speed;
 	float player_speed;
 	float next_eagle_spawn;
-	float next_bug_spawn;
+	float next_sparkle_spawn;
 	float next_enemy_spawn;
 	Entity player_chicken;
 	int stage;
