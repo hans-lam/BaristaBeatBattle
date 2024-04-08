@@ -162,7 +162,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg, StageSystem* stage_system_arg,
 	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
-	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg) {
+	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg, CutSceneSystemBefore* cutscene_system_before_arg) {
 	// Global Systems Set up
 	this->renderer = renderer_arg;
 	this->turn_based = turn_based_arg;
@@ -174,6 +174,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
 	this->minigame_system = minigame_system_arg;
+	this->cutscene_system_before = cutscene_system_before_arg;
 
 	// Playing background music indefinitely
 	Mix_PlayMusic(main_menu_music, -1);
@@ -183,7 +184,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
 	stage_music_map[StageSystem::Stage::overworld] = background_music;
 	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
-
+	stage_music_map[StageSystem::Stage::cutscene_before] = cutscene_music;
 	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music; 
 	stage_music_map[StageSystem::Stage::minigame] = minigame_select_music;
 
@@ -376,6 +377,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	}
 
+	// Handle beginning cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene_before) {
+		cutscene_system_before->handle_cutscene_render(renderer);
+
+	}
+
 	// Handle minigame stepping
 	if (curr_stage == StageSystem::Stage::minigame) {
 		if (minigame_system->get_not_started()) {
@@ -458,6 +465,7 @@ void WorldSystem::restart_game() {
 	main_menu_system->init(stage_system);
 	overworld_system->init(stage_system);
 	cutscene_system->init(stage_system, renderer);
+	cutscene_system_before->init(stage_system, renderer);
 	combat_system->init(stage_system, turn_based);
 	minigame_system->init(stage_system, renderer);
 
@@ -637,6 +645,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		break;
 	case StageSystem::Stage::cutscene:
 		cutscene_system->handle_cutscene_keys(key, action);
+		break;
+	case StageSystem::Stage::cutscene_before:
+		cutscene_system_before->handle_cutscene_keys(key, action);
 		break;
 	case StageSystem::Stage::turn_based: {
 		CombatSystem::SoundMapping play_sound = combat_system->handle_turnbased_keys(key, action);

@@ -14,6 +14,7 @@
 #include "stage_system/main_menu/main_menu_system.hpp"
 #include "stage_system/overworld/overworld_system.hpp"
 #include "stage_system/cutscene/cutscene_system.hpp"
+#include "stage_system/cutscene/cutscene_system_before.hpp"
 #include "stage_system/combat/combat_system.hpp"
 #include "stage_system/combat/minigame_system.hpp"
 
@@ -28,6 +29,7 @@ int main()
 	MainMenuSystem main_menu_system;
 	OverworldSystem overworld_system;
 	CutSceneSystem cutscene_system;
+	CutSceneSystemBefore cutscene_system_before;
 	CombatSystem combat_system;
 	MinigameSystem minigame_system;
 
@@ -50,7 +52,7 @@ int main()
 	turn_based.init(&ai_system);
 	stage_system.init();
 	world.init(&renderer, &turn_based, &stage_system, &main_menu_system, 
-		&overworld_system, &cutscene_system, &combat_system, &minigame_system);
+		&overworld_system, &cutscene_system, &combat_system, &minigame_system, &cutscene_system_before);
 
 	// setup fonts 
 	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
