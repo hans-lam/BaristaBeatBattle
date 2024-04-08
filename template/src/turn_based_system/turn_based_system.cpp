@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = 0.80;
+const double HIT_CHANCE = 0.85;
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
@@ -74,7 +74,7 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		duration = (std::clock() - enemy_await) / (double)CLOCKS_PER_SEC;
 
-		if (duration < 0.50) return;
+		if (duration < 0.25) return;
 
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
 
