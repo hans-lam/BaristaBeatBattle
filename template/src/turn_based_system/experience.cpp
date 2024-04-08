@@ -16,6 +16,10 @@ void ExperienceManager::apply_experience(Entity character_entity, int experience
 }
 
 void ExperienceManager::level_up_character(Entity character_entity) {
+	if (!registry.levelUpTimers.has(character_entity)) {
+		registry.levelUpTimers.emplace(character_entity);
+	}
+
 	Character* character_data = registry.characterDatas.get(character_entity).characterData;
 
 	character_data->curr_experience_points -= EXPERIENCE_REQUIRED_TO_LEVEL;

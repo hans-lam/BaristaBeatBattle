@@ -344,6 +344,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		if (registry.sparkles.has(entity)) {
 			Sparkle& sparkle = registry.sparkles.get(entity);
 			motion.velocity += sparkle.acceleration;
+			motion.angle += M_PI / 12.f;
 			//motion.position.x = sin(step_seconds * 2.f * M_PI);
 		}
 		motion.position += motion.velocity * step_seconds;

@@ -206,6 +206,11 @@ struct MissTimer
 	float counter_ms = 2000;
 };
 
+struct LevelUpTimer
+{
+	float counter_ms = 3000;
+};
+
 struct MiniGameTimer
 {
 	float counter_ms = 12000;

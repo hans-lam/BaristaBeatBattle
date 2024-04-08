@@ -56,6 +56,7 @@ public:
 	ComponentContainer<CutsceneSlideComp> cutsceneSlideComp;
 	ComponentContainer<Sparkle> sparkles;
 	ComponentContainer<MissTimer> missTimers;
+	ComponentContainer<LevelUpTimer> levelUpTimers;
 
 
 	// constructor that adds all containers for looping over them
@@ -106,6 +107,7 @@ public:
 		registry_list.push_back(&cutsceneSlideComp);
 		registry_list.push_back(&sparkles);
 		registry_list.push_back(&missTimers);
+		registry_list.push_back(&levelUpTimers);
 		
 	}
 
