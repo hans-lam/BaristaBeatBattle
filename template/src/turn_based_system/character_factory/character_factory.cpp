@@ -200,6 +200,34 @@ Entity CharacterFactory::construct_enemy(Entity entity, int level) {
 	return entity;
 }
 
+Entity CharacterFactory::construct_tutorial_enemy(Entity entity) {
+	std::string name = "Tutorial Enemy";
+	unsigned int enemy_max_health = 45;
+	unsigned int enemy_strength = 15;
+	unsigned int enemy_magic = 1;
+	unsigned int enemy_defense = 1;
+	unsigned int enemy_magic_resist = 8;
+	unsigned int enemy_speed = 7;
+
+	CharacterStatSheet* character_stat = new CharacterStatSheet(name, enemy_max_health, enemy_strength, enemy_magic, enemy_defense, enemy_magic_resist, enemy_speed);
+
+	Ability* basic_attack = ability_factory->construct_basic_attack();
+
+
+	Character* enemy_character_obj = new Character(name, character_stat);
+	enemy_character_obj->add_ability(basic_attack);
+	enemy_character_obj->level = 5;
+
+	CharacterData characterData = CharacterData();
+	characterData.characterData = enemy_character_obj;
+	registry.characterDatas.emplace(entity, characterData);
+
+	return entity;
+}
+
+
+
+
 
 int does_character_data_already_exist(Entity entity, std::string name) {
 	// look to see if there is a stored character

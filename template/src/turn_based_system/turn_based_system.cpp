@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = 0.80;
+const double HIT_CHANCE = 0.95;
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
@@ -64,7 +64,17 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 		waiting_for_player = true;
 
 	}
-	else {
+	else {	
+
+		double duration;
+
+		if (enemy_await == NULL) {
+			enemy_await = std::clock();
+		}
+
+		duration = (std::clock() - enemy_await) / (double)CLOCKS_PER_SEC;
+
+		if (duration < 0.50) return;
 
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
 
@@ -73,8 +83,9 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		std::cout << ai_character->get_name() << "'s targeting " << target_character->get_name() << " best they have the lowest health!" << "\n";
 
-		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
+		int outcome = process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
 	
+		enemy_await = NULL;
 
 	}
 

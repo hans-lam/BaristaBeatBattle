@@ -378,8 +378,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		if (out_of_combat) {
-			combat_system->set_selected_level(stage_system->get_current_level());
-			combat_system->handle_level(renderer);
+
+			if (registry.turnBasedEnemies.size() >= 1) {
+				combat_system->handle_combat_over();
+			}
+			else {
+				combat_system->set_selected_level(stage_system->get_current_level());
+				combat_system->handle_level(renderer);
+			}
+
+			
 		}
 		else {
 			combat_system->handle_turn_rendering();

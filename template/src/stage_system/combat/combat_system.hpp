@@ -34,6 +34,8 @@ public:
 
 	void handle_minigame_attack(Entity active_char, int score);
 
+	void handle_combat_over();
+
 	void set_selected_level(int level) {
 		this->selected_level = (CombatLevel)(level - 1);
 	}
@@ -46,8 +48,6 @@ private:
 	void init_combat_data_for_level(RenderSystem* renderer, Level* level);
 
 	void handle_tutorial();
-
-	void handle_combat_over();
 
 	SoundMapping handle_menu(int key);
 

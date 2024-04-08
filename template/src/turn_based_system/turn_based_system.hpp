@@ -11,7 +11,10 @@
 #include "../world_init.hpp"
 #include "experience.hpp"
 #include "flag_progression.hpp"
-
+#include <chrono>
+#include <thread>
+#include <cstdio>
+#include <ctime>
 
 class TurnBasedSystem {
 	
@@ -49,6 +52,8 @@ private:
 	AISystem* ai_system;
 
 	int current_level;
+
+	std::clock_t enemy_await = NULL;
 
 };
 
