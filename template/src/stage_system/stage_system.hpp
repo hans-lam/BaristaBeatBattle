@@ -43,8 +43,6 @@ public:
 		this->current_level = current_level;
 	}
 
-	bool is_london_recruited = false;
-
 private: 
 	void set_main_menu();
 

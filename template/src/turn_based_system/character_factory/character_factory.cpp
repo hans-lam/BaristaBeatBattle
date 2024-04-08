@@ -218,4 +218,4 @@ int does_character_data_already_exist(Entity entity, std::string name) {
 	return false;
 }
 
-CharacterFactory character_factory;
+CharacterFactory* character_factory = new CharacterFactory();

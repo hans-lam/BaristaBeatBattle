@@ -523,7 +523,7 @@ Entity create_chai(RenderSystem* renderer, vec2 pos) {
 
 
 	// give entity turn based components
-	character_factory.construct_chai(entity);
+	character_factory->construct_chai(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
@@ -555,7 +555,7 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	rr.shown = true;
 
 	// give entity turn based components
-	character_factory.construct_americano(entity);
+	character_factory->construct_americano(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
@@ -588,7 +588,7 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	rr.shown = true;
 
 	// give entity turn based components
-	character_factory.construct_earl(entity);
+	character_factory->construct_earl(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
@@ -621,7 +621,7 @@ Entity create_london(RenderSystem* renderer, vec2 pos) {
 			GEOMETRY_BUFFER_ID::PLAYER });
 
 	// give entity turn based components
-	character_factory.construct_london(entity);
+	character_factory->construct_london(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
@@ -653,7 +653,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	rr.shown = true;
 
 	// give entity turn based components
-	character_factory.construct_enemy(entity, level);
+	character_factory->construct_enemy(entity, level);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
