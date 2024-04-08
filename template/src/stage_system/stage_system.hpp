@@ -34,6 +34,8 @@ public:
 
 	void set_render_shown(Entity entity, bool show_render, bool tutorial);
 
+	void render_clean_up(Entity entity);
+
 	int get_current_level() {
 		return this->current_level;
 	}
@@ -41,8 +43,6 @@ public:
 	void set_current_level(int current_level) {
 		this->current_level = current_level;
 	}
-
-	bool is_london_recruited = false;
 
 private: 
 	void set_main_menu();

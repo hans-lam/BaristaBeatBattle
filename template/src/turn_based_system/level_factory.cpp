@@ -6,7 +6,6 @@ const int VERTICAL_SPACE_BETWEEN_ALLIES = 150;
 const int VERTICAL_SPACE_BETWEEN_ENEMIES = 150;
 
 LevelFactory::LevelFactory() {
-	this->is_london_recruited = false;
 }
 	
 
@@ -124,7 +123,7 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	level_five->enemies.push_back(level_two_ground_b);
 	level_five->enemies.push_back(level_two_ground_c);
 
-	if (this->is_london_recruited) {
+	if (flag_progression->is_london_recruited) {
 		Entity london = create_london(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 3) });
 		level_five->allies.push_back(london);
 	}
@@ -145,8 +144,6 @@ Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_
 	level_six->allies.push_back(chai_entity);
 	level_six->allies.push_back(earl_entity);
 	level_six->allies.push_back(americano_entity);
-
-	// TODO ADD LONDON
 
 	Entity level_three_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 3);
 	Entity level_three_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 3);

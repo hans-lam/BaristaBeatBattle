@@ -339,7 +339,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			float y_pos = motion.position.y + (motion.velocity.y * step_seconds);
 			if (y_pos <= BG_HEIGHT) motion.velocity.y *= -1.f;
 		}
-		motion.position += motion.velocity * step_seconds;
+		//motion.position += motion.velocity * step_seconds;
 		// (void)elapsed_ms; // placeholder to silence unused warning until implemented
 	}
 

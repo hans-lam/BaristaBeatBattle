@@ -25,15 +25,15 @@ void MinigameSystem::init(StageSystem* stage_system_arg, RenderSystem* renderer_
 
 	// Minigame texts
 	minigame_text_map[cool_it] = createText("Cool It!", { x_center - 400, y_center },
-		1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame); 
+		1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true); 
 	minigame_text_map[pour_it] = createText("Pour It!", { x_center, y_center },
-		1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+		1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
 	minigame_text_map[milk_it] = createText("Milk It!", { x_center + 400, y_center },
-		1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+		1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
 
 	// Create game selection screen's title
 	minigame_select_title = createText("Choose your minigame:", { x_center - 225, y_center + 200 },
-		2.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+		2.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
 }
 
 void MinigameSystem::handle_set_rhythm() {
@@ -106,7 +106,7 @@ void MinigameSystem::load_cool_it() {
 		while (getline(myfile, line)) {
 			// Create text instructions for game 
 			Entity current_text = createText(line, { 10, initial_y },
-				1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+				1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 			registry.textRenderRequests.get(current_text).shown = true;
 			initial_y -= 25;
 
@@ -117,7 +117,7 @@ void MinigameSystem::load_cool_it() {
 	myfile.close();
 
 	render_text_map["practice"] = createText("Currently in PRACTICE MODE. Press 'S' to start!", {10, 10},
-		1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+		1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 	registry.textRenderRequests.get(render_text_map["practice"]).shown = true;
 
 	// create the normal state cup
@@ -464,7 +464,7 @@ void MinigameSystem::handle_minigame_key(int key, int action) {
 						"You get two measures to get the timing, good luck!";
 					// add score text
 					render_text_map["score"] = createText("Score: " + std::to_string(score), {window_width_px - 125, window_height_px - 25},
-						1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame);
+						1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 					registry.textRenderRequests.get(render_text_map["score"]).shown = true;
 
 					// reset timer for key presses

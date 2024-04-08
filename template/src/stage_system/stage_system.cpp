@@ -77,6 +77,27 @@ void StageSystem::set_render_shown(Entity entity, bool show_render, bool tutoria
 	}
 }
 
+void StageSystem::render_clean_up(Entity entity) {
+	if (registry.renderRequests.has(entity)) {
+		RenderRequest& rr = registry.renderRequests.get(entity);
+		if (rr.isStatic) {
+			set_render_shown(entity, false, false);
+		}
+		else {
+			registry.remove_all_components_of(entity);
+		}
+	}
+	else if (registry.textRenderRequests.has(entity)) {
+		TextRenderRequest& trr = registry.textRenderRequests.get(entity); 
+		if (trr.isStatic) {
+			set_render_shown(entity, false, false);
+		}
+		else {
+			registry.remove_all_components_of(entity);
+		}
+	}
+}
+
 void StageSystem::set_main_menu()
 {
 	// Set all main menu entities to be shown 
@@ -86,30 +107,30 @@ void StageSystem::set_main_menu()
 
 	// Set all overworld entities to not be shown
 	for (Entity entity : registry.overWorld.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set all entites from turn_based to not be shown
 	for (Entity entity : registry.turnBased.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set all entities from cutscene to not be shown
 	for (Entity entity : registry.cutscenes.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set turn based entities to not be rendered
 	for (Entity entity : registry.turnBased.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set all minigame based entities to not be shown
 	for (Entity entity : registry.miniStage.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 	for (Entity entity : registry.miniGame.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 }
 
@@ -133,7 +154,7 @@ void StageSystem::set_overworld()
 
 	// Set all entites from turn_based to not be shown
 	for (Entity entity : registry.turnBased.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 }
 
@@ -143,7 +164,7 @@ void StageSystem::set_cutscene(int level_num)
 	// Set all overworld entities to not be shown
 	// Keep entities live since we still might need them
 	for (Entity entity : registry.overWorld.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set all cutscene entities to be shown; 
@@ -176,15 +197,15 @@ void StageSystem::set_turn_based(int level_num)
 	
 	// Remove all components from cutscenes
 	for (Entity entity : registry.cutscenes.entities) {
-		registry.remove_all_components_of(entity);
+		render_clean_up(entity);
 	}
 
 	// Set all minigame based entities to not be shown
 	for (Entity entity : registry.miniStage.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 	for (Entity entity : registry.miniGame.entities) {
-		set_render_shown(entity, false, false);
+		render_clean_up(entity);
 	}
 
 	// Set turn based entities to be rendered
