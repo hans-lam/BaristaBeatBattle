@@ -2,25 +2,35 @@
 
 const string PATH_TO_SAVE_FILE = "../../../data/persistence/";
 
-void DataManager::write_data(std::string file_name, int current_level, vector<Character*> character_datas, bool is_london_recruited) {
+void DataManager::write_data(std::string file_name, vector<Character*> character_datas, FlagProgression* flags) {
 
 	StringBuffer s;
 	Writer<StringBuffer> writer(s);
 
 	writer.StartObject();
 
-	write_general_game_data(&writer, current_level, is_london_recruited);
+	write_general_game_data(&writer, flags);
 	write_party_members(&writer, character_datas);
 	writer.EndObject();
 
 	handle_file_write(file_name, s.GetString());
 }
 
-void DataManager::write_general_game_data(Writer<StringBuffer>* writer, int current_level, bool is_london_recruited) {
-	writer->Key("current_level");
-	writer->Int(current_level);
+void DataManager::write_general_game_data(Writer<StringBuffer>* writer, FlagProgression* flags) {
+	writer->Key("is_level_one_complete");
+	writer->Bool(flags->is_level_one_complete);
+	writer->Key("is_level_two_complete");
+	writer->Bool(flags->is_level_two_complete);
+	writer->Key("is_level_two_complete");
+	writer->Bool(flags->is_level_three_complete);
+	writer->Key("is_level_three_complete");
+	writer->Bool(flags->is_level_three_complete);
+	writer->Key("is_level_four_complete");
+	writer->Bool(flags->is_level_four_complete);
+	writer->Key("is_level_five_complete");
+	writer->Bool(flags->is_level_five_complete);
 	writer->Key("is_london_recruited");
-	writer->Bool(is_london_recruited);
+	writer->Bool(flags->is_london_recruited);
 }
 
 void DataManager::write_party_members(Writer<StringBuffer>* writer, vector<Character*> character_datas) {
@@ -55,19 +65,43 @@ void DataManager::write_party_members(Writer<StringBuffer>* writer, vector<Chara
 	writer->EndArray();
 }
 
-void DataManager::read_data(string file_name, StageSystem* stage_system) {
+void DataManager::read_data(string file_name, FlagProgression* flags) {
 	Document doc = handle_file_read(file_name);
 
-	if (doc.HasMember("current_level") && doc["current_level"].IsInt()) {
-		int current_level = doc["current_level"].GetInt();
-		std::cout << "Current Level: " << current_level << std::endl;
-		stage_system->set_current_level(current_level);
+	if (doc.HasMember("is_level_one_complete") && doc["is_level_one_complete"].IsBool()) {
+		int is_level_one_complete = doc["is_level_one_complete"].GetBool();
+		std::cout << "is_level_one_complete: " << is_level_one_complete << std::endl;
+		flags->is_level_one_complete = is_level_one_complete;
+	}
+
+	if (doc.HasMember("is_level_two_complete") && doc["is_level_two_complete"].IsBool()) {
+		int is_level_two_complete = doc["is_level_two_complete"].GetBool();
+		std::cout << "is_level_two_complete: " << is_level_two_complete << std::endl;
+		flags->is_level_two_complete = is_level_two_complete;
+	}
+
+	if (doc.HasMember("is_level_three_complete") && doc["is_level_three_complete"].IsBool()) {
+		int is_level_three_complete = doc["is_level_three_complete"].GetBool();
+		std::cout << "is_level_three_complete: " << is_level_three_complete << std::endl;
+		flags->is_level_three_complete = is_level_three_complete;
+	}
+
+	if (doc.HasMember("is_level_four_complete") && doc["is_level_four_complete"].IsBool()) {
+		int is_level_four_complete = doc["is_level_four_complete"].GetBool();
+		std::cout << "is_level_four_complete: " << is_level_four_complete << std::endl;
+		flags->is_level_four_complete = is_level_four_complete;
+	}
+
+	if (doc.HasMember("is_level_five_complete") && doc["is_level_five_complete"].IsBool()) {
+		int is_level_five_complete = doc["is_level_five_complete"].GetBool();
+		std::cout << "is_level_five_complete: " << is_level_five_complete << std::endl;
+		flags->is_level_five_complete = is_level_five_complete;
 	}
 
 	if (doc.HasMember("is_london_recruited") && doc["is_london_recruited"].IsBool()) {
 		int is_london_recruited = doc["is_london_recruited"].GetBool();
 		std::cout << "Is Londond Recruited? " << is_london_recruited << std::endl;
-		stage_system->is_london_recruited = is_london_recruited;
+		flags->is_london_recruited = is_london_recruited;
 	}
 
 	if (doc.HasMember("party_member_data")

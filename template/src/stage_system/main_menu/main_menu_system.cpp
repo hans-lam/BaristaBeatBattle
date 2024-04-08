@@ -16,13 +16,13 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	selected_option = new_game;
 	tutorial_on = false;
 	const int basex = window_width_px / 2 - 200;
-	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
-	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
-	menu_text_map[save_game] = createText("Save Game", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
-	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
-	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	menu_text_map[save_game] = createText("Save Game", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 
-	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 300,window_height_px / 2 + 100 }, 3.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu);
+	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 300,window_height_px / 2 + 100 }, 3.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 }
 
 void MainMenuSystem::handle_menu_keys(int key, int action) {
@@ -72,9 +72,9 @@ void MainMenuSystem::handle_option()
 	case load_game:
 		// popup game load option
 		printf("load_game: ");
-		data_manager->read_data("barista_beat_battle_save_data.json", stage_system);
+		data_manager->read_data("barista_beat_battle_save_data.json", flag_progression);
 		// TODO: show feedback to screen
-		feedback = createText("Done Loading!", { 10,10 }, 0.9f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu);
+		feedback = createText("Done Loading!", { 10,10 }, 0.9f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 		for (Entity& e : registry.persistanceFeedbackTimer.entities) {
 			if (registry.textRenderRequests.has(e)) {
 				registry.textRenderRequests.remove(e);
@@ -96,7 +96,7 @@ void MainMenuSystem::handle_option()
 
 		}
 
-		data_manager->write_data("barista_beat_battle_save_data.json", 1, curr_characters, stage_system->is_london_recruited);
+		data_manager->write_data("barista_beat_battle_save_data.json", curr_characters, flag_progression);
 
 		// TODO: show feedback to screen
 		for (Entity& e : registry.persistanceFeedbackTimer.entities) {
@@ -104,18 +104,18 @@ void MainMenuSystem::handle_option()
 				registry.textRenderRequests.remove(e);
 			}
 		}
-		feedback = createText("Done Saving!", { 10,10 }, 0.9f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu);
+		feedback = createText("Done Saving!", { 10,10 }, 0.9f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 		registry.persistanceFeedbackTimer.clear();
 		registry.persistanceFeedbackTimer.emplace(feedback);
 		break;
 	case tutorials:
 		if (tutorial_on == false) {
 			tutorial_on = true;
-			tutorial.push_back(createText("Welcome to our game! To get started, use the enter key and up down buttons", {10, 870}, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
-			tutorial.push_back(createText("1) use the enter key and up down buttons to make a selection", { 10, 840 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
-			tutorial.push_back(createText("2) click on \'NEW GAME\' ", { 10, 810 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
-			tutorial.push_back(createText("3) select a level on the overworld ", { 10, 780 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
-			tutorial.push_back(createText("      with the left and right buttons", { 10, 750 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu));
+			tutorial.push_back(createText("Welcome to our game! To get started, use the enter key and up down buttons", {10, 870}, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
+			tutorial.push_back(createText("1) use the enter key and up down buttons to make a selection", { 10, 840 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
+			tutorial.push_back(createText("2) click on \'NEW GAME\' ", { 10, 810 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
+			tutorial.push_back(createText("3) select a level on the overworld ", { 10, 780 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
+			tutorial.push_back(createText("      with the left and right buttons", { 10, 750 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
 		} else if (tutorial_on) {
 			
 			tutorial_on = false;

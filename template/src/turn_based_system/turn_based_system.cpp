@@ -200,9 +200,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
 
-
 		return 2;
-
 	}
 
 	if (are_all_enemies_defeated()) {
@@ -212,13 +210,13 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 		return 1;
 	}
 
-	// TODO CREATE A FLAG SYSTEM
 	if (registry.turnBasedEnemies.size() == 1) {
 		Entity turn_based_enemy_entity = registry.turnBasedEnemies.entities[0];
 		Character* turn_based_enemy = registry.characterDatas.get(turn_based_enemy_entity).characterData;
 		if (turn_based_enemy->get_name() == "London") {
 			out_of_combat = true;
 			printf("London was the last enemy alive and has been recruited!");
+			flag_progression->is_london_recruited = true;
 			return 1;
 		}
 	}

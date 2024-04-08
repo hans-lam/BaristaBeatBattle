@@ -40,7 +40,10 @@ public:
 	ComponentContainer<TurnBased> turnBased;
 	ComponentContainer<MiniStage> miniStage;
 	ComponentContainer<MiniGameVisualizer> miniGameVisual;
+
+	// OVERWORLD COMPONENTS
 	ComponentContainer<LevelNode> levelNode;
+	ComponentContainer<Animation> animations;
 
 	// TURN BASED COMPONENTS
 	ComponentContainer<CharacterData> characterDatas;
@@ -82,6 +85,8 @@ public:
 		registry_list.push_back(&miniStage);
 		registry_list.push_back(&miniGameVisual);
 		registry_list.push_back(&levelNode);
+		registry_list.push_back(&animations);
+
 
 		registry_list.push_back(&characterDatas);
 		registry_list.push_back(&turnBasedEnemies);

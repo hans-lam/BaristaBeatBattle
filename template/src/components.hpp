@@ -29,6 +29,16 @@ struct TutorialBoard {
 
 };
 
+// This struct is just so I can have a nice curve in the motion of the player. 
+// We add this component to the entity when it moves and then it helps process the animation. 
+
+struct Animation {
+	float current_ms = 0.f;
+	float total_ms;
+	vec2 start_pos;
+	vec2 end_pos;
+};
+
 struct LevelNode
 {
 	vec2 position;
@@ -322,6 +332,7 @@ struct RenderRequest {
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 	bool shown = false;
+	bool isStatic = false;
 };
 
 
@@ -332,5 +343,6 @@ struct TextRenderRequest {
 	vec3 color;
 	glm::mat4 trans;
 	bool shown = false;
+	bool isStatic = false;
 };
 
