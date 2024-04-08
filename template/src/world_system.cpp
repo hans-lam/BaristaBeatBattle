@@ -51,6 +51,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(minigame_practice_metronome);
 	if (minigame_music != nullptr)
 		Mix_FreeMusic(minigame_music); 
+	if (pour_it_music != nullptr)
+		Mix_FreeMusic(pour_it_music);
 
 	// Destroy sound effect components
 	if (change_selection_effect != nullptr)
@@ -134,6 +136,7 @@ GLFWwindow* WorldSystem::create_window() {
 	minigame_select_music = Mix_LoadMUS(audio_path("minigame_select.wav").c_str());
 	minigame_practice_metronome = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
+	pour_it_music = Mix_LoadMUS(audio_path("pour_it.wav").c_str());
 	// load sound effects
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
@@ -414,16 +417,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			if (minigame_system->get_practice()) {
 				// playing practice "music"
 				if (!(minigame_system->practice_music_start)) {
-					Mix_PlayMusic(minigame_practice_metronome, -1);
-					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					switch (minigame_system->get_selected_game()) {
+					case minigame_system->Minigame::cool_it: {
+						Mix_PlayMusic(minigame_practice_metronome, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+						break;
+					}
+					case minigame_system->Minigame::pour_it: {
+						Mix_PlayMusic(pour_it_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.25);
+						break;
+					}
+					}
 					minigame_system->practice_music_start = true;
 				}
 			}
 			else {
 				// playing minigame "music"
 				if (!(minigame_system->minigame_music_start)) {
-					Mix_PlayMusic(minigame_music, -1);
-					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					switch (minigame_system->get_selected_game()) {
+					case minigame_system->Minigame::cool_it: {
+						Mix_PlayMusic(minigame_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+						break;
+					}
+					case minigame_system->Minigame::pour_it: {
+						break;
+					}
+					}
 					minigame_system->minigame_music_start = true;
 				}
 			}

@@ -31,7 +31,56 @@ Entity createChicken(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer) {
+Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer, std::string sprite) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	// Place in minigame
+	registry.miniGame.emplace(entity);
+	// Place in minigame timer for ryhthym calcs
+	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
+	mgt.counter_ms = rhythm_length; 
+	mgt.inter_timer = inter_timer;
+
+	switch (sprite[0]) {
+	// cup case
+	case 'c': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECUP,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+		break;
+	}
+	// kettle case
+	case 'k': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::KETTLENORM,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ KETTLE_WIDTH, KETTLE_HEIGHT });
+		break;
+	}
+	}
+
+	return entity;
+}
+
+Entity createSpeech(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -43,17 +92,14 @@ Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float in
 	motion.position = pos;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+	motion.scale = vec2({ SPEECH_WIDTH, SPEECH_HEIGHT });
 
 	// Place in minigame
 	registry.miniGame.emplace(entity);
-	// Place in minigame timer for ryhthym calcs
-	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
-	mgt.counter_ms = rhythm_length; 
-	mgt.inter_timer = inter_timer;
+
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::MINIGAMECUP,
+		{ TEXTURE_ASSET_ID::MINISPEECH,
 		EFFECT_ASSET_ID::TEXTURED,
 		GEOMETRY_BUFFER_ID::SPRITE }
 	);
