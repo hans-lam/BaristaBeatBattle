@@ -155,13 +155,15 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	Entity caller_entity = get_entity_given_character(caller);
 	if (ability->get_ability_name() == "rest" || chance_hit < HIT_CHANCE) {
 		
-		if (registry.attackTimers.has(caller_entity) && ability->get_ability_name() != "rest") {
-			// registry.injuryTimers.remove(receiving_entity);
-			AttackTimer& attack = registry.attackTimers.get(caller_entity);
-			attack.counter_ms = 700.f;
-		}
-		else {
-			registry.attackTimers.emplace(caller_entity);
+		if (ability->get_ability_name() != "rest") {
+			if (registry.attackTimers.has(caller_entity)) {
+				// registry.injuryTimers.remove(receiving_entity);
+				AttackTimer& attack = registry.attackTimers.get(caller_entity);
+				attack.counter_ms = 700.f;
+			}
+			else {
+				registry.attackTimers.emplace(caller_entity);
+			}
 		}
 		
 		for (Character* receiving_character : recipients) {
@@ -217,14 +219,14 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	if (are_all_allies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
-
+		this->end_of_game_wait = std::clock();
 		return 2;
 	}
 
 	if (are_all_enemies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You won the fight!!");
-
+		this->end_of_game_wait = std::clock();
 		return 1;
 	}
 
@@ -235,6 +237,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 			out_of_combat = true;
 			printf("London was the last enemy alive and has been recruited!");
 			flag_progression->is_london_recruited = true;
+			this->end_of_game_wait = std::clock();
 			return 1;
 		}
 	}

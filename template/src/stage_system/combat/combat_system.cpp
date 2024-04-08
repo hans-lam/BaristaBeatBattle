@@ -182,10 +182,6 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 				flag_progression->is_london_recruited = true;
 			}
 
-			// delete all enemies	
-			handle_combat_over();
-			// move selected level to next level
-			//selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
 		}
 	}
 

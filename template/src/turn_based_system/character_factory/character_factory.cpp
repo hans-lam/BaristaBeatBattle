@@ -191,7 +191,7 @@ Entity CharacterFactory::construct_enemy(Entity entity, int level) {
 
 	Character* enemy_character_obj = new Character(name, character_stat);
 	enemy_character_obj->add_ability(basic_attack);
-	enemy_character_obj->level = level;
+	enemy_character_obj->level = level * 2;
 
 	CharacterData characterData = CharacterData();
 	characterData.characterData = enemy_character_obj;

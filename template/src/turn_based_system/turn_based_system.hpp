@@ -43,12 +43,14 @@ public:
 
 	HealthBarFill& get_health_bar_given_entity(Entity receiving_character);
 
+	std::clock_t end_of_game_wait = NULL;
+
 private:
 
 	Entity active_character = emptyEntity;
 	
 	bool waiting_for_player = false;
-
+	
 	AISystem* ai_system;
 
 	int current_level;

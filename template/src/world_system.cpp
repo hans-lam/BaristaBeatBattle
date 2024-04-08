@@ -443,8 +443,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 		if (out_of_combat) {
 
-			if (registry.turnBasedEnemies.size() >= 1) {
-				combat_system->handle_combat_over();
+			
+
+			if (registry.turnBasedEnemies.size() >= 1 || registry.partyMembers.size() >= 1) {
+
+
+				double duration;
+
+				duration = (std::clock() - turn_based->end_of_game_wait) / (double)CLOCKS_PER_SEC;
+
+				if (duration > 3.00 && registry.levelUpTimers.size() == 0 ) {
+					turn_based->end_of_game_wait = NULL;
+					combat_system->handle_combat_over();
+				}
+				
 			}
 			else {
 				combat_system->set_selected_level(stage_system->get_current_level());
