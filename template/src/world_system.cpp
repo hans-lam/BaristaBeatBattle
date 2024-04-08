@@ -379,7 +379,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		// sparkles are emitted downwards while miss timers are on
-		float min_miss_counter_ms = 2000.f;
+		float min_miss_counter_ms = 1000.f;
 		for (Entity entity : registry.missTimers.entities) {
 			// progress timer, 
 			MissTimer& counter = registry.missTimers.get(entity);
@@ -400,6 +400,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// stop spawning sparkles
 			if (counter.counter_ms < 0) {
 				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+				registry.remove_all_components_of(counter.associated_text);
 				registry.missTimers.remove(entity);
 			}
 		}
@@ -426,6 +427,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// stop spawning sparkles
 			if (counter.counter_ms < 0) {
 				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+				registry.remove_all_components_of(counter.associated_text);
 				registry.levelUpTimers.remove(entity);
 			}
 		}

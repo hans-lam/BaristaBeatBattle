@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = 0.0; // originally 0.80, changed for miss testing
+const double HIT_CHANCE = 0.80; // originally 0.80, changed for miss testing
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
@@ -191,7 +191,11 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	else {
 		std::cout << caller->get_name() << " Missed!" << '\n';
 		if (!registry.missTimers.has(caller_entity)) {
-			registry.missTimers.emplace(caller_entity);
+			MissTimer& miss = registry.missTimers.emplace(caller_entity);
+			Motion& caller_motion = registry.motions.get(caller_entity);
+			Entity miss_text = createText("MISS!", vec2(caller_motion.position.x + 50.f, window_height_px - caller_motion.position.y), 0.7f, vec3(1.0f, 0.0f, 0.0f), mat4(1.0f), StageSystem::Stage::turn_based, false);
+			registry.textRenderRequests.get(miss_text).shown = true;
+			miss.associated_text = miss_text;
 		}
 	}
 

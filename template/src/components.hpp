@@ -203,12 +203,14 @@ struct InjuredTimer
 
 struct MissTimer
 {
-	float counter_ms = 2000;
+	float counter_ms = 1000;
+	Entity associated_text;
 };
 
 struct LevelUpTimer
 {
 	float counter_ms = 3000;
+	Entity associated_text;
 };
 
 struct MiniGameTimer
