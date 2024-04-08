@@ -26,35 +26,7 @@ Entity createChicken(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::PLAYER });
-
-	return entity;
-}
-
-Entity createBug(RenderSystem* renderer, vec2 position)
-{
-	// Reserve en entity
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// Initialize the position, scale, and physics components
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.velocity = { 0, 50 };
-	motion.position = position;
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -BUG_BB_WIDTH, BUG_BB_HEIGHT });
-
-	// Create an (empty) Bug component to be able to refer to all bug
-	registry.eatables.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::BUG,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+	rr.isStatic = true;
 
 	return entity;
 }
@@ -182,34 +154,6 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 	return entity;
 }
 
-Entity createEagle(RenderSystem* renderer, vec2 position)
-{
-	auto entity = Entity();
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// Initialize the motion
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.velocity = { 0, 100.f };
-	motion.position = position;
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
-
-	// Create and (empty) Eagle component to be able to refer to all eagles
-	registry.deadlys.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::EAGLE,
-		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
-
-	return entity;
-}
-
 
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 {
@@ -271,7 +215,7 @@ Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
-	Entity level_text = createText(std::to_string(level_num), position - vec2(0,200), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld);
+	Entity level_text = createText(std::to_string(level_num), position - vec2(0,200), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld, false);
 	registry.textRenderRequests.get(level_text).shown = true;
 
 	return entity;
@@ -362,6 +306,7 @@ Entity createBackgroundScroller(RenderSystem* renderer, vec2 position) {
 		{ TEXTURE_ASSET_ID::BGSCROLL,
 		 EFFECT_ASSET_ID::BACKGROUND,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.isStatic = true;
 
 	return entity;
 }
@@ -400,6 +345,8 @@ Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLi
 			 EFFECT_ASSET_ID::FOREGROUND,
 			 GEOMETRY_BUFFER_ID::SPRITE });
 	}
+	RenderRequest& rr = registry.renderRequests.get(entity);
+	rr.isStatic = true;
 
 	return entity;
 }
@@ -422,11 +369,12 @@ Entity createBackgroundBattle(RenderSystem* renderer, vec2 position) {
 
 	registry.turnBased.emplace(entity);
 	registry.backgrounds.emplace(entity);
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::BGBATTLE,
 		 EFFECT_ASSET_ID::BATTLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.isStatic = true;
 
 	return entity;
 }
@@ -482,6 +430,7 @@ Entity createMainMenu(RenderSystem* renderer, vec2 position) {
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
+	rr.isStatic = true;
 	
 	return entity;
 }
@@ -519,6 +468,9 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 
 	registry.tutorials.emplace(entity);
 
+	RenderRequest& rr = registry.renderRequests.get(entity);
+	rr.isStatic = true;
+
 	return entity;
 }
 
@@ -543,30 +495,6 @@ Entity createLine(vec2 position, vec2 scale, float angle)
 	registry.debugComponents.emplace(entity);
 	return entity;
 }
-
-Entity createEgg(vec2 pos, vec2 size)
-{
-	auto entity = Entity();
-
-	// Setting initial motion values
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = pos;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = size;
-
-	// Create and (empty) Chicken component to be able to refer to all eagles
-	registry.deadlys.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::EGG,
-			GEOMETRY_BUFFER_ID::EGG });
-
-	return entity;
-}
-
-
 
 Entity create_chai(RenderSystem* renderer, vec2 pos) {
 
@@ -734,7 +662,7 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	return entity;
 }
 
-Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
+Entity createText(std::string text, vec2 position, float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage, bool isStatic) {
 	auto entity = Entity();
 	auto& textRenderRequest = registry.textRenderRequests.emplace(entity);
 	textRenderRequest.text = text;
@@ -761,9 +689,10 @@ Entity createText(std::string text, vec2 position, float scale, vec3 color, glm:
 		break;
 	case StageSystem::Stage::minigame:
 		registry.miniStage.emplace(entity);
-		// textRenderRequest.shown = true;
 		break;
 	}
+
+	textRenderRequest.isStatic = isStatic;
 
 	return entity;
 }

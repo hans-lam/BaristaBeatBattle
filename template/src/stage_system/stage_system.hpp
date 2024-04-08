@@ -33,6 +33,8 @@ public:
 
 	void set_render_shown(Entity entity, bool show_render, bool tutorial);
 
+	void render_clean_up(Entity entity);
+
 	int get_current_level() {
 		return this->current_level;
 	}

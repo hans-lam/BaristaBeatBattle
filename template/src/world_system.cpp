@@ -195,6 +195,7 @@ void WorldSystem::set_fps(float elapsed_ms_since_last_update) {
 	// Updating window title with fps
 	std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
 	std::chrono::duration<float> elapsed_seconds = current_time - last_frame_time;
+
 	frames_since_prev_second++;
 
 	if (elapsed_seconds.count() >= 0.5f) {
@@ -232,6 +233,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
+	// to pass time into overworld system.
+	overworld_system->update_time(elapsed_ms_since_last_update);
+
 	// Handle overworld stepping
 	next_enemy_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (curr_stage == StageSystem::Stage::overworld) {
@@ -241,28 +245,49 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		/*if (registry.players.has(player_chicken)) {
 			registry.players.get(player_chicken);
 		}*/
+
+
+		// This is tied with the addToAnimation() calls in the key press functions in OverworldSystem
+		if (registry.animations.has(registry.players.entities[0])) {
+			for (Entity entity_in_animation : registry.animations.entities) {
+				Animation& animation_component = registry.animations.get(entity_in_animation);
+				Motion& motion_component = registry.motions.get(entity_in_animation);
+				
+				float t = animation_component.current_ms / animation_component.total_ms;
+
+				vec2 newpos = overworld_system->getBezierPath(animation_component.start_pos.x, animation_component.start_pos.y, animation_component.end_pos.x, animation_component.end_pos.y, t);
+				// std::cout << "I AM GETTING HERE, newpos.x = " << newpos.x << std::endl;
+				// std::cout << "I AM GETTING HERE, newpos.y = " << newpos.y << std::endl;
+
+				std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
+				std::cout << newpos.x << ", " << newpos.y << std::endl;
+
+				motion_component.position = newpos;
+				
+				animation_component.current_ms += elapsed_ms_since_last_update;
+				
+
+
+				if (animation_component.current_ms > animation_component.total_ms) {
+					std::cout << "HERE ARE SOME STATS: " << std::endl;
+					std::cout << "I came from this level: " << overworld_system->prev_node.level_number << std::endl;
+
+					std::cout << "The position of this previous thing is: " << "(" << overworld_system->prev_node.position.x << ", " << overworld_system->prev_node.position.y << ")" << std::endl;
+					//std::cout << " " << << std::endl;
+
+					overworld_system->nearest_node.position = motion_component.position;
+
+					std::cout << "I am now at this level: " << overworld_system->nearest_node.level_number << std::endl;
+					std::cout << "The position of this current thing is: " << "(" << overworld_system->nearest_node.position.x << ", " << overworld_system->nearest_node.position.y << ")" << std::endl;
+					//std::cout << " " << << std::endl;
+
+					overworld_system->updatePlayerVelocityTowardsTarget(elapsed_ms_since_last_update);
+
+					registry.animations.remove(entity_in_animation);
+				}
+			}
+		}
 		
-		if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
-			// check using nearest_node from the overworld_system
-			float x_pos_near_left = overworld_system->nearest_left_node.position.x;
-			if (2 > abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
-
-			}
-		}
-		else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
-			// check using nearest_node from the overworld_system
-			float x_pos_near_right = overworld_system->nearest_right_node.position.x;
-			if (2 > abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-				registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-				registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
-
-			}
-		}
-		else {
-			// std::cout << "REACHED ELSE CASE" << std::endl;
-		}
 		
 		// Remove entities that leave the screen on the left side
 		// Iterate backwards to be able to remove without unterfering with the next object to visit
@@ -439,11 +464,23 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 		
 		for (int i = 0; i < num_levels; i++) {
 			// 1500 is window_width_px
-			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 600);
-			Entity test = createLevelNode(renderer, i+1, levelpos);
+			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
 
+			std::cout << "HERE IS THE COORDINATE OF LEVEL: " << (i + 1) << std::endl;
+			std::cout << levelpos.x << ", " << levelpos.y << std::endl;
+
+
+			Entity level = createLevelNode(renderer, i+1, levelpos);
+			
+			
+			// TODO // set the first levelnode to 3 just for testing, DELETE AND FIX THIS LATERRRRR:
+			if (i == 2) {
+				std::cout << "This should only run once: " << "i = 0" << std::endl;
+				overworld_system->prev_node = registry.levelNode.get(level);
+			}
+			
 		}
-		//std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
+		
 	}
 }
 // Reset the world state to its initial state

@@ -262,7 +262,7 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 			registry.textRenderRequests.remove(e);
 		}
 	}
-	Entity level_text = createText("Level " + std::to_string(level->level_number), {window_width_px / 2 - 100, window_height_px - 50}, 1.3f, vec3(1.0f, 1.0f, 1.0f), mat4(1.0f), StageSystem::Stage::turn_based);
+	Entity level_text = createText("Level " + std::to_string(level->level_number), {window_width_px / 2 - 100, window_height_px - 50}, 1.3f, vec3(1.0f, 1.0f, 1.0f), mat4(1.0f), StageSystem::Stage::turn_based, false);
 	registry.textRenderRequests.get(level_text).shown = true;
 
 	int j = 0;
