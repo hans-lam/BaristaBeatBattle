@@ -11,7 +11,10 @@
 #include "../world_init.hpp"
 #include "experience.hpp"
 #include "flag_progression.hpp"
-
+#include <chrono>
+#include <thread>
+#include <cstdio>
+#include <ctime>
 
 class TurnBasedSystem {
 	
@@ -40,15 +43,19 @@ public:
 
 	HealthBarFill& get_health_bar_given_entity(Entity receiving_character);
 
+	std::clock_t end_of_game_wait = NULL;
+
 private:
 
 	Entity active_character = emptyEntity;
 	
 	bool waiting_for_player = false;
-
+	
 	AISystem* ai_system;
 
 	int current_level;
+
+	std::clock_t enemy_await = NULL;
 
 };
 
