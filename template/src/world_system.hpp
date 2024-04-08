@@ -98,6 +98,7 @@ private:
 	Mix_Music* minigame_practice_metronome;
 	Mix_Music* minigame_music;
 	Mix_Music* pour_it_music;
+	Mix_Music* milk_it_music;
 
 	// Sound Effects
 	Mix_Chunk* change_selection_effect;

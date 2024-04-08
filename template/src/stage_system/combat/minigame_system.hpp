@@ -75,6 +75,10 @@ private:
 	void handle_pour();
 	bool step_pour(float elapsed_ms_since_last_update);
 
+	void set_milk_color(vec3 color);
+	void handle_milk();
+	bool step_milk(float elapsed_ms_since_last_update);
+
 	bool not_started; 
 	StageSystem* stage_system; 
 	RenderSystem* renderer;
@@ -88,6 +92,10 @@ private:
 	glm::vec3 selected_color = glm::vec3(0.0, 1.0, 0.0);
 	// black
 	glm::vec3 not_selected_color = glm::vec3(0, 0, 0);
+	// white
+	glm::vec3 milk_selected_color = glm::vec3(1.0, 1.0, 1.0);
+	// red
+	glm::vec3 milk_result_color = glm::vec3(1.0, 0.0, 0.0);
 	const int x_center = window_width_px / 2 - 100;
 	const int y_center = window_height_px / 2;
 
@@ -112,4 +120,31 @@ private:
 	// for pour
 	int target_pour = 0;
 	int prev_pour = 0;
+	// for milk
+	enum RiddleOption {A, B, C, D};
+	std::string options_arr[4] = { "A", "B", "C", "D" };
+	struct Riddle {
+		std::string answer;
+		std::string question;
+		std::string options[4];
+	};
+	Riddle rid1 = {
+		"B", "What percentage of the world is lactose intolerant?",
+		{"57%", "68%", "76%", "85%"}
+	};
+	Riddle rid2 = {
+		"D", "Which country is the world's largest producer of milk?",
+		{"USA", "France", "Italy", "India"}
+	};
+	Riddle rid3 = {
+		"C", "How much milk do is required to make a pound of cheese?",
+		{"20 lbs", "15 lbs", "10 lbs", "5 lbs"}
+	};
+	Riddle rid4 = {
+		"A", "How big is the milky way's diamater (in light years)?",
+		{"1e5", "1e7", "1e10", "1e12"}
+	};
+	Riddle riddles_arr[4] = { rid1, rid2, rid3, rid4 };
+	Riddle current_riddle;
+	RiddleOption chosen_answer;
 };

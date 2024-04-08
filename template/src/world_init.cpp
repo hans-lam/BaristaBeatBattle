@@ -75,6 +75,10 @@ Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, flo
 		motion.scale = vec2({ KETTLE_WIDTH, KETTLE_HEIGHT });
 		break;
 	}
+	case 'm': {
+		registry.motions.remove(entity);
+		break;
+	}
 	}
 
 	return entity;

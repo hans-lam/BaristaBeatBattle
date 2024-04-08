@@ -37,7 +37,7 @@ void MinigameSystem::init(StageSystem* stage_system_arg, RenderSystem* renderer_
 		{ x_center - 400, y_center - 300}, 1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
 	minigame_desc_map[pour_it] = createText("A gambling minigame where you must pour the right amount of tea/coffee!",
 		{ x_center - 450, y_center - 300 }, 1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
-	minigame_desc_map[milk_it] = createText("A guessing minigame where you must guess the right type of milk to use!",
+	minigame_desc_map[milk_it] = createText("A trivia minigame where you must find the right type of milk to use!",
 		{ x_center - 450, y_center - 300 }, 1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, true);
 
 	// Create game selection screen's title
@@ -83,11 +83,6 @@ void MinigameSystem::handle_game_selection() {
 		break;
 	case milk_it:
 		load_milk_it();
-		// Reset initial values
-		reset_values(false);
-		initialized = false;
-
-		stage_system->set_stage(StageSystem::Stage::turn_based);
 		break;
 	}
 
@@ -117,7 +112,10 @@ void MinigameSystem::read_game_desc(Minigame chosen_game) {
 		x_pos = x_center - 300;
 		break;
 	case milk_it:
-		myfile.open("..//..//..//src//stage_system//combat//pour_it_description.txt");
+		myfile.open("..//..//..//src//stage_system//combat//milk_it_description.txt");
+		initial_y = y_center + 200;
+		y_spacing = 50;
+		x_pos = x_center - 300;
 		break;
 	}
 
@@ -183,7 +181,15 @@ void MinigameSystem::load_pour_it() {
 }
 
 void MinigameSystem::load_milk_it() {
-	printf("POUR IT NOT IMPLEMENTED YET SORRY!");
+	// Set description_text
+	read_game_desc(milk_it);
+
+	render_text_map["practice"] = createText("Press 'S' when you're ready to start!", { x_center - 225, 50 },
+		1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+	registry.textRenderRequests.get(render_text_map["practice"]).shown = true;
+
+	// create no rendered entity
+	createMainMini(renderer, { 0, 0 }, 15000, 2000, "milk");
 }
 
 void MinigameSystem::set_current_text_and_desc(vec3 color, bool shown) {
@@ -192,6 +198,11 @@ void MinigameSystem::set_current_text_and_desc(vec3 color, bool shown) {
 
 	TextRenderRequest& desc_trr = registry.textRenderRequests.get(minigame_desc_map[selected_game]);
 	desc_trr.shown = shown;
+}
+
+void MinigameSystem::set_milk_color(vec3 color) {
+	TextRenderRequest& text_trr = registry.textRenderRequests.get(render_text_map[options_arr[chosen_answer]]);
+	text_trr.color = color; 
 }
 
 void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
@@ -204,6 +215,10 @@ void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
 	}
 	case pour_it: {
 		ended = step_pour(elapsed_ms_since_last_update);
+		break;
+	}
+	case milk_it: {
+		ended = step_milk(elapsed_ms_since_last_update);
 		break;
 	}
 	}
@@ -407,7 +422,7 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 
 				if (mgt.inter_timer <= 0) {
 					if (!practice) {
-						// delete the cup
+						// delete the kettle
 						registry.remove_all_components_of(entity);
 
 						ended = true;
@@ -453,6 +468,61 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 			}
 			else if (x.first == "prev_poured") {
 				trr.text = "Previous Amount Poured: " + std::to_string(prev_pour) + " mL";
+			}
+		}
+	}
+
+	return ended;
+}
+
+bool MinigameSystem::step_milk(float elapsed_ms_since_last_update) {
+	bool ended = false;
+	float current_ms = 0.0;
+
+	// check if we should be starting the timer decrement
+	if (!practice) {
+		for (Entity entity : registry.miniGameTimer.entities) {
+			MiniGameTimer& mgt = registry.miniGameTimer.get(entity);
+
+			if (mgt.counter_ms > 0) {
+				mgt.counter_ms -= elapsed_ms_since_last_update;
+
+				// game should move to win/lose screen if timer hits 0
+				if (mgt.counter_ms < 0) {
+					mgt.counter_ms = 0;
+					// handle whether or not user won/lost
+					handle_milk();
+				}
+
+				current_ms = mgt.counter_ms;
+			}
+
+
+			if (mgt.cup_state == minigame_state::dead) {
+				mgt.inter_timer -= elapsed_ms_since_last_update;
+
+				if (mgt.inter_timer <= 0) {
+					if (!practice) {
+						// delete the nothing
+						registry.remove_all_components_of(entity);
+
+						ended = true;
+
+						// load an attack on enemies
+						loaded = true;
+					}
+				}
+			}
+		}
+	}
+
+	// Change timer text
+	if (!ended) {
+		for (auto const& x : render_text_map) {
+			if (x.first == "timer") {
+				if (registry.textRenderRequests.has(x.second)) {
+					registry.textRenderRequests.get(x.second).text = "Timer: " + std::to_string(current_ms / 1000) + "s";
+				}
 			}
 		}
 	}
@@ -667,6 +737,32 @@ void MinigameSystem::handle_pour() {
 	registry.textRenderRequests.get(render_text_map["speech"]).text = "Currently pouring!";
 }
 
+void MinigameSystem::handle_milk() {
+	// remove previous text
+	for (auto const& x : render_text_map) {
+		registry.remove_all_components_of(x.second);
+	}
+
+	for (Entity entity : registry.miniGameTimer.entities) {
+		MiniGameTimer& mgt = registry.miniGameTimer.get(entity);
+		mgt.inter_timer = 2000.f;
+		mgt.cup_state = minigame_state::dead;
+
+		if (current_riddle.answer == options_arr[chosen_answer]) {
+			render_text_map["result"] = createText("YOU WIN!", { x_center - 50, y_center},
+				2.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+			score = 3;
+		}
+		else {
+			render_text_map["result"] = createText("YOU LOSE", { x_center - 50, y_center},
+				2.5f, milk_result_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+			score = 0;
+		}
+
+		registry.textRenderRequests.get(render_text_map["result"]).shown = true;
+	}
+}
+
 void MinigameSystem::start_minigame() {
 	switch (selected_game) {
 	case cool_it: {
@@ -726,6 +822,51 @@ void MinigameSystem::start_minigame() {
 
 		break;
 	}
+	case milk_it: {
+		// change the practice text 
+		TextRenderRequest& practiceText = registry.textRenderRequests.get(render_text_map["practice"]);
+		practiceText.text = "Use left/right to choose, enter to confirm!";
+		practiceText.position = { 10, 10 };
+
+		// remove previous text
+		for (auto const& x : render_text_map) {
+			if (!(x.first == "practice")) {
+				registry.remove_all_components_of(x.second);
+			}
+		}
+
+		// add riddle text
+		srand(time(0));
+		int current_riddle_ind = rand() % 4;
+		current_riddle = riddles_arr[current_riddle_ind];
+		render_text_map["question"] = createText(current_riddle.question, { x_center / 2, y_center + 200 },
+			1.0f, not_selected_color, glm::mat4(2.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["question"]).shown = true;
+
+		// add answers text
+		render_text_map["A"] = createText("A: " + current_riddle.options[0], {x_center/2 + 100, y_center},
+			1.0f, milk_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["A"]).shown = true;
+		render_text_map["B"] = createText("B: " + current_riddle.options[1], { x_center/2 + 300, y_center },
+			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["B"]).shown = true;
+		render_text_map["C"] = createText("C: " + current_riddle.options[2], { x_center/2 + 500, y_center},
+			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["C"]).shown = true;
+		render_text_map["D"] = createText("D: " + current_riddle.options[3], { x_center/2 + 700, y_center},
+			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["D"]).shown = true;
+
+		// add timer text
+		render_text_map["timer"] = createText("Time: 15.00s", { window_width_px - 175, window_height_px - 25 },
+			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		registry.textRenderRequests.get(render_text_map["timer"]).shown = true;
+
+		// default value for chosen_answer is A
+		chosen_answer = A;
+
+		break;
+	}
 	}
 }
 
@@ -763,6 +904,30 @@ void MinigameSystem::handle_minigame(int key) {
 			stage_system->set_stage(StageSystem::Stage::turn_based);
 		}
 		break;
+	}
+	case milk_it: {
+		switch(key) {
+		case GLFW_KEY_LEFT: {
+			set_milk_color(not_selected_color);
+
+			chosen_answer = static_cast<RiddleOption>(((chosen_answer - 1) % (D + 1) + (D + 1)) % (D + 1));
+
+			set_milk_color(milk_selected_color);
+			break;
+		}
+		case GLFW_KEY_RIGHT: {
+			set_milk_color(not_selected_color);
+
+			chosen_answer = static_cast<RiddleOption>((chosen_answer + 1) % (D + 1));
+
+			set_milk_color(milk_selected_color);
+			break;
+		}
+		case GLFW_KEY_ENTER: {
+			handle_milk();
+			break;
+		}
+		}
 	}
 	}
 }

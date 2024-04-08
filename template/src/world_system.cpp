@@ -53,6 +53,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(minigame_music); 
 	if (pour_it_music != nullptr)
 		Mix_FreeMusic(pour_it_music);
+	if (milk_it_music != nullptr)
+		Mix_FreeMusic(milk_it_music);
 
 	// Destroy sound effect components
 	if (change_selection_effect != nullptr)
@@ -137,6 +139,7 @@ GLFWwindow* WorldSystem::create_window() {
 	minigame_practice_metronome = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
 	pour_it_music = Mix_LoadMUS(audio_path("pour_it.wav").c_str());
+	milk_it_music = Mix_LoadMUS(audio_path("milk_it.wav").c_str());
 	// load sound effects
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
@@ -428,6 +431,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.25);
 						break;
 					}
+					case minigame_system->Minigame::milk_it: {
+						Mix_PlayMusic(milk_it_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.25);
+						break;
+					}
 					}
 					minigame_system->practice_music_start = true;
 				}
@@ -442,6 +450,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 						break;
 					}
 					case minigame_system->Minigame::pour_it: {
+						break;
+					}
+					case minigame_system->Minigame::milk_it: {
 						break;
 					}
 					}
