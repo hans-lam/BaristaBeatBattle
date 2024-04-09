@@ -259,8 +259,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// std::cout << "I AM GETTING HERE, newpos.x = " << newpos.x << std::endl;
 				// std::cout << "I AM GETTING HERE, newpos.y = " << newpos.y << std::endl;
 
-				std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
-				std::cout << newpos.x << ", " << newpos.y << std::endl;
+				//std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
+				//std::cout << newpos.x << ", " << newpos.y << std::endl;
 
 				motion_component.position = newpos;
 				
@@ -269,17 +269,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 				if (animation_component.current_ms > animation_component.total_ms) {
-					std::cout << "HERE ARE SOME STATS: " << std::endl;
-					std::cout << "I came from this level: " << overworld_system->prev_node.level_number << std::endl;
-
-					std::cout << "The position of this previous thing is: " << "(" << overworld_system->prev_node.position.x << ", " << overworld_system->prev_node.position.y << ")" << std::endl;
-					//std::cout << " " << << std::endl;
-
-					overworld_system->nearest_node.position = motion_component.position;
-
-					std::cout << "I am now at this level: " << overworld_system->nearest_node.level_number << std::endl;
-					std::cout << "The position of this current thing is: " << "(" << overworld_system->nearest_node.position.x << ", " << overworld_system->nearest_node.position.y << ")" << std::endl;
-					//std::cout << " " << << std::endl;
+					
 
 					overworld_system->updatePlayerVelocityTowardsTarget(elapsed_ms_since_last_update);
 
@@ -466,16 +456,13 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 			// 1500 is window_width_px
 			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
 
-			std::cout << "HERE IS THE COORDINATE OF LEVEL: " << (i + 1) << std::endl;
-			std::cout << levelpos.x << ", " << levelpos.y << std::endl;
 
 
 			Entity level = createLevelNode(renderer, i+1, levelpos);
 			
 			
 			// TODO // set the first levelnode to 3 just for testing, DELETE AND FIX THIS LATERRRRR:
-			if (i == 2) {
-				std::cout << "This should only run once: " << "i = 0" << std::endl;
+			if (i == 0) {
 				overworld_system->prev_node = registry.levelNode.get(level);
 			}
 			
