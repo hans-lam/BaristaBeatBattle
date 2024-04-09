@@ -25,7 +25,7 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 
 	tutorial.push_back(createText("Welcome to our game! To get started, use the enter key and up down buttons", { 10, 870 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
 	tutorial.push_back(createText("1) use the enter key and up down buttons to make a selection", { 10, 840 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
-	tutorial.push_back(createText("2) click on \'NEW GAME\' ", { 10, 810 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
+	tutorial.push_back(createText("2) click on \'START GAME\' ", { 10, 810 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
 	tutorial.push_back(createText("3) select a level on the overworld ", { 10, 780 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
 	tutorial.push_back(createText("      with the left and right buttons", { 10, 750 }, 1.0f, glm::vec3(1.0, 0.4, 0.4), glm::mat4(1.0f), StageSystem::Stage::main_menu, true));
 }
