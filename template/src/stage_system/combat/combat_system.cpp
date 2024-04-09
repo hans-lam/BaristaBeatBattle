@@ -38,38 +38,39 @@ CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int acti
 void CombatSystem::handle_level(RenderSystem* renderer) {
 	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
 	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-	Level* level;
+	Level* level = nullptr;
+
 	switch (selected_level) {
 	case level_two:
 		// Need to switch this up once more create levels are implemented
 		level = level_factory->construct_level_two(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_three:
 		level = level_factory->construct_level_three(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_four:
 		level = level_factory->construct_level_four(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_five:
 		level = level_factory->construct_level_five(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_six:
 		level = level_factory->construct_level_six(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_seven:
 		level = level_factory->construct_level_seven(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	default:
 		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	}
+
+	// band-aid fix for initialization bug of selected_level
+	/*if (level == nullptr) {
+		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
+	}*/
+
+	init_combat_data_for_level(renderer, level);
 
 	turn_based->start_encounter(level);
 }
@@ -285,7 +286,7 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 	}
 	attack_text = createText("attack", {0,0}, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 	rest_text = createText("rest", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
-	pourit_text = createText("pourit", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	magic_text = createText("magic", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 
 }
 
@@ -353,7 +354,7 @@ void CombatSystem::handle_turn_rendering() {
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
 					Motion& motion = registry.motions.get(pourIt);
-					TextRenderRequest& trr = registry.textRenderRequests.get(pourit_text);
+					TextRenderRequest& trr = registry.textRenderRequests.get(magic_text);
 					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}

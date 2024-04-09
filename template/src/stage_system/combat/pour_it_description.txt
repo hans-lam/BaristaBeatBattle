@@ -1,0 +1,8 @@
+Welcome to Pour It! The goal of this minigame:
+to 'pour' the right amount of hot water. You will need
+to press 'D' to start pouring a random amount of water.
+After every pour, the kettle will tell you how much
+more water they need! Pour too much, and you'll spill!
+If you spill, you will get 0 points. Otherwise, your
+score is based on how close you are to the right amount.
+Press 'E' to end the mini-game early.
