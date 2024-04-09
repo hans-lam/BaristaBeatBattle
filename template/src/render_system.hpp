@@ -94,7 +94,7 @@ class RenderSystem {
 			textures_path("cutsceneBox3.png"),
 			textures_path("earlgrey.png"),
 			textures_path("americano.png"),
-      textures_path("sparkle.png"),
+			textures_path("sparkle.png"),
 			textures_path("level_1_sprite.png"),
 			textures_path("level_2_sprite.png"),
 			textures_path("level_3_sprite.png"),
