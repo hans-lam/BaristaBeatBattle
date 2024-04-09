@@ -375,8 +375,8 @@ void CombatSystem::handle_turn_rendering() {
 				if (registry.textRenderRequests.has(rest_text)) {
 					registry.textRenderRequests.get(rest_text).shown = false;
 				}
-				if (registry.textRenderRequests.has(pourit_text)) {
-					registry.textRenderRequests.get(pourit_text).shown = false;
+				if (registry.textRenderRequests.has(magic_text)) {
+					registry.textRenderRequests.get(magic_text).shown = false;
 				}
 			}
 
