@@ -845,7 +845,7 @@ Entity create_sparkle(RenderSystem* renderer, vec2 pos, vec2 vel, vec2 acc, vec3
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::SPARKLE,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::SPARKLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
