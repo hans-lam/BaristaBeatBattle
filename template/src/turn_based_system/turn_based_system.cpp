@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = 0.85;
+const double HIT_CHANCE = 0.85; // 0.85
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;

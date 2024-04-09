@@ -394,7 +394,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Motion& motion = registry.motions.get(entity);
 				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, -40.f);
 				vec2 sparkle_acc = vec2(0.f, uniform_dist(rng) * 10.f);
-				create_sparkle(renderer, sparkle_pos, vec2(0.0f, 50.f), sparkle_acc, vec3(1.f, 0.f, 0.f));
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, 20.f), sparkle_acc, vec3(1.f, 0.f, 0.f));
 			}
 
 			// stop spawning sparkles
@@ -421,7 +421,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				Motion& motion = registry.motions.get(entity);
 				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, 40.f);
 				vec2 sparkle_acc = vec2(0.f, -uniform_dist(rng) * 10.f);
-				create_sparkle(renderer, sparkle_pos, vec2(0.0f, -50.f), sparkle_acc, vec3(0.f, 0.5f, 0.5f));
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, -20.f), sparkle_acc, vec3(0.f, 0.5f, 0.5f));
 			}
 
 			// stop spawning sparkles
