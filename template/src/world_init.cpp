@@ -197,25 +197,53 @@ Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
 	auto& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = vec2(0.f,0.f);
-	motion.position = position;
+	motion.position = position + vec2(0, 100);
 
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+	motion.scale = vec2({ -100, 100});
 
 	registry.overWorld.emplace(entity);
 	auto& levelNode = registry.levelNode.emplace(entity);
 	levelNode.position = position;
 	levelNode.level_number = level_num;
 
+
+	// Based on the value of level_num, set the appropriate TEXTURE_ASSET_ID
+	TEXTURE_ASSET_ID textureId;
+	switch (level_num) {
+	case 1:
+		textureId = TEXTURE_ASSET_ID::LEVEL1;
+		break;
+	case 2:
+		textureId = TEXTURE_ASSET_ID::LEVEL2;
+		break;
+	case 3:
+		textureId = TEXTURE_ASSET_ID::LEVEL3;
+		break;
+	case 4:
+		textureId = TEXTURE_ASSET_ID::LEVEL4;
+		break;
+	case 5:
+		textureId = TEXTURE_ASSET_ID::LEVEL5;
+		break;
+		// Add more cases if there are more levels
+	default:
+		textureId = TEXTURE_ASSET_ID::LEVEL1; // Or some default case
+		std::cerr << "Warning: Level number " << level_num << " not recognized. Using default texture." << std::endl;
+		break;
+	}
+
+
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::ENEMYDRINK,
-		 EFFECT_ASSET_ID::TEXTURED,
+		{ textureId,
+		 EFFECT_ASSET_ID::FOREGROUND,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
-	Entity level_text = createText(std::to_string(level_num), position - vec2(0,200), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld, false);
+
+	Entity level_text = createText(std::to_string(level_num), vec2(position.x - 90, 900 - position.y + 80), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld, false);
 	registry.textRenderRequests.get(level_text).shown = true;
 
 	return entity;
@@ -342,7 +370,7 @@ Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLi
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::FGSCROLL,
-			 EFFECT_ASSET_ID::FOREGROUND,
+			 EFFECT_ASSET_ID::BATTLE,
 			 GEOMETRY_BUFFER_ID::SPRITE });
 	}
 	RenderRequest& rr = registry.renderRequests.get(entity);

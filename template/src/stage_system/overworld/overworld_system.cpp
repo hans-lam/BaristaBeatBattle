@@ -214,7 +214,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					dist_remaining = nearest_right_dist;
 
 					// TESTING:
-					std::cout << dist_remaining << std::endl;
 
 					stored_static_dist_remaining = nearest_left_dist;
 

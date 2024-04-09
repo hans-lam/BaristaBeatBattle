@@ -454,16 +454,38 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 		
 		for (int i = 0; i < num_levels; i++) {
 			// 1500 is window_width_px
-			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
-
-
-
+			// vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
+			vec2 levelpos;
+			
+			// manually hard coded locations of overworld levels
+			switch (i) {
+				case 0:
+					levelpos = vec2(150, 550);
+					break;
+				case 1:
+					levelpos = vec2(350, 500);
+					break;
+				case 2:
+					levelpos = vec2(700, 700);
+					break;
+				case 3:
+					levelpos = vec2(1100, 600);
+					break;
+				case 4:
+					levelpos = vec2(1300, 400);
+					break;
+				default:
+					std::cout << "i is not in range" << std::endl;
+			}
+			
 			Entity level = createLevelNode(renderer, i+1, levelpos);
 			
 			
-			// TODO // set the first levelnode to 3 just for testing, DELETE AND FIX THIS LATERRRRR:
+			
+			// initialized prev level to be the first one
 			if (i == 0) {
 				overworld_system->prev_node = registry.levelNode.get(level);
+				
 			}
 			
 		}
@@ -510,7 +532,8 @@ void WorldSystem::restart_game() {
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
 	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
+	// set as level1 position
+	player_chicken = createChicken(renderer, { 150, 550 });
 	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
 
 	// Create Background for turn based battle
