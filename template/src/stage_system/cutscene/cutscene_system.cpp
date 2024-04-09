@@ -244,8 +244,8 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 
 			//registry.remove_all_components_of(textBox);
 			textBox1 = create_cutscene_text_box(renderer, 4, 2, vec2(400, 700), StageSystem::Stage::cutscene);
-			//PLACE HOLDER WILL PUT GROUND DEVIL HERE
-			char1 = createCharPic(renderer, vec2(400, 500), 3);
+			
+			char1 = createCharPic(renderer, vec2(400, 500), 5);
 			// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 			break;
 		case 3:
@@ -274,7 +274,7 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 			//registry.renderRequests.get(textBox).shown = false;
 			textBox1 = create_cutscene_text_box(renderer, 4, 6, vec2(400, 700), StageSystem::Stage::cutscene);
 			//place hodler will be london fog
-			char1 = createCharPic(renderer, vec2(400, 500), 3);
+			char1 = createCharPic(renderer, vec2(400, 500), 4);
 			//char1 = createCharPic(renderer, vec2(1100, 500), 0);
 
 			break;
@@ -311,8 +311,8 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 				break;
 			case 3:
 				textBox1 = create_cutscene_text_box(renderer, 5, 12, vec2(1100, 700), StageSystem::Stage::cutscene);
-				//PLACE HOLDER -- WILL BE LONDON 
-				char1 = createCharPic(renderer, vec2(1100, 500), 3);
+			
+				char1 = createCharPic(renderer, vec2(1100, 500), 4);
 
 				//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 				break;
@@ -330,15 +330,15 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 				//registry.renderRequests.get(textBox).shown = false;
 				 
 				textBox1 = create_cutscene_text_box(renderer, 5, 15, vec2(400, 700), StageSystem::Stage::cutscene);
-				//PLACE HOLDER -- WILL BE LONDON
-				char1 = createCharPic(renderer, vec2(400, 500), 3);
+	
+				char1 = createCharPic(renderer, vec2(400, 500), 4);
 
 				break;
 			case 7:
 				//registry.renderRequests.get(textBox).shown = false;
 				textBox1 = create_cutscene_text_box(renderer, 5, 16, vec2(1100, 700), StageSystem::Stage::cutscene);
-				//PLACE HOLDER -- WILL BE GROUND 
-				char1 = createCharPic(renderer, vec2(1100, 500), 2);
+				
+				char1 = createCharPic(renderer, vec2(1100, 500), 5);
 
 				break;
 			case 8:
@@ -397,8 +397,8 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 			case 7:
 				//registry.renderRequests.get(textBox).shown = false;
 				textBox1 = create_cutscene_text_box(renderer, 5, 7, vec2(1100, 700), StageSystem::Stage::cutscene);
-				//PLACE HOLDER -- WILL BE GROUND DEVIL 
-				char1 = createCharPic(renderer, vec2(1100, 500), 0);
+			
+				char1 = createCharPic(renderer, vec2(1100, 500), 5);
 
 				break;
 			case 8:
@@ -485,6 +485,24 @@ Entity CutSceneSystem::createCharPic(RenderSystem * renderer, vec2 pos, int char
 		RenderRequest& rr = registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::EARL, // TEXTURE_COUNT indicates that no txture is needed
+				EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+				GEOMETRY_BUFFER_ID::SPRITE });
+		rr.shown = true;
+	}
+	//london
+	else if (character == 4) {
+		RenderRequest& rr = registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::LONDON, // TEXTURE_COUNT indicates that no txture is needed
+				EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+				GEOMETRY_BUFFER_ID::SPRITE });
+		rr.shown = true;
+	}
+	//ground devil
+	else if (character == 5) {
+		RenderRequest& rr = registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::DEVIL, // TEXTURE_COUNT indicates that no txture is needed
 				EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
 				GEOMETRY_BUFFER_ID::SPRITE });
 		rr.shown = true;

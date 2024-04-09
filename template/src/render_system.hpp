@@ -133,6 +133,8 @@ class RenderSystem {
 			textures_path("levelFive7.png"),
 			textures_path("levelFive8.png"),
 			textures_path("levelFive9.png"),
+			textures_path("london.png"),
+			textures_path("devil.png"),
 
 	};
 

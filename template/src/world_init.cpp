@@ -610,15 +610,16 @@ Entity create_london(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 300.f;
+	motion.scale = mesh.original_size * 300.f * 1.5f;
 	motion.scale.y *= -1; // point front to the right
 
 
-	registry.renderRequests.insert(
+	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
-			GEOMETRY_BUFFER_ID::PLAYER });
+		{ TEXTURE_ASSET_ID::LONDON, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
 
 	// give entity turn based components
 	character_factory->construct_london(entity);
@@ -657,6 +658,44 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	else character_factory->construct_enemy(entity, level);
 	
 	
+	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+
+	registry.turnBased.emplace(entity);
+
+	return entity;
+}
+
+Entity create_devil(RenderSystem* renderer, vec2 pos, int level) {
+
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	
+	motion.velocity = { 0.f, 0.f };
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = mesh.original_size * 300.f * 1.5f;
+	motion.scale.y *= -1; // point front to the right
+
+	RenderRequest& rr = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::DEVIL,
+		 EFFECT_ASSET_ID::BATTLE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	// give entity turn based components
+	if (level == 0) character_factory->construct_tutorial_enemy(entity);
+	else character_factory->construct_enemy(entity, level);
+
+
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
 	registry.turnBased.emplace(entity);
