@@ -688,7 +688,7 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::AMERICANO, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			EFFECT_ASSET_ID::BATTLE, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
@@ -721,7 +721,7 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::EARL, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			EFFECT_ASSET_ID::BATTLE, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
@@ -755,8 +755,8 @@ Entity create_london(RenderSystem* renderer, vec2 pos) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::CHICKEN, // shuold prob fix this later
-			GEOMETRY_BUFFER_ID::PLAYER });
+			EFFECT_ASSET_ID::BATTLE, // shuold prob fix this later
+			GEOMETRY_BUFFER_ID::SPRITE });
 
 	// give entity turn based components
 	character_factory->construct_london(entity);
