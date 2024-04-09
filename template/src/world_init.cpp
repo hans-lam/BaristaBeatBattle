@@ -1001,6 +1001,219 @@ Entity create_cutscene_text_box(RenderSystem* renderer, int level, int selection
 		}
 
 	}
+	else if (level == 4) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 5) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 6) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 7) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR7,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 8) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFOUR8,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+
+		}
+	else if (level == 5) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 5) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 6) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 7) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE7,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 8) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE8,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		if (selection == 9) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVE9,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection ==10) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 11) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 12) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 13) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 14) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 15) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 16) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC7,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 17) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC8,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 18) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELFIVEREC9,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+	}
 	
 	else {
 	RenderRequest& rq = registry.renderRequests.insert(

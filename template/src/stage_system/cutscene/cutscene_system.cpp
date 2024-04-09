@@ -233,10 +233,189 @@ void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, 
 		break;
 	case 4: 
 		slides = 8 ;
+		switch (cutscene_slide) {
+		case 1:
+
+			textBox = create_cutscene_text_box(renderer, 4, 1, vec2(750, 700), StageSystem::Stage::cutscene);
+			//
+			
+			break;
+		case 2:
+
+			//registry.remove_all_components_of(textBox);
+			textBox1 = create_cutscene_text_box(renderer, 4, 2, vec2(400, 700), StageSystem::Stage::cutscene);
+			//PLACE HOLDER WILL PUT GROUND DEVIL HERE
+			char1 = createCharPic(renderer, vec2(400, 500), 3);
+			// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+			break;
+		case 3:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 3, vec2(1100, 700), StageSystem::Stage::cutscene);
+			
+			char1 = createCharPic(renderer, vec2(1100, 500), 0);
+
+			//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+			break;
+		case 4:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 4, vec2(400, 700), StageSystem::Stage::cutscene);
+			char1 = createCharPic(renderer, vec2(400, 500), 2);
+			//char1 = createCharPic(renderer, vec2(750, 500), 0);
+			//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+			break;
+		case 5:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 5, vec2(1100, 700), StageSystem::Stage::cutscene);
+			char1 = createCharPic(renderer, vec2(1100, 500), 3);
+			//char1 = createCharPic(renderer, vec2(750, 500), 0);
+			//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+			break;
+		case 6:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 6, vec2(400, 700), StageSystem::Stage::cutscene);
+			//place hodler will be london fog
+			char1 = createCharPic(renderer, vec2(400, 500), 3);
+			//char1 = createCharPic(renderer, vec2(1100, 500), 0);
+
+			break;
+		case 7:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 7, vec2(1100, 700), StageSystem::Stage::cutscene);
+			char1 = createCharPic(renderer, vec2(1100, 500), 3);
+
+			break;
+		case 8:
+			//registry.renderRequests.get(textBox).shown = false;
+			textBox1 = create_cutscene_text_box(renderer, 4, 8, vec2(400, 700), StageSystem::Stage::cutscene);
+			char1 = createCharPic(renderer, vec2(400, 500), 0);
+
+			break;
+		}
 		this->cutscene_currently_rendered = cutscene_slide;
 		break;
 	case 5:
 		slides = 9 ;
+		if (recruited) {
+			switch (cutscene_slide) {
+			case 1:
+
+				textBox = create_cutscene_text_box(renderer, 5, 10, vec2(750, 700), StageSystem::Stage::cutscene);
+
+				break;
+			case 2:
+
+				textBox1 = create_cutscene_text_box(renderer, 5, 11, vec2(400, 700), StageSystem::Stage::cutscene);
+
+				char1 = createCharPic(renderer, vec2(400, 500), 3);
+				// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+				break;
+			case 3:
+				textBox1 = create_cutscene_text_box(renderer, 5, 12, vec2(1100, 700), StageSystem::Stage::cutscene);
+				//PLACE HOLDER -- WILL BE LONDON 
+				char1 = createCharPic(renderer, vec2(1100, 500), 3);
+
+				//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+				break;
+			case 4:
+				textBox1 = create_cutscene_text_box(renderer, 5, 13, vec2(400, 700), StageSystem::Stage::cutscene);
+
+				char1 = createCharPic(renderer, vec2(400, 500), 3);
+				break;
+			case 5:
+				textBox1 = create_cutscene_text_box(renderer, 5, 14, vec2(1100, 700), StageSystem::Stage::cutscene);
+				
+				char1 = createCharPic(renderer, vec2(1100, 500), 2);
+				break;
+			case 6:
+				//registry.renderRequests.get(textBox).shown = false;
+				 
+				textBox1 = create_cutscene_text_box(renderer, 5, 15, vec2(400, 700), StageSystem::Stage::cutscene);
+				//PLACE HOLDER -- WILL BE LONDON
+				char1 = createCharPic(renderer, vec2(400, 500), 3);
+
+				break;
+			case 7:
+				//registry.renderRequests.get(textBox).shown = false;
+				textBox1 = create_cutscene_text_box(renderer, 5, 16, vec2(1100, 700), StageSystem::Stage::cutscene);
+				//PLACE HOLDER -- WILL BE GROUND 
+				char1 = createCharPic(renderer, vec2(1100, 500), 2);
+
+				break;
+			case 8:
+				//registry.renderRequests.get(textBox).shown = false;
+				textBox1 = create_cutscene_text_box(renderer, 5, 17, vec2(400, 700), StageSystem::Stage::cutscene);
+				char1 = createCharPic(renderer, vec2(400, 500), 3);
+
+
+				break;
+			case 9:
+				textBox1 = create_cutscene_text_box(renderer, 5, 18, vec2(400, 700), StageSystem::Stage::cutscene);
+				char1 = createCharPic(renderer, vec2(400, 500), 0);
+
+
+				break;
+			}
+		}
+		else {
+			switch (cutscene_slide) {
+			case 1:
+
+				textBox = create_cutscene_text_box(renderer, 5, 1, vec2(750, 700), StageSystem::Stage::cutscene);
+
+				break;
+			case 2:
+
+				textBox1 = create_cutscene_text_box(renderer, 5, 2, vec2(400, 700), StageSystem::Stage::cutscene);
+
+				char1 = createCharPic(renderer, vec2(400, 500), 0);
+				// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+				break;
+			case 3:
+				textBox1 = create_cutscene_text_box(renderer, 5, 3, vec2(1100, 700), StageSystem::Stage::cutscene);
+				char1 = createCharPic(renderer, vec2(1100, 500), 3);
+
+				//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
+				break;
+			case 4:
+				textBox1 = create_cutscene_text_box(renderer, 5, 4, vec2(400, 700), StageSystem::Stage::cutscene);
+
+				char1 = createCharPic(renderer, vec2(400, 500), 2);
+				break;
+			case 5:
+				textBox1 = create_cutscene_text_box(renderer, 5, 5, vec2(1100, 700), StageSystem::Stage::cutscene);
+
+				char1 = createCharPic(renderer, vec2(1100, 500), 3);
+				break;
+			case 6:
+				//registry.renderRequests.get(textBox).shown = false;
+
+				textBox1 = create_cutscene_text_box(renderer, 5, 6, vec2(400, 700), StageSystem::Stage::cutscene);
+				
+				char1 = createCharPic(renderer, vec2(400, 500), 3);
+
+				break;
+			case 7:
+				//registry.renderRequests.get(textBox).shown = false;
+				textBox1 = create_cutscene_text_box(renderer, 5, 7, vec2(1100, 700), StageSystem::Stage::cutscene);
+				//PLACE HOLDER -- WILL BE GROUND DEVIL 
+				char1 = createCharPic(renderer, vec2(1100, 500), 0);
+
+				break;
+			case 8:
+				//registry.renderRequests.get(textBox).shown = false;
+				textBox1 = create_cutscene_text_box(renderer, 5, 8, vec2(400, 700), StageSystem::Stage::cutscene);
+				char1 = createCharPic(renderer, vec2(400, 500), 2);
+
+
+				break;
+			case 9:
+				textBox1 = create_cutscene_text_box(renderer, 5, 9, vec2(750, 700), StageSystem::Stage::cutscene);
+				char1 = createCharPic(renderer, vec2(750, 500), 0);
+
+
+				break;
+			}
+		}
 		this->cutscene_currently_rendered = cutscene_slide;
 		break;
 	default: 
