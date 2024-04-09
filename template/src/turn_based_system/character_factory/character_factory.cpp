@@ -226,6 +226,32 @@ Entity CharacterFactory::construct_tutorial_enemy(Entity entity) {
 }
 
 
+Entity CharacterFactory::construct_ground_devil(Entity entity) {
+	std::string name = "Ground Devil";
+	unsigned int enemy_max_health = 150;
+	unsigned int enemy_strength = 25;
+	unsigned int enemy_magic = 1;
+	unsigned int enemy_defense = 12;
+	unsigned int enemy_magic_resist = 10;
+	unsigned int enemy_speed = 16;
+
+	CharacterStatSheet* character_stat = new CharacterStatSheet(name, enemy_max_health, enemy_strength, enemy_magic, enemy_defense, enemy_magic_resist, enemy_speed);
+
+	Ability* basic_attack = ability_factory->construct_basic_attack();
+
+
+	Character* enemy_character_obj = new Character(name, character_stat);
+	enemy_character_obj->add_ability(basic_attack);
+	enemy_character_obj->level = 15;
+
+	CharacterData characterData = CharacterData();
+	characterData.characterData = enemy_character_obj;
+	registry.characterDatas.emplace(entity, characterData);
+
+	return entity;
+}
+
+
 
 
 
