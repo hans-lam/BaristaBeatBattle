@@ -85,7 +85,7 @@ struct Sparkle
 {
 	vec3 colour;
 	vec2 acceleration;
-	float life = 2000;
+	float life = 1000;
 };
 
 // EnemyDrinks start fights if you talk/attack them
@@ -203,12 +203,14 @@ struct InjuredTimer
 
 struct MissTimer
 {
-	float counter_ms = 2000;
+	float counter_ms = 1000;
+	Entity associated_text;
 };
 
 struct LevelUpTimer
 {
 	float counter_ms = 3000;
+	Entity associated_text;
 };
 
 struct MiniGameTimer
@@ -380,7 +382,8 @@ enum class EFFECT_ASSET_ID {
 	LIGHTS = FOREGROUND + 1,
 	BATTLE = LIGHTS + 1,
 	BATTLEBAR = BATTLE + 1,
-	EFFECT_COUNT = BATTLEBAR + 1
+	SPARKLE = BATTLEBAR + 1,
+	EFFECT_COUNT = SPARKLE + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

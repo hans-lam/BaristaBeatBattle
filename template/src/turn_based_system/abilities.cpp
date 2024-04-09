@@ -43,7 +43,7 @@ void Ability::process_ability(Character* caller, Character* target) {
 		defense_amount = target_stat_sheet->get_magic_resist();
 	}
 
-	unsigned int damage_amount = std::max(attack_amount - defense_amount, (unsigned int)0);
+	unsigned int damage_amount = std::max(attack_amount - defense_amount, (unsigned int)1);
 
 	std::cout << caller->get_name() << " dealt " << damage_amount << " to " << target->get_name() << " using " << this->ability_name << '\n';
 

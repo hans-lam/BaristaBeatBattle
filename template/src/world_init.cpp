@@ -653,8 +653,10 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	rr.shown = true;
 
 	// give entity turn based components
-	character_factory->construct_enemy(entity, level);
-
+	if (level == 0) character_factory->construct_tutorial_enemy(entity);
+	else character_factory->construct_enemy(entity, level);
+	
+	
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
 	registry.turnBased.emplace(entity);
@@ -1249,7 +1251,7 @@ Entity create_sparkle(RenderSystem* renderer, vec2 pos, vec2 vel, vec2 acc, vec3
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::SPARKLE,
-		 EFFECT_ASSET_ID::TEXTURED,
+		 EFFECT_ASSET_ID::SPARKLE,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 

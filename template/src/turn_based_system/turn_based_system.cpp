@@ -9,7 +9,7 @@
 #include <iostream>
 
 const unsigned int SPEED_REQUIRED_FOR_TURN = 100;
-const double HIT_CHANCE = .80; // originally 0.80, changed for miss testing
+const double HIT_CHANCE = 0.85; // 0.85
 
 TurnBasedSystem::TurnBasedSystem() {
 	// stub;
@@ -66,6 +66,16 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 	}
 	else {
 
+		double duration;
+
+		if (enemy_await == NULL) {
+			enemy_await = std::clock();
+		}
+
+		duration = (std::clock() - enemy_await) / (double)CLOCKS_PER_SEC;
+
+		if (duration < 0.25) return;
+
 		Character* ai_character = registry.characterDatas.get(active_character).characterData;
 
 
@@ -73,8 +83,9 @@ void TurnBasedSystem::step(float elapsed_ms_since_last_update) {
 
 		std::cout << ai_character->get_name() << "'s targeting " << target_character->get_name() << " best they have the lowest health!" << "\n";
 
-		process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
+		int outcome = process_character_action(ai_character->get_ability_by_name("Basic Attack"), ai_character, { target_character});
 	
+		enemy_await = NULL;
 
 	}
 
@@ -144,13 +155,15 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	Entity caller_entity = get_entity_given_character(caller);
 	if (ability->get_ability_name() == "rest" || chance_hit < HIT_CHANCE) {
 		
-		if (registry.attackTimers.has(caller_entity) && ability->get_ability_name() != "rest") {
-			// registry.injuryTimers.remove(receiving_entity);
-			AttackTimer& attack = registry.attackTimers.get(caller_entity);
-			attack.counter_ms = 700.f;
-		}
-		else {
-			registry.attackTimers.emplace(caller_entity);
+		if (ability->get_ability_name() != "rest") {
+			if (registry.attackTimers.has(caller_entity)) {
+				// registry.injuryTimers.remove(receiving_entity);
+				AttackTimer& attack = registry.attackTimers.get(caller_entity);
+				attack.counter_ms = 700.f;
+			}
+			else {
+				registry.attackTimers.emplace(caller_entity);
+			}
 		}
 		
 		for (Character* receiving_character : recipients) {
@@ -191,7 +204,11 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	else {
 		std::cout << caller->get_name() << " Missed!" << '\n';
 		if (!registry.missTimers.has(caller_entity)) {
-			registry.missTimers.emplace(caller_entity);
+			MissTimer& miss = registry.missTimers.emplace(caller_entity);
+			Motion& caller_motion = registry.motions.get(caller_entity);
+			Entity miss_text = createText("MISS!", vec2(caller_motion.position.x + 50.f, window_height_px - caller_motion.position.y), 0.7f, vec3(1.0f, 0.0f, 0.0f), mat4(1.0f), StageSystem::Stage::turn_based, false);
+			registry.textRenderRequests.get(miss_text).shown = true;
+			miss.associated_text = miss_text;
 		}
 	}
 
@@ -202,14 +219,14 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 	if (are_all_allies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You lost :(");
-
+		this->end_of_game_wait = std::clock();
 		return 2;
 	}
 
 	if (are_all_enemies_defeated()) {
 		out_of_combat = true;
 		printf("Game Over! You won the fight!!");
-
+		this->end_of_game_wait = std::clock();
 		return 1;
 	}
 
@@ -220,6 +237,7 @@ int TurnBasedSystem::process_character_action(Ability* ability, Character* calle
 			out_of_combat = true;
 			printf("London was the last enemy alive and has been recruited!");
 			flag_progression->is_london_recruited = true;
+			this->end_of_game_wait = std::clock();
 			return 1;
 		}
 	}

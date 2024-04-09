@@ -17,7 +17,7 @@ Level* LevelFactory::construct_level_one(RenderSystem* renderer, vec2 base_ally_
 
 	level_one->allies.push_back(chai_entity);
 
-	Entity level_one_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 1);
+	Entity level_one_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 0);
 
 	level_one->enemies.push_back(level_one_ground_a);
 
