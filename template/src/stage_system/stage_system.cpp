@@ -198,7 +198,7 @@ void StageSystem::set_cutscene_ending(int level_num)
 	current_level = level_num;
 	// Set all overworld entities to not be shown
 	// Keep entities live since we still might need them
-	for (Entity entity : registry.mainMenu.entities) {
+	for (Entity entity : registry.turnBased.entities) {
 		set_render_shown(entity, false, false);
 	}
 

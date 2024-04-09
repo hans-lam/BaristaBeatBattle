@@ -763,6 +763,7 @@ Entity create_london(RenderSystem* renderer, vec2 pos) {
 	character_factory->construct_london(entity);
 
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
+	registry.turnBased.emplace(entity);
 
 	return entity;
 }
