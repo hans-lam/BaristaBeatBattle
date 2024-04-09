@@ -31,7 +31,60 @@ Entity createChicken(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer) {
+Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer, std::string sprite) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	// Place in minigame
+	registry.miniGame.emplace(entity);
+	// Place in minigame timer for ryhthym calcs
+	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
+	mgt.counter_ms = rhythm_length; 
+	mgt.inter_timer = inter_timer;
+
+	switch (sprite[0]) {
+	// cup case
+	case 'c': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECUP,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+		break;
+	}
+	// kettle case
+	case 'k': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::KETTLENORM,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ KETTLE_WIDTH, KETTLE_HEIGHT });
+		break;
+	}
+	case 'm': {
+		registry.motions.remove(entity);
+		break;
+	}
+	}
+
+	return entity;
+}
+
+Entity createSpeech(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -43,17 +96,14 @@ Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float in
 	motion.position = pos;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+	motion.scale = vec2({ SPEECH_WIDTH, SPEECH_HEIGHT });
 
 	// Place in minigame
 	registry.miniGame.emplace(entity);
-	// Place in minigame timer for ryhthym calcs
-	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
-	mgt.counter_ms = rhythm_length; 
-	mgt.inter_timer = inter_timer;
+
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::MINIGAMECUP,
+		{ TEXTURE_ASSET_ID::MINISPEECH,
 		EFFECT_ASSET_ID::TEXTURED,
 		GEOMETRY_BUFFER_ID::SPRITE }
 	);
@@ -147,13 +197,73 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE }
+			GEOMETRY_BUFFER_ID::SPRITE } 
 		);
 	}
 
 	return entity;
 }
 
+// create milk option that attaches to a mc option
+Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
+	// add entity to minigame component
+	registry.miniGame.emplace(entity);
+
+	switch (milk_type[0]) {
+	case 'A': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKALMOND,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'B': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILK2,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'C': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKCOCONUT,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'D': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKSOY,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	}
+
+	registry.renderRequests.get(entity).shown = true;
+
+	return entity;
+}
 
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 {
