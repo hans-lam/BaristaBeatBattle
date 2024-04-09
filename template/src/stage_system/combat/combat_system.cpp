@@ -286,7 +286,7 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 	}
 	attack_text = createText("attack", {0,0}, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 	rest_text = createText("rest", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
-	pourit_text = createText("pourit", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	magic_text = createText("magic", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 
 }
 
@@ -354,7 +354,7 @@ void CombatSystem::handle_turn_rendering() {
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
 					Motion& motion = registry.motions.get(pourIt);
-					TextRenderRequest& trr = registry.textRenderRequests.get(pourit_text);
+					TextRenderRequest& trr = registry.textRenderRequests.get(magic_text);
 					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}

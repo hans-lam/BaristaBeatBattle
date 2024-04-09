@@ -62,5 +62,5 @@ private:
 	bool turn_based_tutorial;
 	Entity attack_text;
 	Entity rest_text;
-	Entity pourit_text;
+	Entity magic_text;
 };

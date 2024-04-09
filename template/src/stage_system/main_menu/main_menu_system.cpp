@@ -16,7 +16,7 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	selected_option = new_game;
 	tutorial_on = false;
 	const int basex = window_width_px / 2 - 200;
-	menu_text_map[new_game] = createText("New Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	menu_text_map[new_game] = createText("Start Game", { basex,window_height_px/2 - 100 }, 1.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[save_game] = createText("Save Game", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
