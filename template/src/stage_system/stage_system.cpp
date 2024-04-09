@@ -22,7 +22,7 @@ void StageSystem::init()
 void StageSystem::set_stage(Stage target, int level)
 {
 
-	if (target != turn_based) {
+	if ((target != turn_based)) {
 		this->current_level = level;
 
 	}
@@ -40,6 +40,9 @@ void StageSystem::set_stage(Stage target, int level)
 		break;
 	case cutscene:
 		set_cutscene(level);
+		break;
+	case cutscene_ending:
+		set_cutscene_ending(level);
 		break;
 	case cutscene_before:
 		set_cutscene_before(level);
@@ -175,6 +178,22 @@ void StageSystem::set_cutscene(int level_num)
 }
 
 void StageSystem::set_cutscene_before(int level_num)
+{
+	current_level = level_num;
+	// Set all overworld entities to not be shown
+	// Keep entities live since we still might need them
+	for (Entity entity : registry.mainMenu.entities) {
+		set_render_shown(entity, false, false);
+	}
+
+	// Set all cutscene entities to be shown; 
+	// this can be changed depending on how we want to decide which cutscenes are rendered
+	for (Entity entity : registry.cutscenes.entities) {
+		set_render_shown(entity, true, false);
+	}
+}
+
+void StageSystem::set_cutscene_ending(int level_num)
 {
 	current_level = level_num;
 	// Set all overworld entities to not be shown
