@@ -310,7 +310,7 @@ void CombatSystem::handle_turn_rendering() {
 				color = { 1, 0.8f, 0.8f };
 			}
 		}
-
+		bool ally_turn_is_next = false;
 		// Setting menu's active 
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
@@ -322,6 +322,7 @@ void CombatSystem::handle_turn_rendering() {
 			MenuOption& prt = registry.menuOptions.get(pourIt);
 
 			if (menu.associated_character == active_char_entity) {
+				ally_turn_is_next = true;
 				if (!registry.renderRequests.has(attack)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						attack,
@@ -358,6 +359,15 @@ void CombatSystem::handle_turn_rendering() {
 					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}
+				if (registry.textRenderRequests.has(attack_text)) {
+					registry.textRenderRequests.get(attack_text).shown = true;
+				}
+				if (registry.textRenderRequests.has(rest_text)) {
+					registry.textRenderRequests.get(rest_text).shown = true;
+				}
+				if (registry.textRenderRequests.has(magic_text)) {
+					registry.textRenderRequests.get(magic_text).shown = true;
+				}
 			}
 			else {
 				if (registry.renderRequests.has(attack)) {
@@ -369,13 +379,13 @@ void CombatSystem::handle_turn_rendering() {
 				if (registry.renderRequests.has(pourIt)) {
 					registry.renderRequests.remove(pourIt);
 				}
-				if (registry.textRenderRequests.has(attack_text)) {
+				if (registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(attack_text).shown = false;
 				}
-				if (registry.textRenderRequests.has(rest_text)) {
+				if (registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(rest_text).shown = false;
 				}
-				if (registry.textRenderRequests.has(magic_text)) {
+				if (registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(magic_text).shown = false;
 				}
 			}
