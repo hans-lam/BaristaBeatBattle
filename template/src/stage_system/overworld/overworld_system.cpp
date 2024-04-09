@@ -38,8 +38,7 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 		handle_player_movement(key, action, player_speed);
 	} 
 	// Attack key
-	else if (action == GLFW_PRESS && key == GLFW_KEY_ENTER) {
-		//player_attack();
+	else if (action == GLFW_PRESS && key == GLFW_KEY_ENTER && !(registry.animations.has(registry.players.entities[0])) ) {		//player_attack();
 		handle_level_selection();
 	}
 	// Tutorial key
@@ -263,7 +262,7 @@ void OverworldSystem::player_attack() {
 
 int my_test_it = 1;
 void OverworldSystem::handle_level_selection() {
-
+	
 	for (Entity entity : registry.levelNode.entities) {
 		registry.remove_all_components_of(entity);
 	}
