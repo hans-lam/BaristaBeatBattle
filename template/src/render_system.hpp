@@ -70,6 +70,17 @@ class RenderSystem {
 			textures_path("hit_box_perfect.png"),
 			textures_path("hit_box_good.png"),
 			textures_path("hit_box_fail.png"),
+			textures_path("kettle_normal.png"),
+			textures_path("kettle_little_more.png"),
+			textures_path("kettle_lot_more.png"),
+			textures_path("kettle_just_right.png"),
+			textures_path("kettle_pour.png"),
+			textures_path("kettle_dead.png"),
+			textures_path("milk_almond.png"),
+			textures_path("milk_2.png"), 
+			textures_path("milk_coconut.png"), 
+			textures_path("milk_soy.png"),
+			textures_path("mini_speech.png"),
 			textures_path("bg.png"),
 			textures_path("fg.png"),
 			textures_path("fglight.png"),
@@ -83,12 +94,12 @@ class RenderSystem {
 			textures_path("cutsceneBox3.png"),
 			textures_path("earlgrey.png"),
 			textures_path("americano.png"),
+      textures_path("sparkle.png"),
 			textures_path("level_1_sprite.png"),
 			textures_path("level_2_sprite.png"),
 			textures_path("level_3_sprite.png"),
 			textures_path("level_4_sprite.png"),
 			textures_path("level_5_sprite.png"),
-
 
 	};
 
@@ -105,6 +116,7 @@ class RenderSystem {
 		shader_path("lights"),
 		shader_path("battle"),
 		shader_path("battlebar"),
+		shader_path("sparkle"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;

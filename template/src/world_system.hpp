@@ -84,7 +84,7 @@ private:
 	float current_speed;
 	float player_speed;
 	float next_eagle_spawn;
-	float next_bug_spawn;
+	float next_sparkle_spawn;
 	float next_enemy_spawn;
 	Entity player_chicken;
 	int stage;
@@ -97,6 +97,8 @@ private:
 	Mix_Music* minigame_select_music;
 	Mix_Music* minigame_practice_metronome;
 	Mix_Music* minigame_music;
+	Mix_Music* pour_it_music;
+	Mix_Music* milk_it_music;
 
 	// Sound Effects
 	Mix_Chunk* change_selection_effect;

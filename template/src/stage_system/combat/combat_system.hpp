@@ -34,6 +34,8 @@ public:
 
 	void handle_minigame_attack(Entity active_char, int score);
 
+	void handle_combat_over();
+
 	void set_selected_level(int level) {
 		this->selected_level = (CombatLevel)(level - 1);
 	}
@@ -47,8 +49,6 @@ private:
 
 	void handle_tutorial();
 
-	void handle_combat_over();
-
 	SoundMapping handle_menu(int key);
 
 	SoundMapping handle_attack(Entity active_char_entity, std::string ability);
@@ -60,4 +60,7 @@ private:
 	TurnBasedSystem* turn_based;
 	LevelFactory* level_factory;
 	bool turn_based_tutorial;
+	Entity attack_text;
+	Entity rest_text;
+	Entity pourit_text;
 };

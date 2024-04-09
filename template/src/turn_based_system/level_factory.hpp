@@ -3,6 +3,7 @@
 #include "./character_factory/character_factory.hpp"
 #include "turn_based_system.hpp"
 #include "level_select_system.hpp"
+#include "flag_progression.hpp"
 
 class LevelFactory {
 public:
@@ -21,6 +22,4 @@ public:
 	Level* construct_level_six(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
 
 	Level* construct_level_seven(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position);
-
-	bool is_london_recruited;
 };

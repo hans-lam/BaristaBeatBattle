@@ -80,6 +80,14 @@ struct Foreground
 
 };
 
+// For particle system
+struct Sparkle
+{
+	vec3 colour;
+	vec2 acceleration;
+	float life = 1000;
+};
+
 // EnemyDrinks start fights if you talk/attack them
 struct EnemyDrink
 {
@@ -184,13 +192,27 @@ enum class minigame_state {
 	normal,
 	perfect,
 	good,
-	fail
+	fail,
+	pouring,
+	dead
 };
 
 struct InjuredTimer
 {
 	float counter_ms = 3000;
 	float redness_factor = 1.0f;
+};
+
+struct MissTimer
+{
+	float counter_ms = 1000;
+	Entity associated_text;
+};
+
+struct LevelUpTimer
+{
+	float counter_ms = 3000;
+	Entity associated_text;
 };
 
 struct MiniGameTimer
@@ -284,7 +306,18 @@ enum class TEXTURE_ASSET_ID {
 	MINIGAMEPERFECT = MINIGAMECUPBAD + 1,
 	MINIGAMEGOOD = MINIGAMEPERFECT + 1,
 	MINIGAMEFAIL = MINIGAMEGOOD + 1,
-	BGSCROLL = MINIGAMEFAIL + 1,
+	KETTLENORM = MINIGAMEFAIL + 1, 
+	KETTLELITTLE = KETTLENORM + 1,
+	KETTLEMORE = KETTLELITTLE + 1,
+	KETTLERIGHT = KETTLEMORE + 1,
+	KETTLEPOUR = KETTLERIGHT + 1,
+	KETTLEDEAD = KETTLEPOUR + 1,
+	MILKALMOND = KETTLEDEAD + 1,
+	MILK2 = MILKALMOND + 1,
+	MILKCOCONUT = MILK2 + 1,
+	MILKSOY = MILKCOCONUT + 1,
+	MINISPEECH = MILKSOY + 1,
+	BGSCROLL = MINISPEECH + 1,
 	FGSCROLL = BGSCROLL + 1,
 	FGLIGHT = FGSCROLL + 1,
 	BGBATTLE = FGLIGHT + 1,
@@ -297,7 +330,9 @@ enum class TEXTURE_ASSET_ID {
 	CUTSCENETEXTBOX3 = CUTSCENETEXTBOX2 + 1,
 	EARL = CUTSCENETEXTBOX3 + 1,
 	AMERICANO = EARL + 1,
-	LEVEL1 = AMERICANO + 1,
+  SPARKLE = AMERICANO + 1,
+	TEXTURE_COUNT = SPARKLE + 1
+	LEVEL1 = SPARKLE + 1,
 	LEVEL2 = LEVEL1 + 1,
 	LEVEL3 = LEVEL2 + 1,
 	LEVEL4 = LEVEL3 + 1,
@@ -317,7 +352,8 @@ enum class EFFECT_ASSET_ID {
 	LIGHTS = FOREGROUND + 1,
 	BATTLE = LIGHTS + 1,
 	BATTLEBAR = BATTLE + 1,
-	EFFECT_COUNT = BATTLEBAR + 1
+	SPARKLE = BATTLEBAR + 1,
+	EFFECT_COUNT = SPARKLE + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
