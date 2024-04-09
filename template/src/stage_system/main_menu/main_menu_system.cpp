@@ -20,7 +20,6 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	menu_text_map[load_game] = createText("Load Game", { basex,window_height_px / 2 - 150 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[save_game] = createText("Save Game", { basex,window_height_px / 2 - 200 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
-	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 
 	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 300,window_height_px / 2 + 100 }, 3.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 }
@@ -31,16 +30,16 @@ void MainMenuSystem::handle_menu_keys(int key, int action) {
 	if (action == GLFW_RELEASE) {
 		switch (key) {
 			case GLFW_KEY_UP:
-				selected_option = static_cast<MenuOption>(((selected_option - 1) % (credits + 1) + (credits +1)) % (credits + 1));
-				for (int i = new_game; i <= credits; i++) {
+				selected_option = static_cast<MenuOption>(((selected_option - 1) % (tutorials + 1) + (tutorials +1)) % (tutorials + 1));
+				for (int i = new_game; i <= tutorials; i++) {
 					MenuOption menu_option = static_cast<MenuOption>(i);
 					registry.textRenderRequests.get(menu_text_map[menu_option]).color = not_selected_color;
 				}
 				registry.textRenderRequests.get(menu_text_map[selected_option]).color = selected_color;
 				break;
 			case GLFW_KEY_DOWN:
-				selected_option = static_cast<MenuOption>((selected_option + 1) % (credits + 1));
-				for (int i = new_game; i <= credits; i++) {
+				selected_option = static_cast<MenuOption>((selected_option + 1) % (tutorials + 1));
+				for (int i = new_game; i <= tutorials; i++) {
 					MenuOption menu_option = static_cast<MenuOption>(i);
 					registry.textRenderRequests.get(menu_text_map[menu_option]).color = not_selected_color;
 				}
@@ -60,7 +59,7 @@ void MainMenuSystem::handle_option()
 	switch (selected_option) {
 	case new_game:
 		// set all texts to not be shown
-		for (int i = new_game; i <= credits; i++) {
+		for (int i = new_game; i <= tutorials; i++) {
 			MenuOption menu_option = static_cast<MenuOption>(i);
 			TextRenderRequest& trr = registry.textRenderRequests.get(menu_text_map[menu_option]);
 			trr.shown = false;
@@ -128,10 +127,6 @@ void MainMenuSystem::handle_option()
 			
 		}
 		printf("tutorials: "); 
-		break;
-	case credits:
-		// popup credits screen
-		printf("credits: ");
 		break;
 	default:
 		printf("something fucked up\n");
