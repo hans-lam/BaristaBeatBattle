@@ -228,7 +228,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		GLint player_pos_uloc = glGetUniformLocation(program, "player_pos");
 		float rel_x = (registry.motions.get(registry.players.entities[0]).position.x - (window_width_px/2.f));
-		//std::cout << "curr pos" << rel_x << std::endl;
 
 		glUniform1f(player_pos_uloc, rel_x);
 
@@ -567,7 +566,6 @@ void RenderSystem::renderText(const std::string& text, float x, float y,
 
 			// render glyph texture over quad
 			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-			// std::cout << "binding texture: " << ch.character << " = " << ch.TextureID << std::endl;
 
 			// update content of VBO memory
 			glBindBuffer(GL_ARRAY_BUFFER, m_font_VBO);

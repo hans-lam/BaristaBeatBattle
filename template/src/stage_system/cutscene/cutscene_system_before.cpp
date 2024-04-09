@@ -25,7 +25,7 @@ void CutSceneSystemBefore::handle_cutscene_render(RenderSystem* renderer) {
 
 	if (cutscene_done) {
 		// transition to overworld
-		std::cout << "GO TO Overwolrd\n";
+		std::cout << "GO TO Overworld\n";
 		skip_cutscene = false;
 		cutscene_done = false;
 		handle_cutscene();

@@ -624,9 +624,6 @@ void MinigameSystem::handle_cool() {
 
 		float modded = (int)minigame_overall_timer % measure_duration;
 
-		std::cout << minigame_overall_timer << '\n';
-		std::cout << modded << '\n';
-
 		minigame_state hit_state = calc_modded_beats(); 
 
 		if (hit_state == minigame_state::perfect) {
@@ -898,7 +895,6 @@ void MinigameSystem::handle_minigame(int key) {
 	switch (selected_game) {
 	case cool_it: {
 		if (key == GLFW_KEY_D) {
-			std::cout << "HIT";
 			// key "D" will only be recognized for every beat
 			if (time_since_last_press >= beat_duration) {
 				// hard-coded bpm of metronome right now

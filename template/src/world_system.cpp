@@ -271,11 +271,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				float t = animation_component.current_ms / animation_component.total_ms;
 
 				vec2 newpos = overworld_system->getBezierPath(animation_component.start_pos.x, animation_component.start_pos.y, animation_component.end_pos.x, animation_component.end_pos.y, t);
-				// std::cout << "I AM GETTING HERE, newpos.x = " << newpos.x << std::endl;
-				// std::cout << "I AM GETTING HERE, newpos.y = " << newpos.y << std::endl;
-
-				//std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
-				//std::cout << newpos.x << ", " << newpos.y << std::endl;
 
 				motion_component.position = newpos;
 				
@@ -312,30 +307,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		
 		// This helper is replacing the block that spawns in enemies. 
 
-
-		// This block spawns in enemies
-		// 
-		//if (registry.enemyDrinks.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-		//	// Reset timer
-		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-		//	// Create enemy drink with random initial velocity, position
-		//	Entity test = createEnemyDrink(renderer,
-		//		// TODO: make negative velocity possible
-		//		vec2((uniform_dist(rng) - 0.5) * 200.f, (uniform_dist(rng) - 0.5) * 200.f),
-		//		// TODO: fix to spawn from only the edges
-		//		vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		//}
-
-		//if (registry.levelNode.components.size() <= MAX_EAGLES && next_enemy_spawn < 0.f) {
-		//	// Reset timer
-		//	next_enemy_spawn = (ENEMY_DELAY_MS / 2) + uniform_dist(rng) * (ENEMY_DELAY_MS / 2);
-		//	// Create enemy drink with random initial velocity, position
-		//	Entity test = createLevelNode(renderer, LevelNode(), LevelNode(), vec2(uniform_dist(rng) * (window_width_px - 100.f), BG_HEIGHT + uniform_dist(rng) * (window_height_px - BG_HEIGHT)));
-		//	}
-
-
-
-
 		// Processing the chicken state
 		assert(registry.screenStates.components.size() <= 1);
 		ScreenState& screen = registry.screenStates.components[0];
@@ -369,7 +340,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// progress timer, 
 			InjuredTimer& counter = registry.injuryTimers.get(entity);
 			counter.counter_ms -= elapsed_ms_since_last_update;
-			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
 			counter.redness_factor -= 1.f / 200.f;
 			if (counter.counter_ms < min_injury_counter_ms) {
 				min_injury_counter_ms = counter.counter_ms;
@@ -377,7 +347,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 			// stop shaking the attacked character after 3 seconds
 			if (counter.counter_ms < 0) {
-				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
 				registry.injuryTimers.remove(entity);
 			}
 		}
@@ -388,7 +357,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// progress timer, 
 			MissTimer& counter = registry.missTimers.get(entity);
 			counter.counter_ms -= elapsed_ms_since_last_update;
-			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+
 			if (counter.counter_ms < min_miss_counter_ms) {
 				min_miss_counter_ms = counter.counter_ms;
 			}
@@ -403,7 +372,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 			// stop spawning sparkles
 			if (counter.counter_ms < 0) {
-				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
 				registry.remove_all_components_of(counter.associated_text);
 				registry.missTimers.remove(entity);
 			}
@@ -415,7 +383,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// progress timer, 
 			LevelUpTimer& counter = registry.levelUpTimers.get(entity);
 			counter.counter_ms -= elapsed_ms_since_last_update;
-			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
 			if (counter.counter_ms < min_level_counter_ms) {
 				min_level_counter_ms = counter.counter_ms;
 			}
@@ -430,7 +397,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 			// stop spawning sparkles
 			if (counter.counter_ms < 0) {
-				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
 				registry.remove_all_components_of(counter.associated_text);
 				registry.levelUpTimers.remove(entity);
 			}
@@ -709,48 +675,10 @@ void WorldSystem::restart_game() {
 		Motion& player_motion = registry.motions.get(registry.players.entities[0]);
 		// std::cout << "THIS IS RUN" << std::endl;
 	}
-	//if (registry.levelNode.has(registry.levelNode.entities[0])) {
-	//	std::cout << "THESE ARE THE POSITION OF THE FIRST LEVELNODE" << std::endl;
-	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.x << std::endl;
-	//	std::cout << registry.motions.get(registry.levelNode.entities[0]).position.y << std::endl;
-	//	//player_motion.position = registry.motions.get(registry.levelNode.entities[0]).position;
-	//}
 }
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
-	// Loop over all collisions detected by the physics system
-	//auto& collisionsRegistry = registry.collisions;
-	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-	//	// The entity and its collider
-	//	Entity entity = collisionsRegistry.entities[i];
-	//	Entity entity_other = collisionsRegistry.components[i].other;
-
-	//	// For now, we are only interested in collisions that involve the chicken
-	//	if (registry.players.has(entity)) {
-
-	//		// Checking Player - Attack collisions
-	//		if (registry.enemyDrinks.has(entity_other)) {
-	//			// initiate fight if player is attacking
-	//			if (registry.attackTimers.has(entity)) {
-	//				// Scream. we can replace this with a diff sound later
-	//				Mix_PlayChannel(-1, chicken_dead_sound, 0);
-
-	//				// potential problem: if we don't remove the enemy it might keep colliding and screaming
-	//				registry.remove_all_components_of(entity_other);
-
-	//				// We also need to kill all other eagles
-	//				for (Entity enemies : registry.enemyDrinks.entities) {
-	//					registry.remove_all_components_of(enemies);
-	//				}
-
-	//				// Stage = 1 maps to turn based
-	//				stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
-	//			}
-	//		}
-	//	}
-	//}
-
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
 }
@@ -802,33 +730,6 @@ bool WorldSystem::is_over() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
-// check if player is in bounds, keep it in bounds if not
-// not using this anymore, but might later on so will keep it commented
-//bool WorldSystem::player_in_bounds(Motion* motion, bool is_x) {
-//	bool in_bounds;
-//	if (is_x) {
-//		float x_pos = motion->position.x;
-//		bool left = x_pos >= 50.f;
-//		bool right = x_pos <= (window_width_px - 50.f);
-//		in_bounds = left && right;
-//
-//		if (!left) motion->position.x = 50.f;
-//		if (!right) motion->position.x = (window_width_px - 50.f);
-//
-//	}
-//	else {
-//		float y_pos = motion->position.y;
-//		bool up = y_pos >= 50.f;
-//		bool down = y_pos <= (window_height_px - 50.f);
-//		in_bounds = up && down;
-//
-//		if (!up) motion->position.y = 50.f;
-//		if (!down) motion->position.y = (window_height_px - 50.f);
-//	}
-//
-//	return in_bounds;
-//}
-
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	switch (stage_system->get_current_stage()) {
@@ -871,14 +772,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		minigame_system->reset_values(true);
 		minigame_system->initialized = false;
 		stage_system->set_stage(StageSystem::Stage::main_menu);
-	}
-
-	// Resetting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-
-        restart_game();
 	}
 
 	// Exit game 
