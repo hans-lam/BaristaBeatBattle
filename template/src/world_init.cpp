@@ -760,7 +760,7 @@ Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associate
 }
 
 
-Entity create_cutscene_text_box(RenderSystem* renderer, int selection, vec2 pos, vec2 textPos, std::string text, std::string text2, std::string text3 , float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage) {
+Entity create_cutscene_text_box(RenderSystem* renderer, int level, int selection, vec2 pos,  StageSystem::Stage current_stage) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -784,31 +784,224 @@ Entity create_cutscene_text_box(RenderSystem* renderer, int selection, vec2 pos,
 
 	// Create and (empty) Eagle component to be able to refer to all eagles
 	registry.cutscenes.emplace(entity);
+	if (level == 0) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+	}
+	else if (level == 1) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 5) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 6) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELONE6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+	}
+	else if (level == 2) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 5) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 6) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 7) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTWO7,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+	}
+	else if (level == 3) {
+		if (selection == 1) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE1,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 2) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE2,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 3) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE3,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 4) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE4,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 5) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE5,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 6) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE6,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 7) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE7,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 8) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE8,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+		else if (selection == 9) {
+			RenderRequest& rq = registry.renderRequests.insert(
+				entity,
+				{ TEXTURE_ASSET_ID::LEVELTHREE9,
+				 EFFECT_ASSET_ID::BATTLE,
+				 GEOMETRY_BUFFER_ID::SPRITE });
+			rq.shown = true;
+		}
+
+	}
 	
-	if (selection == 1) {
-		RenderRequest&		rq = registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX1,
-			 EFFECT_ASSET_ID::BATTLE,
-			 GEOMETRY_BUFFER_ID::SPRITE });
-		rq.shown = true;
-	}
-	else if (selection == 2) {
-		RenderRequest& 		rq = registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX2,
-			 EFFECT_ASSET_ID::BATTLE,
-			 GEOMETRY_BUFFER_ID::SPRITE });
-		rq.shown = true;
-	}
-	else if (selection == 3) {
-		RenderRequest&		rq = registry.renderRequests.insert(
-			entity,
-			{ TEXTURE_ASSET_ID::CUTSCENETEXTBOX3,
-			 EFFECT_ASSET_ID::BATTLE,
-			 GEOMETRY_BUFFER_ID::SPRITE });
-		rq.shown = true;
-	}
 	else {
 	RenderRequest& rq = registry.renderRequests.insert(
 		entity,

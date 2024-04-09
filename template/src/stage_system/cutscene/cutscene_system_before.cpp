@@ -23,11 +23,6 @@ void CutSceneSystemBefore::handle_cutscene_render(RenderSystem* renderer) {
 	}
 
 
-	Entity textBox;
-	Entity char1;
-	Entity char2;
-
-
 	if (cutscene_done) {
 		// transition to overworld
 		std::cout << "GO TO Overwolrd\n";
@@ -41,30 +36,33 @@ void CutSceneSystemBefore::handle_cutscene_render(RenderSystem* renderer) {
 		return;
 	}
 
-	Entity instructionsText = createText("Press ENTER to continue cutscene", { 10, 790 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
-	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.5f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
+	Entity instructionsText = createText("Press left or right SHIFT to continue cutscene", { 10, 790 }, 1.2f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
+	Entity instructionsText2 = createText("Press SPACE twice to skip cutscene", { 10, 740 }, 1.2f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::cutscene, true);
 	switch (cutscene_slide) {
 	case 1:
 
-		textBox = create_cutscene_text_box(renderer, 1, vec2(750, 700), vec2(415, 250), " Welcome to Brew Battle Cafe, a bustling place", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
+		textBox = create_cutscene_text_box(renderer, 0,1, vec2(750, 700), StageSystem::Stage::cutscene);
 		//
 		break;
 	case 2:
 
 
-		textBox = create_cutscene_text_box(renderer, 2, vec2(750, 700), vec2(415, 250), "TEST", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-
+		textBox = create_cutscene_text_box(renderer, 0,2, vec2(750, 700), StageSystem::Stage::cutscene);
 		char1 = createCharPic(renderer, vec2(750, 500));
 		// textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 		break;
 	case 3:
 		//registry.renderRequests.get(textBox).shown = false;
-		textBox = create_cutscene_text_box(renderer, 3, vec2(750, 700), vec2(415, 250), "TEST", "filled with beats, baristas, and battles alike  in the never ", " ending battle to prove their best in the age - old rivalry between coffee and tea!", .56f, glm::vec3(0.12941176470588237, 0.06274509803921569, 0.06666666666666667), glm::mat4(1.0f), StageSystem::Stage::cutscene);
-
+		textBox = create_cutscene_text_box(renderer, 0,3, vec2(750, 700), StageSystem::Stage::cutscene);
 
 		char1 = createCharPic(renderer, vec2(750, 500));
 		//textBox = create_cutscene_text_box(renderer, vec2(0, 0));
 		break;
+	case 4: 
+		textBox = create_cutscene_text_box(renderer, 0,4, vec2(750, 700), StageSystem::Stage::cutscene);
+		char1 = createCharPic(renderer, vec2(750, 500));
+		break;
+
 	}
 
 
@@ -116,14 +114,23 @@ void CutSceneSystemBefore::handle_cutscene_keys(int key, int action) {
 				cutscene_slide = 1;
 			}
 		}
-		if (key == GLFW_KEY_ENTER) {
+		if (key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) {
 
 			if (!cutscene_done) {
 				// transition to turn-based
+				if (char1) {
+					registry.remove_all_components_of(char1);
+				}
+				if (char2) {
+					registry.remove_all_components_of(char2);
+				}
+				if (textBox) {
+					registry.remove_all_components_of(textBox);
+				}
 				cutscene_slide++;
 				printf("You entered: %d", cutscene_slide);
 			}
-			if (cutscene_slide >= 4) {
+			if (cutscene_slide >= 5) {
 				std::cout << "GO TO overworld\n";
 				skip_cutscene = false;
 				cutscene_done = false;

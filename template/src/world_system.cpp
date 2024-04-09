@@ -24,6 +24,7 @@ Entity tutorial;
 std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
 int frames_since_prev_second = 0;
 int fps = 0;
+int currentLevel;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -280,6 +281,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					overworld_system->nearest_node.position = motion_component.position;
 
 					std::cout << "I am now at this level: " << overworld_system->nearest_node.level_number << std::endl;
+					currentLevel = overworld_system->nearest_node.level_number;
 					std::cout << "The position of this current thing is: " << "(" << overworld_system->nearest_node.position.x << ", " << overworld_system->nearest_node.position.y << ")" << std::endl;
 					//std::cout << " " << << std::endl;
 
@@ -441,6 +443,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		if (out_of_combat) {
+			
 			combat_system->set_selected_level(stage_system->get_current_level());
 			combat_system->handle_level(renderer);
 		}
@@ -460,7 +463,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Handle cutscene stepping
 	if (curr_stage == StageSystem::Stage::cutscene) {
-		cutscene_system->handle_cutscene_render(renderer);
+		cutscene_system->handle_cutscene_render(renderer, currentLevel, flag_progression->is_london_recruited);
 
 	}
 

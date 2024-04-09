@@ -38,7 +38,7 @@ class RenderSystem {
 	GLuint m_font_VAO;
 	GLuint m_font_VBO;
 
-	std::string font_filename = "..//..//..//data//fonts//MonsterFriendFore.otf";
+	std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
 	unsigned int font_default_size = 24;
 
 	// Make sure these paths remain in sync with the associated enumerators.
@@ -78,12 +78,35 @@ class RenderSystem {
 			textures_path("health_bar_empty.png"),
 			textures_path("fill_bar.png"),
 			textures_path("cutscenebg.png"),
-			textures_path("cutsceneBox1.png"),
-			textures_path("cutsceneBox2.png"),
-			textures_path("cutsceneBox3.png"),
+			textures_path("cutsceneBegin1.png"),
+			textures_path("cutsceneBegin2.png"),
+			textures_path("cutsceneBegin3.png"),
 			textures_path("earlgrey.png"),
 			textures_path("americano.png"),
 			textures_path("sparkle.png"),
+			textures_path("cutsceneBegin4.png"),
+			textures_path("levelOne1.png"),
+			textures_path("levelOne2.png"),
+			textures_path("levelOne3.png"),
+			textures_path("levelOne4.png"),
+			textures_path("levelOne5.png"),
+			textures_path("levelOne6.png"),
+			textures_path("levelTwo1.png"),
+			textures_path("levelTwo2.png"),
+			textures_path("levelTwo3.png"),
+			textures_path("levelTwo4.png"),
+			textures_path("levelTwo5.png"),
+			textures_path("levelTwo6.png"),
+			textures_path("levelTwo7.png"),
+			textures_path("levelThree1.png"),
+			textures_path("levelThree2.png"),
+			textures_path("levelThree3.png"),
+			textures_path("levelThree4.png"),
+			textures_path("levelThree5.png"),
+			textures_path("levelThree6.png"),
+			textures_path("levelThree7.png"),
+			textures_path("levelThree8.png"),
+			textures_path("levelThree9.png"),
 
 	};
 

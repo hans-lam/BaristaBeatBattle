@@ -22,7 +22,7 @@ void MainMenuSystem::init(StageSystem* stage_system_arg) {
 	menu_text_map[tutorials] = createText("Tutorial", { basex,window_height_px / 2 - 250 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 	menu_text_map[credits] = createText("Credits", { basex,window_height_px / 2 - 300 }, 1.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 
-	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 125,window_height_px / 2 + 100 }, 2.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
+	main_menu_title = createText("BARISTA BEAT BATTLE", { basex - 300,window_height_px / 2 + 100 }, 3.f, glm::vec3(1.0, 1.0, 1.0), glm::mat4(1.0f), StageSystem::Stage::main_menu, true);
 }
 
 void MainMenuSystem::handle_menu_keys(int key, int action) {
