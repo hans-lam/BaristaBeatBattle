@@ -55,7 +55,7 @@ Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, flo
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECUP,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 
@@ -68,7 +68,7 @@ Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, flo
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::KETTLENORM,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		// Setting initial values, scale is negative to make it face the opposite way
@@ -104,7 +104,7 @@ Entity createSpeech(RenderSystem* renderer, vec2 pos) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::MINISPEECH,
-		EFFECT_ASSET_ID::TEXTURED,
+		EFFECT_ASSET_ID::BATTLE,
 		GEOMETRY_BUFFER_ID::SPRITE }
 	);
 
@@ -132,7 +132,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEPERFECT,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -140,7 +140,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEGOOD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -148,7 +148,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -156,7 +156,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLCLOUD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		motion.scale = { motion.scale.x * 2, motion.scale.y * 2 };
@@ -188,7 +188,7 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLGOOD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 	}
@@ -196,7 +196,7 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE } 
 		);
 	}
@@ -226,7 +226,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MILKALMOND,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -235,7 +235,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MILK2,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -244,7 +244,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MILKCOCONUT,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -253,7 +253,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MILKSOY,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
