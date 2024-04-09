@@ -10,16 +10,17 @@
 
 
 OverworldSystem::OverworldSystem() :
-	overworld_tutorial(false)
+	overworld_tutorial(false),
 
 	// THERE IS SOMETHING ABOUT THIS SO I COMMENTED THIS OUT:
-	//current_level(3)
+	current_level(1)
 {
 }
 
 void OverworldSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
 	overworld_tutorial = false;
+	current_level = 1;
 	
 	// I dont think this call works
 	//create_overworld_levels();

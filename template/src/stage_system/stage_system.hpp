@@ -10,6 +10,8 @@ public:
 		main_menu, 
 		overworld,
 		cutscene, 
+		cutscene_before,
+		cutscene_ending,
 		turn_based, 
 		minigame
 	};
@@ -49,6 +51,9 @@ private:
 	void set_overworld(); 
 
 	void set_cutscene(int level_num);
+
+	void set_cutscene_before(int level_num);
+	void set_cutscene_ending(int level_num);
 
 	void set_turn_based(int level_num);
 

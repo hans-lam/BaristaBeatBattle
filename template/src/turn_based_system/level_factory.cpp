@@ -58,7 +58,7 @@ Level* LevelFactory::construct_level_three(RenderSystem* renderer, vec2 base_all
 	level_three->allies.push_back(americano_entity);
 
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ENEMIES }, 2);
 
 	level_three->enemies.push_back(level_two_ground_a);
 	level_three->enemies.push_back(level_two_ground_b);
@@ -84,10 +84,10 @@ Level* LevelFactory::construct_level_four(RenderSystem* renderer, vec2 base_ally
 	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
 	//Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
-	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
+	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ENEMIES * 2) }, 2);
 
 	// temp here as we currently only have 5 levels
-	Entity possessed_london = create_london(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES });
+	Entity possessed_london = create_london(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ENEMIES });
 
 	level_four->enemies.push_back(level_two_ground_a);
 	//level_four->enemies.push_back(level_two_ground_b);
@@ -114,14 +114,15 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	level_five->allies.push_back(earl_entity);
 	level_five->allies.push_back(americano_entity);
 
-	// TO BECOME COFFEE ENEMIES
+	// TO BECOME TEA ENEMIES
 	Entity level_two_ground_a = create_turn_based_enemy(renderer, base_enemy_position, 2);
-	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ALLIES }, 2);
-	Entity level_two_ground_c = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 2) }, 2);
+	Entity level_two_ground_b = create_turn_based_enemy(renderer, { base_enemy_position.x,base_enemy_position.y - (VERTICAL_SPACE_BETWEEN_ENEMIES * 2) }, 2);
+	// To become devil, in the middle
+	Entity ground_devil = create_devil(renderer, { base_enemy_position.x,base_enemy_position.y - VERTICAL_SPACE_BETWEEN_ENEMIES });
 
 	level_five->enemies.push_back(level_two_ground_a);
 	level_five->enemies.push_back(level_two_ground_b);
-	level_five->enemies.push_back(level_two_ground_c);
+	level_five->enemies.push_back(ground_devil);
 
 	if (flag_progression->is_london_recruited) {
 		Entity london = create_london(renderer, { base_ally_position.x,base_ally_position.y - (VERTICAL_SPACE_BETWEEN_ALLIES * 3) });
@@ -131,6 +132,8 @@ Level* LevelFactory::construct_level_five(RenderSystem* renderer, vec2 base_ally
 	return level_five;
 
 }
+
+
 
 Level* LevelFactory::construct_level_six(RenderSystem* renderer, vec2 base_ally_position, vec2 base_enemy_position) {
 

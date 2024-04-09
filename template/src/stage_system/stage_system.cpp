@@ -22,7 +22,7 @@ void StageSystem::init()
 void StageSystem::set_stage(Stage target, int level)
 {
 
-	if (target != turn_based) {
+	if ((target != turn_based)) {
 		this->current_level = level;
 
 	}
@@ -40,6 +40,12 @@ void StageSystem::set_stage(Stage target, int level)
 		break;
 	case cutscene:
 		set_cutscene(level);
+		break;
+	case cutscene_ending:
+		set_cutscene_ending(level);
+		break;
+	case cutscene_before:
+		set_cutscene_before(level);
 		break;
 	case turn_based:
 		set_turn_based(level);
@@ -139,6 +145,11 @@ void StageSystem::set_overworld()
 		set_render_shown(entity, false, false);
 	}
 
+	//setting all cutscene entities to false 
+	for (Entity entity : registry.cutscenes.entities) {
+		set_render_shown(entity, false, false);
+	}
+
 	// Set all overworld entities to be shown
 	for (Entity entity : registry.overWorld.entities) {
 		set_render_shown(entity, true, true);
@@ -157,6 +168,38 @@ void StageSystem::set_cutscene(int level_num)
 	// Keep entities live since we still might need them
 	for (Entity entity : registry.overWorld.entities) {
 		render_clean_up(entity);
+	}
+
+	// Set all cutscene entities to be shown; 
+	// this can be changed depending on how we want to decide which cutscenes are rendered
+	for (Entity entity : registry.cutscenes.entities) {
+		set_render_shown(entity, true, false);
+	}
+}
+
+void StageSystem::set_cutscene_before(int level_num)
+{
+	current_level = level_num;
+	// Set all overworld entities to not be shown
+	// Keep entities live since we still might need them
+	for (Entity entity : registry.mainMenu.entities) {
+		set_render_shown(entity, false, false);
+	}
+
+	// Set all cutscene entities to be shown; 
+	// this can be changed depending on how we want to decide which cutscenes are rendered
+	for (Entity entity : registry.cutscenes.entities) {
+		set_render_shown(entity, true, false);
+	}
+}
+
+void StageSystem::set_cutscene_ending(int level_num)
+{
+	current_level = level_num;
+	// Set all overworld entities to not be shown
+	// Keep entities live since we still might need them
+	for (Entity entity : registry.mainMenu.entities) {
+		set_render_shown(entity, false, false);
 	}
 
 	// Set all cutscene entities to be shown; 

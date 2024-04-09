@@ -18,6 +18,9 @@
 #include "stage_system/main_menu/main_menu_system.hpp"
 #include "stage_system/overworld/overworld_system.hpp"
 #include "stage_system/cutscene/cutscene_system.hpp"
+#include "stage_system/cutscene/cutscene_system_before.hpp"
+#include "stage_system/cutscene/cutscene_system_ending.hpp"
+
 #include "stage_system/combat/combat_system.hpp"
 #include "stage_system/combat/minigame_system.hpp"
 
@@ -35,7 +38,7 @@ public:
 	void init(RenderSystem* renderer, TurnBasedSystem* turn_based_arg,
 		StageSystem* stage_system_arg, MainMenuSystem* main_menu_system_arg,
 		OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
-		CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg);
+		CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg, CutSceneSystemBefore* cutscene_system_before_arg, CutSceneSystemEnding* cutscene_system_ending_arg);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -78,6 +81,8 @@ private:
 	MainMenuSystem* main_menu_system;
 	OverworldSystem* overworld_system;
 	CutSceneSystem* cutscene_system;
+	CutSceneSystemBefore* cutscene_system_before;
+	CutSceneSystemEnding* cutscene_system_ending;
 	CombatSystem* combat_system;
 	MinigameSystem* minigame_system;
 

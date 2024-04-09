@@ -26,8 +26,8 @@ const float HEALTH_BAR_WIDTH = 250.f;
 const float HEALTH_BAR_HEIGHT = 62.5f;
 const float FILL_WIDTH = 135.f;
 const float FILL_HEIGHT = 18.f;
-const float TEXTBOX_WIDTH = 900.f;
-const float TEXTBOX_HEIGHT = 300.f;
+const float TEXTBOX_WIDTH = 750.f;
+const float TEXTBOX_HEIGHT = 275.f;
 const float SPARKLE_LENGTH = 50.f;
 
 // the player
@@ -68,8 +68,9 @@ Entity create_americano(RenderSystem* renderer, vec2 pos);
 Entity create_earl(RenderSystem* renderer, vec2 pos);
 Entity create_london(RenderSystem* renderer, vec2 pos);
 Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level);
+Entity create_devil(RenderSystem* renderer, vec2 pos);
 Entity create_health_bar_outline(RenderSystem* renderer, vec2 pos);
-Entity create_cutscene_text_box(RenderSystem* renderer, int selection,  vec2 pos, vec2 textPos, std::string text, std::string text2, std::string text3,  float scale, vec3 color, glm::mat4 trans, StageSystem::Stage current_stage);
+Entity create_cutscene_text_box(RenderSystem* renderer, int level, int selection, vec2 pos, StageSystem::Stage current_stage);
 Entity create_health_bar_fill(RenderSystem* renderer, vec2 pos, Entity associated_character);
 Entity create_sparkle(RenderSystem* renderer, vec2 pos, vec2 vel, vec2 acc, vec3 color);
 

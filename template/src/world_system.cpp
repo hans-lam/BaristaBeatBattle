@@ -26,6 +26,7 @@ Entity tutorial;
 std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
 int frames_since_prev_second = 0;
 int fps = 0;
+int currentLevel = 1 ;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -109,7 +110,7 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Chicken Game Assignment", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "Barista Beat Battle!", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -171,7 +172,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_arg, StageSystem* stage_system_arg,
 	MainMenuSystem* main_menu_system_arg, OverworldSystem* overworld_system_arg, CutSceneSystem* cutscene_system_arg,
-	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg) {
+	CombatSystem* combat_system_arg, MinigameSystem* minigame_system_arg, CutSceneSystemBefore* cutscene_system_before_arg, CutSceneSystemEnding* cutscene_system_ending_arg) {
 	// Global Systems Set up
 	this->renderer = renderer_arg;
 	this->turn_based = turn_based_arg;
@@ -183,6 +184,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	this->cutscene_system = cutscene_system_arg;
 	this->combat_system = combat_system_arg;
 	this->minigame_system = minigame_system_arg;
+	this->cutscene_system_before = cutscene_system_before_arg;
+	this->cutscene_system_ending = cutscene_system_ending_arg;
 
 	// Playing background music indefinitely
 	Mix_PlayMusic(main_menu_music, -1);
@@ -192,7 +195,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, TurnBasedSystem* turn_based_a
 	stage_music_map[StageSystem::Stage::main_menu] = main_menu_music;
 	stage_music_map[StageSystem::Stage::overworld] = background_music;
 	stage_music_map[StageSystem::Stage::cutscene] = cutscene_music;
-
+	stage_music_map[StageSystem::Stage::cutscene_before] = cutscene_music;
+	stage_music_map[StageSystem::Stage::cutscene_ending] = cutscene_music;
 	stage_music_map[StageSystem::Stage::turn_based] = turn_based_music; 
 	stage_music_map[StageSystem::Stage::minigame] = minigame_select_music;
 
@@ -230,6 +234,8 @@ void WorldSystem::set_music(StageSystem::Stage curr_stage) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+
+	currentLevel = overworld_system->current_level;
 	set_fps(elapsed_ms_since_last_update);
 
 	StageSystem::Stage curr_stage = stage_system->get_current_stage();
@@ -479,7 +485,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Handle cutscene stepping
 	if (curr_stage == StageSystem::Stage::cutscene) {
-		cutscene_system->handle_cutscene_render(renderer);
+		cutscene_system->handle_cutscene_render(renderer, currentLevel, flag_progression->is_london_recruited);
+
+	}
+
+	// Handle beginning cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene_before) {
+		cutscene_system_before->handle_cutscene_render(renderer);
+
+	}
+
+	// Handle beginning cutscene stepping
+	if (curr_stage == StageSystem::Stage::cutscene_ending) {
+		cutscene_system_ending->handle_cutscene_render(renderer);
 
 	}
 
@@ -639,6 +657,8 @@ void WorldSystem::restart_game() {
 	main_menu_system->init(stage_system);
 	overworld_system->init(stage_system);
 	cutscene_system->init(stage_system, renderer);
+	cutscene_system_before->init(stage_system, renderer);
+	cutscene_system_ending->init(stage_system, renderer);
 	combat_system->init(stage_system, turn_based);
 	minigame_system->init(stage_system, renderer);
 
@@ -765,6 +785,7 @@ void WorldSystem::handle_level_collisions() {
 					// TODO: SHOULD MAP TO DIFFERENT LEVELS
 					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
 					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
+					
 
 					// stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
 				}
@@ -819,6 +840,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		break;
 	case StageSystem::Stage::cutscene:
 		cutscene_system->handle_cutscene_keys(key, action);
+		break;
+	case StageSystem::Stage::cutscene_before:
+		cutscene_system_before->handle_cutscene_keys(key, action);
+		break;
+	case StageSystem::Stage::cutscene_ending:
+		cutscene_system_ending->handle_cutscene_keys(key, action);
 		break;
 	case StageSystem::Stage::turn_based: {
 		CombatSystem::SoundMapping play_sound = combat_system->handle_turnbased_keys(key, action);
