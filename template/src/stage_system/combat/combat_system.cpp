@@ -36,7 +36,7 @@ CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int acti
 }
 
 void CombatSystem::handle_level(RenderSystem* renderer) {
-	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
+	vec2 base_ally_position = { BASE_X_VALUE + 25, window_height_px - 225 };
 	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
 	Level* level = nullptr;
 
@@ -279,8 +279,8 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 		j++;
 
 		vec2 posn = registry.motions.get(party_member_entity).position;
-		create_health_bar_outline(renderer, posn + vec2(25.f, dy));
-		create_health_bar_fill(renderer, posn + vec2(50.f, dy), party_member_entity);
+		create_health_bar_outline(renderer, posn + vec2(5.f, dy));
+		create_health_bar_fill(renderer, posn + vec2(30.f, dy), party_member_entity);
 	}
 
 	for (Entity enemy_member : level->enemies) {
