@@ -62,14 +62,13 @@ void CombatSystem::handle_level(RenderSystem* renderer) {
 		break;
 	default:
 		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	}
 
 	// band-aid fix for initialization bug of selected_level
-	if (level == nullptr) {
+	/*if (level == nullptr) {
 		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
-	}
+	}*/
 
 	init_combat_data_for_level(renderer, level);
 

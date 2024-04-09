@@ -137,7 +137,7 @@ private:
 		{"USA", "France", "Italy", "India"}
 	};
 	Riddle rid3 = {
-		"C", "How much milk do is required to make a pound of cheese?",
+		"C", "How much milk is required to make a pound of cheese?",
 		{"20 lbs", "15 lbs", "10 lbs", "5 lbs"}
 	};
 	Riddle rid4 = {

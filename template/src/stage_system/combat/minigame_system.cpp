@@ -731,12 +731,12 @@ void MinigameSystem::handle_pour() {
 					GEOMETRY_BUFFER_ID::SPRITE }
 				);
 				rr.shown = true;
+
+				// setting text
+				registry.textRenderRequests.get(render_text_map["speech"]).text = "Currently pouring!";
 			}
 		}
 	}
-
-	// setting text
-	registry.textRenderRequests.get(render_text_map["speech"]).text = "Currently pouring!";
 }
 
 void MinigameSystem::handle_milk() {
