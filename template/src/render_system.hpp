@@ -94,6 +94,7 @@ class RenderSystem {
 			textures_path("cutsceneBox3.png"),
 			textures_path("earlgrey.png"),
 			textures_path("americano.png"),
+			textures_path("sparkle.png"),
 
 	};
 
@@ -110,6 +111,7 @@ class RenderSystem {
 		shader_path("lights"),
 		shader_path("battle"),
 		shader_path("battlebar"),
+		shader_path("sparkle"),
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;

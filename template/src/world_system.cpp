@@ -17,6 +17,9 @@ const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
+const size_t SPARKLE_DELAY_MS = 60.f; 
+const float MAX_SPARKLE_ACC = 75.f;
+const float SPARKLE_VELOCITY = 60.f;
 
 bool tutorialOn = false;
 Entity tutorial;
@@ -28,7 +31,7 @@ int fps = 0;
 WorldSystem::WorldSystem()
 	: player_speed(300.f)
 	, next_eagle_spawn(0.f)
-	, next_bug_spawn(0.f)
+	, next_sparkle_spawn(0.f)
 	, next_enemy_spawn(0.f)
 	, stage(0) {
 	// Seeding rng with random device
@@ -345,6 +348,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Handle turn based stepping
 	if (curr_stage == StageSystem::Stage::turn_based) {
+		next_sparkle_spawn -= elapsed_ms_since_last_update * current_speed;
 		// process attacks
 		
 		float min_attack_counter_ms = 700.f;
@@ -364,7 +368,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		// deal with injury graphics
-		// i do not know why this does not work if its in turn based system
 		float min_injury_counter_ms = 3000.f;
 		for (Entity entity : registry.injuryTimers.entities) {
 			// progress timer, 
@@ -383,9 +386,92 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		// sparkles are emitted downwards while miss timers are on
+		float min_miss_counter_ms = 1000.f;
+		for (Entity entity : registry.missTimers.entities) {
+			// progress timer, 
+			MissTimer& counter = registry.missTimers.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+			if (counter.counter_ms < min_miss_counter_ms) {
+				min_miss_counter_ms = counter.counter_ms;
+			}
+
+			if (next_sparkle_spawn < 0.f) {
+				next_sparkle_spawn = (SPARKLE_DELAY_MS / 2) + uniform_dist(rng) * (SPARKLE_DELAY_MS / 2);
+				Motion& motion = registry.motions.get(entity);
+				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, -40.f);
+				vec2 sparkle_acc = vec2(0.f, uniform_dist(rng) * MAX_SPARKLE_ACC);
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, SPARKLE_VELOCITY), sparkle_acc, vec3(1.f, 0.f, 0.f));
+			}
+
+			// stop spawning sparkles
+			if (counter.counter_ms < 0) {
+				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+				registry.remove_all_components_of(counter.associated_text);
+				registry.missTimers.remove(entity);
+			}
+		}
+
+		// sparkles are emitted upwards while levelup timers are on
+		float min_level_counter_ms = 3000.f;
+		for (Entity entity : registry.levelUpTimers.entities) {
+			// progress timer, 
+			LevelUpTimer& counter = registry.levelUpTimers.get(entity);
+			counter.counter_ms -= elapsed_ms_since_last_update;
+			//std::cout << "curr time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+			if (counter.counter_ms < min_level_counter_ms) {
+				min_level_counter_ms = counter.counter_ms;
+			}
+
+			if (next_sparkle_spawn < 0.f) {
+				next_sparkle_spawn = (SPARKLE_DELAY_MS / 2) + uniform_dist(rng) * (SPARKLE_DELAY_MS / 2);
+				Motion& motion = registry.motions.get(entity);
+				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, 40.f);
+				vec2 sparkle_acc = vec2(0.f, -uniform_dist(rng) * MAX_SPARKLE_ACC);
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, -SPARKLE_VELOCITY), sparkle_acc, vec3(0.f, 0.5f, 0.5f));
+			}
+
+			// stop spawning sparkles
+			if (counter.counter_ms < 0) {
+				//std::cout << "end time: " << (3000.f - counter.counter_ms) / 3000.f << '\n';
+				registry.remove_all_components_of(counter.associated_text);
+				registry.levelUpTimers.remove(entity);
+			}
+		}
+
+		// kill sparkles when their lifespan is up
+		for (Entity entity : registry.sparkles.entities) {
+			Sparkle& sparkle = registry.sparkles.get(entity);
+			sparkle.life -= elapsed_ms_since_last_update;
+			if (sparkle.life < 0.f) {
+				registry.remove_all_components_of(entity);
+			}
+		}
+
 		if (out_of_combat) {
-			combat_system->set_selected_level(stage_system->get_current_level());
-			combat_system->handle_level(renderer);
+
+			
+
+			if (registry.turnBasedEnemies.size() >= 1 || registry.partyMembers.size() >= 1) {
+
+
+				double duration;
+
+				duration = (std::clock() - turn_based->end_of_game_wait) / (double)CLOCKS_PER_SEC;
+
+				if (duration > 3.00 && registry.levelUpTimers.size() == 0 ) {
+					turn_based->end_of_game_wait = NULL;
+					combat_system->handle_combat_over();
+				}
+				
+			}
+			else {
+				combat_system->set_selected_level(stage_system->get_current_level());
+				combat_system->handle_level(renderer);
+			}
+
+			
 		}
 		else {
 			combat_system->handle_turn_rendering();

@@ -763,8 +763,10 @@ Entity create_turn_based_enemy(RenderSystem* renderer, vec2 pos, int level) {
 	rr.shown = true;
 
 	// give entity turn based components
-	character_factory->construct_enemy(entity, level);
-
+	if (level == 0) character_factory->construct_tutorial_enemy(entity);
+	else character_factory->construct_enemy(entity, level);
+	
+	
 	registry.colors.insert(entity, { 1, 0.8f, 0.8f });
 
 	registry.turnBased.emplace(entity);
@@ -928,5 +930,35 @@ Entity create_cutscene_text_box(RenderSystem* renderer, int selection, vec2 pos,
 	rq.shown = true;
 	}
 	
+	return entity;
+}
+
+Entity create_sparkle(RenderSystem* renderer, vec2 pos, vec2 vel, vec2 acc, vec3 color) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = vel;
+	motion.position = pos;
+
+	// scale the sparkle FIX THIS TO BE SMALLER?
+	motion.scale = vec2({ SPARKLE_LENGTH, SPARKLE_LENGTH });
+
+	auto& sparkle = registry.sparkles.emplace(entity);
+	sparkle.colour = color;
+	sparkle.acceleration = acc;
+	RenderRequest& rr = registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::SPARKLE,
+		 EFFECT_ASSET_ID::SPARKLE,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+	rr.shown = true;
+
+	registry.turnBased.emplace(entity);
 	return entity;
 }

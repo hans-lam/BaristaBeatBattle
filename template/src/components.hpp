@@ -80,6 +80,14 @@ struct Foreground
 
 };
 
+// For particle system
+struct Sparkle
+{
+	vec3 colour;
+	vec2 acceleration;
+	float life = 1000;
+};
+
 // EnemyDrinks start fights if you talk/attack them
 struct EnemyDrink
 {
@@ -193,6 +201,18 @@ struct InjuredTimer
 {
 	float counter_ms = 3000;
 	float redness_factor = 1.0f;
+};
+
+struct MissTimer
+{
+	float counter_ms = 1000;
+	Entity associated_text;
+};
+
+struct LevelUpTimer
+{
+	float counter_ms = 3000;
+	Entity associated_text;
 };
 
 struct MiniGameTimer
@@ -310,7 +330,8 @@ enum class TEXTURE_ASSET_ID {
 	CUTSCENETEXTBOX3 = CUTSCENETEXTBOX2 + 1,
 	EARL = CUTSCENETEXTBOX3 + 1,
 	AMERICANO = EARL + 1,
-	TEXTURE_COUNT = AMERICANO + 1
+	SPARKLE = AMERICANO + 1,
+	TEXTURE_COUNT = SPARKLE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -325,7 +346,8 @@ enum class EFFECT_ASSET_ID {
 	LIGHTS = FOREGROUND + 1,
 	BATTLE = LIGHTS + 1,
 	BATTLEBAR = BATTLE + 1,
-	EFFECT_COUNT = BATTLEBAR + 1
+	SPARKLE = BATTLEBAR + 1,
+	EFFECT_COUNT = SPARKLE + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

@@ -41,9 +41,6 @@ void CombatSystem::handle_level(RenderSystem* renderer) {
 	Level* level = nullptr;
 
 	switch (selected_level) {
-	case level_one:
-		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
-		break;
 	case level_two:
 		// Need to switch this up once more create levels are implemented
 		level = level_factory->construct_level_two(renderer, base_ally_position, base_enemy_position);
@@ -62,6 +59,10 @@ void CombatSystem::handle_level(RenderSystem* renderer) {
 		break;
 	case level_seven:
 		level = level_factory->construct_level_seven(renderer, base_ally_position, base_enemy_position);
+		break;
+	default:
+		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
+		init_combat_data_for_level(renderer, level);
 		break;
 	}
 
@@ -143,6 +144,8 @@ void CombatSystem::handle_combat_over() {
 	for (Entity entity : registry.turnBasedEnemies.entities) {
 		registry.remove_all_components_of(entity);
 	}
+
+	stage_system->set_stage(StageSystem::Stage::overworld);
 }
 
 void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {
@@ -181,11 +184,6 @@ CombatSystem::SoundMapping CombatSystem::handle_attack(Entity active_char_entity
 				flag_progression->is_london_recruited = true;
 			}
 
-			// delete all enemies	
-			handle_combat_over();
-			// move selected level to next level
-			//selected_level = static_cast<CombatLevel>((selected_level + 1) % (level_seven + 1));
-			stage_system->set_stage(StageSystem::Stage::overworld);
 		}
 	}
 
