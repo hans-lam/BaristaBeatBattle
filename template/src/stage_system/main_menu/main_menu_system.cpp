@@ -72,7 +72,7 @@ void MainMenuSystem::handle_option()
 		}
 
 		// go to overworld with default settings
-		stage_system->set_stage(StageSystem::Stage::overworld);
+		stage_system->set_stage(StageSystem::Stage::cutscene_before);
 		break;
 	case load_game:
 		// popup game load option

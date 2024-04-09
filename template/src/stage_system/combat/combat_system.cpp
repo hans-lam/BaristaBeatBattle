@@ -143,8 +143,12 @@ void CombatSystem::handle_combat_over() {
 	for (Entity entity : registry.turnBasedEnemies.entities) {
 		registry.remove_all_components_of(entity);
 	}
-
-	stage_system->set_stage(StageSystem::Stage::overworld);
+	if (selected_level == level_five) {
+		stage_system->set_stage(StageSystem::Stage::cutscene_ending);
+	} else{
+		stage_system->set_stage(StageSystem::Stage::overworld);
+	}
+	
 }
 
 void CombatSystem::handle_minigame_attack(Entity active_char_entity, int score) {
