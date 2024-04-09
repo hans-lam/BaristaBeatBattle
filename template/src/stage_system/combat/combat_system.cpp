@@ -379,13 +379,13 @@ void CombatSystem::handle_turn_rendering() {
 				if (registry.renderRequests.has(pourIt)) {
 					registry.renderRequests.remove(pourIt);
 				}
-				if (registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) {
+				if ((registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
 					registry.textRenderRequests.get(attack_text).shown = false;
 				}
-				if (registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) {
+				if ((registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
 					registry.textRenderRequests.get(rest_text).shown = false;
 				}
-				if (registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) {
+				if ((registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
 					registry.textRenderRequests.get(magic_text).shown = false;
 				}
 			}
