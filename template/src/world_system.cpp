@@ -491,6 +491,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				minigame_system->reset_values(true);
 				minigame_system->initialized = true;
 			}
+
+			// Adding mapping of minigames to specific characters
+			for (Entity entity : registry.characterDatas.entities) {
+				if (entity == turn_based->get_active_character()) {
+					CharacterData& current_data = registry.characterDatas.get(entity);
+
+					std::string current_name = current_data.characterData->get_name();
+
+					if (current_name == "London") {
+						break;
+					}
+					else {
+						minigame_system->set_selected_game(current_name);
+						minigame_system->handle_game_selection();
+					}
+				}
+			}
 		}
 		else {
 			if (minigame_system->get_practice()) {

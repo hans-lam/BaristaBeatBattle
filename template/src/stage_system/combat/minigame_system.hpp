@@ -20,6 +20,13 @@ public:
 		milk_it
 	};
 
+	std::map<std::string, Minigame> mini_to_char_map = {
+		{"Chai", cool_it},
+		{"Americano", pour_it},
+		{"Earl", milk_it}
+	};
+
+
 	void init(StageSystem* stage_system_arg, RenderSystem* renderer_arg); 
 
 	void handle_minigame_key(int key, int action);
@@ -40,6 +47,10 @@ public:
 
 	int get_selected_game() const {
 		return this->selected_game;
+	}
+
+	void set_selected_game(std::string chosen_mini) {
+		selected_game = mini_to_char_map[chosen_mini];
 	}
 
 	void handle_game_selection();
