@@ -283,7 +283,9 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 		create_health_bar_outline(renderer, posn + vec2(-25.f, dy));
 		create_health_bar_fill(renderer, posn + vec2(0.f, dy), enemy_member);
 	}
-
+	attack_text = createText("attack", {0,0}, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	rest_text = createText("rest", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	pourit_text = createText("pourit", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 
 }
 
@@ -323,25 +325,37 @@ void CombatSystem::handle_turn_rendering() {
 					RenderRequest& rr = registry.renderRequests.insert(
 						attack,
 						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(attack);
+					TextRenderRequest& trr = registry.textRenderRequests.get(attack_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(rest)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						rest,
-						{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(rest);
+					TextRenderRequest& trr = registry.textRenderRequests.get(rest_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(pourIt)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						pourIt,
-						{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(pourIt);
+					TextRenderRequest& trr = registry.textRenderRequests.get(pourit_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
 				}
 			}
 			else {
