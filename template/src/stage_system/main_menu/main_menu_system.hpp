@@ -15,8 +15,7 @@ public:
 		new_game,
 		load_game, 
 		save_game,
-		tutorials,
-		credits
+		tutorials
 	};
 
 	void init(StageSystem* stage_system_arg);

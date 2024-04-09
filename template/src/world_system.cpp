@@ -26,7 +26,7 @@ Entity tutorial;
 std::chrono::steady_clock::time_point last_frame_time = std::chrono::steady_clock::now();
 int frames_since_prev_second = 0;
 int fps = 0;
-int currentLevel;
+int currentLevel = 1 ;
 
 // Create the bug world
 WorldSystem::WorldSystem()
@@ -55,6 +55,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(minigame_practice_metronome);
 	if (minigame_music != nullptr)
 		Mix_FreeMusic(minigame_music); 
+	if (pour_it_music != nullptr)
+		Mix_FreeMusic(pour_it_music);
+	if (milk_it_music != nullptr)
+		Mix_FreeMusic(milk_it_music);
 
 	// Destroy sound effect components
 	if (change_selection_effect != nullptr)
@@ -138,6 +142,8 @@ GLFWwindow* WorldSystem::create_window() {
 	minigame_select_music = Mix_LoadMUS(audio_path("minigame_select.wav").c_str());
 	minigame_practice_metronome = Mix_LoadMUS(audio_path("metronome.wav").c_str());
 	minigame_music = Mix_LoadMUS(audio_path("120bpmwithmetronome.wav").c_str());
+	pour_it_music = Mix_LoadMUS(audio_path("pour_it.wav").c_str());
+	milk_it_music = Mix_LoadMUS(audio_path("milk_it.wav").c_str());
 	// load sound effects
 	change_selection_effect = Mix_LoadWAV(audio_path("change_selection_effect.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
@@ -228,6 +234,8 @@ void WorldSystem::set_music(StageSystem::Stage curr_stage) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+
+	currentLevel = overworld_system->current_level;
 	set_fps(elapsed_ms_since_last_update);
 
 	StageSystem::Stage curr_stage = stage_system->get_current_stage();
@@ -266,8 +274,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				// std::cout << "I AM GETTING HERE, newpos.x = " << newpos.x << std::endl;
 				// std::cout << "I AM GETTING HERE, newpos.y = " << newpos.y << std::endl;
 
-				std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
-				std::cout << newpos.x << ", " << newpos.y << std::endl;
+				//std::cout << "THIS IS THE PATH OF BEZIER: " << std::endl;
+				//std::cout << newpos.x << ", " << newpos.y << std::endl;
 
 				motion_component.position = newpos;
 				
@@ -276,18 +284,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 				if (animation_component.current_ms > animation_component.total_ms) {
-					std::cout << "HERE ARE SOME STATS: " << std::endl;
-					std::cout << "I came from this level: " << overworld_system->prev_node.level_number << std::endl;
-
-					std::cout << "The position of this previous thing is: " << "(" << overworld_system->prev_node.position.x << ", " << overworld_system->prev_node.position.y << ")" << std::endl;
-					//std::cout << " " << << std::endl;
-
-					overworld_system->nearest_node.position = motion_component.position;
-
-					std::cout << "I am now at this level: " << overworld_system->nearest_node.level_number << std::endl;
-					currentLevel = overworld_system->nearest_node.level_number;
-					std::cout << "The position of this current thing is: " << "(" << overworld_system->nearest_node.position.x << ", " << overworld_system->nearest_node.position.y << ")" << std::endl;
-					//std::cout << " " << << std::endl;
+					
 
 					overworld_system->updatePlayerVelocityTowardsTarget(elapsed_ms_since_last_update);
 
@@ -512,21 +509,64 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				minigame_system->reset_values(true);
 				minigame_system->initialized = true;
 			}
+
+			// Adding mapping of minigames to specific characters
+			for (Entity entity : registry.characterDatas.entities) {
+				if (entity == turn_based->get_active_character()) {
+					CharacterData& current_data = registry.characterDatas.get(entity);
+
+					std::string current_name = current_data.characterData->get_name();
+
+					if (current_name == "London") {
+						break;
+					}
+					else {
+						minigame_system->set_selected_game(current_name);
+						minigame_system->handle_game_selection();
+					}
+				}
+			}
 		}
 		else {
 			if (minigame_system->get_practice()) {
 				// playing practice "music"
 				if (!(minigame_system->practice_music_start)) {
-					Mix_PlayMusic(minigame_practice_metronome, -1);
-					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					switch (minigame_system->get_selected_game()) {
+					case minigame_system->Minigame::cool_it: {
+						Mix_PlayMusic(minigame_practice_metronome, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+						break;
+					}
+					case minigame_system->Minigame::pour_it: {
+						Mix_PlayMusic(pour_it_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.25);
+						break;
+					}
+					case minigame_system->Minigame::milk_it: {
+						Mix_PlayMusic(milk_it_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.25);
+						break;
+					}
+					}
 					minigame_system->practice_music_start = true;
 				}
 			}
 			else {
 				// playing minigame "music"
 				if (!(minigame_system->minigame_music_start)) {
-					Mix_PlayMusic(minigame_music, -1);
-					Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+					switch (minigame_system->get_selected_game()) {
+					case minigame_system->Minigame::cool_it: {
+						Mix_PlayMusic(minigame_music, -1);
+						Mix_VolumeMusic(MIX_MAX_VOLUME * 0.50);
+						break;
+					}
+					case minigame_system->Minigame::pour_it: {
+						break;
+					}
+					case minigame_system->Minigame::milk_it: {
+						break;
+					}
+					}
 					minigame_system->minigame_music_start = true;
 				}
 			}
@@ -567,19 +607,38 @@ void WorldSystem::create_overworld_levels(int num_levels) {
 		
 		for (int i = 0; i < num_levels; i++) {
 			// 1500 is window_width_px
-			vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
-
-			std::cout << "HERE IS THE COORDINATE OF LEVEL: " << (i + 1) << std::endl;
-			std::cout << levelpos.x << ", " << levelpos.y << std::endl;
-
-
+			// vec2 levelpos = vec2((1500/num_levels)/2 + (1500/(num_levels) * i), 400 + (300*((1+i)%2)));
+			vec2 levelpos;
+			
+			// manually hard coded locations of overworld levels
+			switch (i) {
+				case 0:
+					levelpos = vec2(150, 550);
+					break;
+				case 1:
+					levelpos = vec2(350, 500);
+					break;
+				case 2:
+					levelpos = vec2(700, 700);
+					break;
+				case 3:
+					levelpos = vec2(1100, 600);
+					break;
+				case 4:
+					levelpos = vec2(1300, 400);
+					break;
+				default:
+					std::cout << "i is not in range" << std::endl;
+			}
+			
 			Entity level = createLevelNode(renderer, i+1, levelpos);
 			
 			
-			// TODO // set the first levelnode to 3 just for testing, DELETE AND FIX THIS LATERRRRR:
-			if (i == 2) {
-				std::cout << "This should only run once: " << "i = 0" << std::endl;
+			
+			// initialized prev level to be the first one
+			if (i == 0) {
 				overworld_system->prev_node = registry.levelNode.get(level);
+				
 			}
 			
 		}
@@ -628,7 +687,8 @@ void WorldSystem::restart_game() {
 	createForegroundScroller(renderer, { window_width_px / 2, BG_HEIGHT / 2 }, true);
 
 	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px / 2, window_height_px - 200 });
+	// set as level1 position
+	player_chicken = createChicken(renderer, { 150, 550 });
 	registry.colors.insert(player_chicken, { 1, 0.8f, 0.8f });
 
 	// Create Background for turn based battle
@@ -725,6 +785,7 @@ void WorldSystem::handle_level_collisions() {
 					// TODO: SHOULD MAP TO DIFFERENT LEVELS
 					// Maybe I should just get this registry.players.components[0].level_num in the turn_based_system
 					std::cout << "THIS IS THE LEVEL NUM: " << registry.players.components[0].level_num << std::endl;
+					
 
 					// stage_system->set_stage(StageSystem::Stage::cutscene, registry.players.components[0].level_num);
 				}

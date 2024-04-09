@@ -24,6 +24,7 @@ public:
 	LevelNode nearest_right_node;
 
 	float movement_time = 3.0;
+	int current_level ; // gets updated when handle_movement receives a key press
 	
 	LevelNode nearest_node; // used to generalize omg im so sorry this is realyl bad code
 	LevelNode prev_node; //used in the calcualtion of bezier movement
@@ -36,7 +37,7 @@ private:
 	bool is_target_reached;
 	StageSystem* stage_system;
 	RenderSystem* renderer;
-	int current_level; // gets updated when handle_movement receives a key press
+	
 	LevelNode* current_levelNode;
 	int prev_level; // stores prev level
 	bool step();

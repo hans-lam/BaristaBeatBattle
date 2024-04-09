@@ -31,7 +31,60 @@ Entity createChicken(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer) {
+Entity createMainMini(RenderSystem* renderer, vec2 pos, float rhythm_length, float inter_timer, std::string sprite) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	// Place in minigame
+	registry.miniGame.emplace(entity);
+	// Place in minigame timer for ryhthym calcs
+	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
+	mgt.counter_ms = rhythm_length; 
+	mgt.inter_timer = inter_timer;
+
+	switch (sprite[0]) {
+	// cup case
+	case 'c': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MINIGAMECUP,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+		break;
+	}
+	// kettle case
+	case 'k': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::KETTLENORM,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		// Setting initial values, scale is negative to make it face the opposite way
+		motion.scale = vec2({ KETTLE_WIDTH, KETTLE_HEIGHT });
+		break;
+	}
+	case 'm': {
+		registry.motions.remove(entity);
+		break;
+	}
+	}
+
+	return entity;
+}
+
+Entity createSpeech(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
@@ -43,18 +96,15 @@ Entity createCup(RenderSystem* renderer, vec2 pos, float rhythm_length, float in
 	motion.position = pos;
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -CUP_WIDTH, CUP_HEIGHT });
+	motion.scale = vec2({ SPEECH_WIDTH, SPEECH_HEIGHT });
 
 	// Place in minigame
 	registry.miniGame.emplace(entity);
-	// Place in minigame timer for ryhthym calcs
-	MiniGameTimer& mgt = registry.miniGameTimer.emplace(entity);
-	mgt.counter_ms = rhythm_length; 
-	mgt.inter_timer = inter_timer;
+
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::MINIGAMECUP,
-		EFFECT_ASSET_ID::TEXTURED,
+		{ TEXTURE_ASSET_ID::MINISPEECH,
+		EFFECT_ASSET_ID::BATTLE,
 		GEOMETRY_BUFFER_ID::SPRITE }
 	);
 
@@ -82,7 +132,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEPERFECT,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -90,7 +140,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEGOOD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -98,7 +148,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMEFAIL,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		break;
@@ -106,7 +156,7 @@ Entity createMiniResult(RenderSystem* renderer, vec2 pos, float interpolate_coun
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLCLOUD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 		motion.scale = { motion.scale.x * 2, motion.scale.y * 2 };
@@ -138,7 +188,7 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLGOOD,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::BATTLE,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
 	}
@@ -146,14 +196,74 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE }
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE } 
 		);
 	}
 
 	return entity;
 }
 
+// create milk option that attaches to a mc option
+Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
+
+	// add entity to minigame component
+	registry.miniGame.emplace(entity);
+
+	switch (milk_type[0]) {
+	case 'A': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKALMOND,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'B': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILK2,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'C': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKCOCONUT,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'D': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::MILKSOY,
+			EFFECT_ASSET_ID::BATTLE,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	}
+
+	registry.renderRequests.get(entity).shown = true;
+
+	return entity;
+}
 
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 {
@@ -197,25 +307,53 @@ Entity createLevelNode(RenderSystem* renderer, int level_num, vec2 position)
 	auto& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = vec2(0.f,0.f);
-	motion.position = position;
+	motion.position = position + vec2(0, 100);
 
 
 	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
+	motion.scale = vec2({ -100, 100});
 
 	registry.overWorld.emplace(entity);
 	auto& levelNode = registry.levelNode.emplace(entity);
 	levelNode.position = position;
 	levelNode.level_number = level_num;
 
+
+	// Based on the value of level_num, set the appropriate TEXTURE_ASSET_ID
+	TEXTURE_ASSET_ID textureId;
+	switch (level_num) {
+	case 1:
+		textureId = TEXTURE_ASSET_ID::LEVEL1;
+		break;
+	case 2:
+		textureId = TEXTURE_ASSET_ID::LEVEL2;
+		break;
+	case 3:
+		textureId = TEXTURE_ASSET_ID::LEVEL3;
+		break;
+	case 4:
+		textureId = TEXTURE_ASSET_ID::LEVEL4;
+		break;
+	case 5:
+		textureId = TEXTURE_ASSET_ID::LEVEL5;
+		break;
+		// Add more cases if there are more levels
+	default:
+		textureId = TEXTURE_ASSET_ID::LEVEL1; // Or some default case
+		std::cerr << "Warning: Level number " << level_num << " not recognized. Using default texture." << std::endl;
+		break;
+	}
+
+
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::ENEMYDRINK,
-		 EFFECT_ASSET_ID::TEXTURED,
+		{ textureId,
+		 EFFECT_ASSET_ID::FOREGROUND,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
-	Entity level_text = createText(std::to_string(level_num), position - vec2(0,200), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld, false);
+
+	Entity level_text = createText(std::to_string(level_num), vec2(position.x - 90, 900 - position.y + 80), 1, glm::vec3(1.0f, 1.0f, 1.0f), glm::mat4(1.0f), StageSystem::Stage::overworld, false);
 	registry.textRenderRequests.get(level_text).shown = true;
 
 	return entity;
@@ -342,7 +480,7 @@ Entity createForegroundScroller(RenderSystem* renderer, vec2 position, bool isLi
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::FGSCROLL,
-			 EFFECT_ASSET_ID::FOREGROUND,
+			 EFFECT_ASSET_ID::BATTLE,
 			 GEOMETRY_BUFFER_ID::SPRITE });
 	}
 	RenderRequest& rr = registry.renderRequests.get(entity);
@@ -550,7 +688,7 @@ Entity create_americano(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::AMERICANO, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			EFFECT_ASSET_ID::BATTLE, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 
@@ -583,7 +721,7 @@ Entity create_earl(RenderSystem* renderer, vec2 pos) {
 	RenderRequest& rr = registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::EARL, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED, // shuold prob fix this later
+			EFFECT_ASSET_ID::BATTLE, // shuold prob fix this later
 			GEOMETRY_BUFFER_ID::SPRITE });
 	rr.shown = true;
 

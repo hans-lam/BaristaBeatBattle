@@ -1,0 +1,6 @@
+Welcome to Milk It! The goal of this minigame:
+to choose the right milk to use! Answer the multiple
+choice riddle correctly, and you'll choose the right milk!
+Be careful though, as there is a time limit for answering.
+Use the arrow keys to change your selection. 
+Press enter to choose your selection.

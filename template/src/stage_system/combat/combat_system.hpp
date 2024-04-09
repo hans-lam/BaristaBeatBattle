@@ -60,4 +60,7 @@ private:
 	TurnBasedSystem* turn_based;
 	LevelFactory* level_factory;
 	bool turn_based_tutorial;
+	Entity attack_text;
+	Entity rest_text;
+	Entity magic_text;
 };

@@ -17,7 +17,7 @@ void CutSceneSystem::init(StageSystem* stage_system_arg, RenderSystem * renderer
 void CutSceneSystem::handle_cutscene_render(RenderSystem * renderer, int level, bool recruited) {
 	// TODO: Change cutscene done to TRUE after some set amount of time
 	//Entity textBox;
-	//printf("You ar in level: %d", level);
+	printf("You ar in level: %d", level);
 
 	if (cutscene_currently_rendered == 0) {
 		createBackgroundCutscene(renderer, { window_width_px / 2.0, window_height_px / 2.0 });

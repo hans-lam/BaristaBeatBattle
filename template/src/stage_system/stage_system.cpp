@@ -238,6 +238,12 @@ void StageSystem::set_minigame()
 	// Set turn based entities to be rendered
 	for (Entity entity : registry.turnBased.entities) {
 		set_render_shown(entity, false, false);
+		if (registry.missTimers.has(entity)) {
+			set_render_shown(registry.missTimers.get(entity).associated_text, false, false);
+		}
+		else if (registry.levelUpTimers.has(entity)) {
+			set_render_shown(registry.levelUpTimers.get(entity).associated_text, false, false);
+		}
 	}
 
 	// Set minigame based entities to be rendered 

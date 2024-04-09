@@ -38,38 +38,39 @@ CombatSystem::SoundMapping CombatSystem::handle_turnbased_keys(int key, int acti
 void CombatSystem::handle_level(RenderSystem* renderer) {
 	vec2 base_ally_position = { BASE_X_VALUE, window_height_px - 200 };
 	vec2 base_enemy_position = { window_width_px - 100, window_height_px - 200 };
-	Level* level;
+	Level* level = nullptr;
+
 	switch (selected_level) {
 	case level_two:
 		// Need to switch this up once more create levels are implemented
 		level = level_factory->construct_level_two(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_three:
 		level = level_factory->construct_level_three(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_four:
 		level = level_factory->construct_level_four(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_five:
 		level = level_factory->construct_level_five(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_six:
 		level = level_factory->construct_level_six(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	case level_seven:
 		level = level_factory->construct_level_seven(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	default:
 		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
-		init_combat_data_for_level(renderer, level);
 		break;
 	}
+
+	// band-aid fix for initialization bug of selected_level
+	/*if (level == nullptr) {
+		level = level_factory->construct_level_one(renderer, base_ally_position, base_enemy_position);
+	}*/
+
+	init_combat_data_for_level(renderer, level);
 
 	turn_based->start_encounter(level);
 }
@@ -287,7 +288,9 @@ void CombatSystem::init_combat_data_for_level(RenderSystem* renderer, Level* lev
 		create_health_bar_outline(renderer, posn + vec2(-25.f, dy));
 		create_health_bar_fill(renderer, posn + vec2(0.f, dy), enemy_member);
 	}
-
+	attack_text = createText("attack", {0,0}, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	rest_text = createText("rest", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
+	magic_text = createText("magic", { 0,0 }, 1.0f, vec3(0), mat4(1.0f), StageSystem::Stage::turn_based, false);
 
 }
 
@@ -311,7 +314,7 @@ void CombatSystem::handle_turn_rendering() {
 				color = { 1, 0.8f, 0.8f };
 			}
 		}
-
+		bool ally_turn_is_next = false;
 		// Setting menu's active 
 		for (Entity menu_entity : registry.menu.entities) {
 			Menu& menu = registry.menu.get(menu_entity);
@@ -323,29 +326,51 @@ void CombatSystem::handle_turn_rendering() {
 			MenuOption& prt = registry.menuOptions.get(pourIt);
 
 			if (menu.associated_character == active_char_entity) {
+				ally_turn_is_next = true;
 				if (!registry.renderRequests.has(attack)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						attack,
 						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(attack);
+					TextRenderRequest& trr = registry.textRenderRequests.get(attack_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(rest)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						rest,
-						{ TEXTURE_ASSET_ID::RESTBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(rest);
+					TextRenderRequest& trr = registry.textRenderRequests.get(rest_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(pourIt)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						pourIt,
-						{ TEXTURE_ASSET_ID::ITEMBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
+					Motion& motion = registry.motions.get(pourIt);
+					TextRenderRequest& trr = registry.textRenderRequests.get(magic_text);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
+					trr.shown = true;
+				}
+				if (registry.textRenderRequests.has(attack_text)) {
+					registry.textRenderRequests.get(attack_text).shown = true;
+				}
+				if (registry.textRenderRequests.has(rest_text)) {
+					registry.textRenderRequests.get(rest_text).shown = true;
+				}
+				if (registry.textRenderRequests.has(magic_text)) {
+					registry.textRenderRequests.get(magic_text).shown = true;
 				}
 			}
 			else {
@@ -357,6 +382,15 @@ void CombatSystem::handle_turn_rendering() {
 				}
 				if (registry.renderRequests.has(pourIt)) {
 					registry.renderRequests.remove(pourIt);
+				}
+				if (registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) {
+					registry.textRenderRequests.get(attack_text).shown = false;
+				}
+				if (registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) {
+					registry.textRenderRequests.get(rest_text).shown = false;
+				}
+				if (registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) {
+					registry.textRenderRequests.get(magic_text).shown = false;
 				}
 			}
 
