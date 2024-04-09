@@ -328,36 +328,36 @@ void CombatSystem::handle_turn_rendering() {
 					RenderRequest& rr = registry.renderRequests.insert(
 						attack,
 						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
 					Motion& motion = registry.motions.get(attack);
 					TextRenderRequest& trr = registry.textRenderRequests.get(attack_text);
-					trr.position = vec2(motion.position.x, window_height_px - motion.position.y);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(rest)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						rest,
 						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
 					Motion& motion = registry.motions.get(rest);
 					TextRenderRequest& trr = registry.textRenderRequests.get(rest_text);
-					trr.position = vec2(motion.position.x, window_height_px - motion.position.y);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}
 				if (!registry.renderRequests.has(pourIt)) {
 					RenderRequest& rr = registry.renderRequests.insert(
 						pourIt,
 						{ TEXTURE_ASSET_ID::ATTACKBUTTON, // TEXTURE_COUNT indicates that no txture is needed
-						EFFECT_ASSET_ID::TEXTURED,
+						EFFECT_ASSET_ID::BATTLE,
 						GEOMETRY_BUFFER_ID::SPRITE });
 					rr.shown = true;
 					Motion& motion = registry.motions.get(pourIt);
 					TextRenderRequest& trr = registry.textRenderRequests.get(pourit_text);
-					trr.position = vec2(motion.position.x, window_height_px - motion.position.y);
+					trr.position = vec2(motion.position.x - 35, window_height_px - motion.position.y - 5);
 					trr.shown = true;
 				}
 			}
