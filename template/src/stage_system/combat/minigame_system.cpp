@@ -589,29 +589,27 @@ minigame_state MinigameSystem::calc_modded_beats() const {
 
 	// For every second beat, the perfect value of modded is beat_duration
 		// So then beat_duration - beat_error <= modded <= beat_duration + beat_error for a hit
-	// Change this to beat_duration <= modded <= beat_duration + beat_error * 2?
 	if (modded == beat_duration) {
 		return minigame_state::perfect;
 	}
-	else if (modded < (beat_duration + beat_error * 2) && modded >= beat_duration) {
+	else if (modded > (beat_duration - beat_error) && modded < beat_duration) {
 		return minigame_state::good;
 	}
-	/*else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
+	else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
 		return minigame_state::good;
-	}*/
+	}
 
 	// For every fourth beat, the perfect value of modded is beat_duration * 3
 		// So then (beat_duration * 3) - beat_error <= modded <= (beat_duration * 3) + beat_error for a hit
-	// Change this to beat_duration * 3 <= modded <= beat_duration * 3 + beat_error * 2
 	if (modded == beat_duration * 3) {
 		return minigame_state::perfect;
 	}
-	else if (modded < (beat_duration * 3 + beat_error * 2) && modded >= beat_duration * 3) {
+	else if (modded > (beat_duration * 3 - beat_error) && modded < beat_duration * 3) {
 		return minigame_state::good;
 	}
-	/*else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
+	else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
 		return minigame_state::good;
-	}*/
+	}
 
 	return minigame_state::fail;
 }
@@ -756,21 +754,30 @@ void MinigameSystem::handle_milk() {
 
 	for (Entity entity : registry.miniGameTimer.entities) {
 		MiniGameTimer& mgt = registry.miniGameTimer.get(entity);
-		mgt.inter_timer = 2000.f;
+		mgt.inter_timer = 3000.f;
 		mgt.cup_state = minigame_state::dead;
 
+		render_text_map["choice_text"] = createText("Your Choice:", { x_center - 225, y_center + 100 },
+			2.5f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
+		Entity milk = createMilk(renderer, { x_center + 325, y_center - 125 }, options_arr[chosen_answer]);
+		registry.renderRequests.get(milk).shown = true;
+		Motion& motion = registry.motions.get(milk);
+		motion.scale.x *= 1.00;
+		motion.scale.y *= 1.50;
+
 		if (current_riddle.answer == options_arr[chosen_answer]) {
-			render_text_map["result"] = createText("CORRECT!", { x_center - 50, y_center},
+			render_text_map["result"] = createText("YOU ARE CORRECT!", { x_center - 250, y_center - 100},
 				2.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 			score = 3;
 		}
 		else {
-			render_text_map["result"] = createText("INCORRECT", { x_center - 50, y_center},
+			render_text_map["result"] = createText("YOU ARE INCORRECT", { x_center - 250, y_center - 100},
 				2.5f, milk_result_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 			score = 0;
 		}
 
 		registry.textRenderRequests.get(render_text_map["result"]).shown = true;
+		registry.textRenderRequests.get(render_text_map["choice_text"]).shown = true;
 	}
 }
 
@@ -869,10 +876,10 @@ void MinigameSystem::start_minigame() {
 		registry.textRenderRequests.get(render_text_map["D"]).shown = true; 
 
 		// create milk entities for each MC option; x offset is 50
-		createMilk(renderer, { x_center / 2 - 50, y_center + 200 }, "A");
-		createMilk(renderer, { x_center / 2 + 250, y_center + 200 }, "B");
-		createMilk(renderer, { x_center / 2 + 550, y_center + 200 }, "C");
-		createMilk(renderer, { x_center / 2 + 850, y_center + 200 }, "D");
+		createMilk(renderer, { x_center / 2 - 70, y_center + 200 }, "A");
+		createMilk(renderer, { x_center / 2 + 230, y_center + 200 }, "B");
+		createMilk(renderer, { x_center / 2 + 530, y_center + 200 }, "C");
+		createMilk(renderer, { x_center / 2 + 830, y_center + 200 }, "D");
 
 		// add timer text
 		render_text_map["timer"] = createText("Time: 15.00s", { window_width_px - 175, window_height_px - 25 },
@@ -891,6 +898,7 @@ void MinigameSystem::handle_minigame(int key) {
 	switch (selected_game) {
 	case cool_it: {
 		if (key == GLFW_KEY_D) {
+			std::cout << "HIT";
 			// key "D" will only be recognized for every beat
 			if (time_since_last_press >= beat_duration) {
 				// hard-coded bpm of metronome right now
@@ -979,6 +987,9 @@ void MinigameSystem::handle_minigame_key(int key, int action) {
 				if (key == GLFW_KEY_S) {
 					practice = false;
 					start_minigame();
+				}
+				if (selected_game == cool_it) {
+					handle_minigame(key);
 				}
 			}
 			else {

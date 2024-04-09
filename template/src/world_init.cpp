@@ -216,7 +216,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 	motion.velocity = { 0, 0 };
 	motion.position = pos;
 
-	motion.scale = vec2({ EAGLE_BB_WIDTH, -EAGLE_BB_HEIGHT });
+	motion.scale = vec2({ MENU_WIDTH, MENU_HEIGHT });
 
 	// add entity to minigame component
 	registry.miniGame.emplace(entity);
@@ -225,7 +225,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 	case 'A': {
 		registry.renderRequests.insert(
 			entity,
-			{ TEXTURE_ASSET_ID::AMERICANO,
+			{ TEXTURE_ASSET_ID::MILKALMOND,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
@@ -234,7 +234,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 	case 'B': {
 		registry.renderRequests.insert(
 			entity,
-			{ TEXTURE_ASSET_ID::AMERICANO,
+			{ TEXTURE_ASSET_ID::MILK2,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
@@ -243,7 +243,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 	case 'C': {
 		registry.renderRequests.insert(
 			entity,
-			{ TEXTURE_ASSET_ID::AMERICANO,
+			{ TEXTURE_ASSET_ID::MILKCOCONUT,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
@@ -252,7 +252,7 @@ Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
 	case 'D': {
 		registry.renderRequests.insert(
 			entity,
-			{ TEXTURE_ASSET_ID::AMERICANO,
+			{ TEXTURE_ASSET_ID::MILKSOY,
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE }
 		);
