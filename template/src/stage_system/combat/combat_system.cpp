@@ -110,6 +110,8 @@ CombatSystem::SoundMapping CombatSystem::handle_selection() {
 }
 
 void CombatSystem::handle_combat_over() {
+
+	bool won_battle = registry.turnBasedEnemies.size() == 0;
 	
 	for (Entity entity : registry.partyMembers.entities) {
 		registry.remove_all_components_of(entity);
@@ -143,7 +145,18 @@ void CombatSystem::handle_combat_over() {
 	for (Entity entity : registry.turnBasedEnemies.entities) {
 		registry.remove_all_components_of(entity);
 	}
-	if (selected_level == level_five) {
+
+	if (registry.textRenderRequests.has(attack_text)) {
+		registry.textRenderRequests.get(attack_text).shown = false;
+	}
+	if (registry.textRenderRequests.has(rest_text)) {
+		registry.textRenderRequests.get(rest_text).shown = false;
+	}
+	if (registry.textRenderRequests.has(magic_text)) {
+		registry.textRenderRequests.get(magic_text).shown = false;
+	}
+
+	if (selected_level == level_five && won_battle) {
 		stage_system->set_stage(StageSystem::Stage::cutscene_ending);
 	} else{
 		stage_system->set_stage(StageSystem::Stage::overworld);
@@ -383,13 +396,13 @@ void CombatSystem::handle_turn_rendering() {
 				if (registry.renderRequests.has(pourIt)) {
 					registry.renderRequests.remove(pourIt);
 				}
-				if ((registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
+				if (registry.textRenderRequests.has(attack_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(attack_text).shown = false;
 				}
-				if ((registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
+				if (registry.textRenderRequests.has(rest_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(rest_text).shown = false;
 				}
-				if ((registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) || registry.turnBasedEnemies.size() == 0) {
+				if (registry.textRenderRequests.has(magic_text) && !ally_turn_is_next) {
 					registry.textRenderRequests.get(magic_text).shown = false;
 				}
 			}
