@@ -256,7 +256,7 @@ bool MinigameSystem::step_cool(float elapsed_ms_since_last_update) {
 				RenderRequest& rr = registry.renderRequests.insert(
 					entity,
 					{ TEXTURE_ASSET_ID::MINIGAMECUP,
-					EFFECT_ASSET_ID::TEXTURED,
+					EFFECT_ASSET_ID::BATTLE,
 					GEOMETRY_BUFFER_ID::SPRITE }
 				);
 				rr.shown = true;
@@ -380,7 +380,7 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 						registry.renderRequests.insert(
 							entity,
 							{ TEXTURE_ASSET_ID::KETTLEDEAD,
-							EFFECT_ASSET_ID::TEXTURED,
+							EFFECT_ASSET_ID::BATTLE,
 							GEOMETRY_BUFFER_ID::SPRITE }
 						);
 						score = 0;
@@ -389,7 +389,7 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 						registry.renderRequests.insert(
 							entity,
 							{ TEXTURE_ASSET_ID::KETTLERIGHT,
-							EFFECT_ASSET_ID::TEXTURED,
+							EFFECT_ASSET_ID::BATTLE,
 							GEOMETRY_BUFFER_ID::SPRITE }
 						);
 						mgt.cup_state = minigame_state::perfect;
@@ -399,7 +399,7 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 						registry.renderRequests.insert(
 							entity,
 							{ TEXTURE_ASSET_ID::KETTLEMORE,
-							EFFECT_ASSET_ID::TEXTURED,
+							EFFECT_ASSET_ID::BATTLE,
 							GEOMETRY_BUFFER_ID::SPRITE }
 						);
 						mgt.cup_state = minigame_state::fail;
@@ -409,7 +409,7 @@ bool MinigameSystem::step_pour(float elapsed_ms_since_last_update) {
 						registry.renderRequests.insert(
 							entity,
 							{ TEXTURE_ASSET_ID::KETTLELITTLE,
-							EFFECT_ASSET_ID::TEXTURED,
+							EFFECT_ASSET_ID::BATTLE,
 							GEOMETRY_BUFFER_ID::SPRITE }
 						);
 						mgt.cup_state = minigame_state::good;
@@ -656,7 +656,7 @@ void MinigameSystem::handle_cool() {
 				RenderRequest& rr = registry.renderRequests.insert(
 					entity,
 					{ TEXTURE_ASSET_ID::MINIGAMECUPGOOD,
-					EFFECT_ASSET_ID::TEXTURED,
+					EFFECT_ASSET_ID::BATTLE,
 					GEOMETRY_BUFFER_ID::SPRITE }
 				);
 				rr.shown = true;
@@ -668,7 +668,7 @@ void MinigameSystem::handle_cool() {
 			RenderRequest& rr = registry.renderRequests.insert(
 				entity,
 				{ TEXTURE_ASSET_ID::MINIGAMECUPBAD,
-				EFFECT_ASSET_ID::TEXTURED,
+				EFFECT_ASSET_ID::BATTLE,
 				GEOMETRY_BUFFER_ID::SPRITE }
 			);
 			rr.shown = true;
@@ -727,7 +727,7 @@ void MinigameSystem::handle_pour() {
 				RenderRequest& rr = registry.renderRequests.insert(
 					entity,
 					{ TEXTURE_ASSET_ID::KETTLEPOUR,
-					EFFECT_ASSET_ID::TEXTURED,
+					EFFECT_ASSET_ID::BATTLE,
 					GEOMETRY_BUFFER_ID::SPRITE }
 				);
 				rr.shown = true;
