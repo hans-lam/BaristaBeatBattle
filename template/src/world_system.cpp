@@ -18,6 +18,8 @@ const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const size_t ENEMY_DELAY_MS = 2000 * 3;
 const size_t SPARKLE_DELAY_MS = 60.f; 
+const float MAX_SPARKLE_ACC = 75.f;
+const float SPARKLE_VELOCITY = 60.f;
 
 bool tutorialOn = false;
 Entity tutorial;
@@ -393,8 +395,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				next_sparkle_spawn = (SPARKLE_DELAY_MS / 2) + uniform_dist(rng) * (SPARKLE_DELAY_MS / 2);
 				Motion& motion = registry.motions.get(entity);
 				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, -40.f);
-				vec2 sparkle_acc = vec2(0.f, uniform_dist(rng) * 10.f);
-				create_sparkle(renderer, sparkle_pos, vec2(0.0f, 20.f), sparkle_acc, vec3(1.f, 0.f, 0.f));
+				vec2 sparkle_acc = vec2(0.f, uniform_dist(rng) * MAX_SPARKLE_ACC);
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, SPARKLE_VELOCITY), sparkle_acc, vec3(1.f, 0.f, 0.f));
 			}
 
 			// stop spawning sparkles
@@ -420,8 +422,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				next_sparkle_spawn = (SPARKLE_DELAY_MS / 2) + uniform_dist(rng) * (SPARKLE_DELAY_MS / 2);
 				Motion& motion = registry.motions.get(entity);
 				vec2 sparkle_pos = motion.position + vec2((uniform_dist(rng) - .5f) * 100.f, 40.f);
-				vec2 sparkle_acc = vec2(0.f, -uniform_dist(rng) * 10.f);
-				create_sparkle(renderer, sparkle_pos, vec2(0.0f, -20.f), sparkle_acc, vec3(0.f, 0.5f, 0.5f));
+				vec2 sparkle_acc = vec2(0.f, -uniform_dist(rng) * MAX_SPARKLE_ACC);
+				create_sparkle(renderer, sparkle_pos, vec2(0.0f, -SPARKLE_VELOCITY), sparkle_acc, vec3(0.f, 0.5f, 0.5f));
 			}
 
 			// stop spawning sparkles
