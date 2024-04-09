@@ -580,7 +580,7 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Motion& motion = registry.motions.emplace(entity);
-	motion.position = position;
+	motion.position = position - vec2(0, 150);
 	motion.scale = vec2({ MENU_WIDTH * 2, MENU_HEIGHT * 2 + 100 }); // ??? i don't think this is right
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
@@ -590,7 +590,7 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::TUTORIALBOARD,
-			  EFFECT_ASSET_ID::TEXTURED,
+			  EFFECT_ASSET_ID::BATTLE,
 			  GEOMETRY_BUFFER_ID::SPRITE });
 
 	}
@@ -599,7 +599,7 @@ Entity createTutorialWindow(RenderSystem* renderer, vec2 position, int window) {
 		registry.renderRequests.insert(
 			entity,
 			{ TEXTURE_ASSET_ID::BATTLEBOARD,
-			  EFFECT_ASSET_ID::TEXTURED,
+			  EFFECT_ASSET_ID::BATTLE,
 			  GEOMETRY_BUFFER_ID::SPRITE });
 
 	}
