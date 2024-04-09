@@ -21,11 +21,6 @@ void OverworldSystem::init(StageSystem* stage_system_arg) {
 	stage_system = stage_system_arg;
 	overworld_tutorial = false;
 	current_level = 1;
-	
-	// I dont think this call works
-	//create_overworld_levels();
-	// std::cout << "IS THIS INIT BEING CALLED?????" << std::endl;
-	
 } 
 
 bool OverworldSystem::step() {
@@ -47,12 +42,6 @@ void OverworldSystem::handle_overworld_keys(int key, int action, float player_sp
 		handle_tutorial();
 	}
 }
-
-//void OverworldSystem::create_overworld_levels() {
-//	vec2 level1pos = vec2(100, 100);
-//	Entity test = createEnemyDrink(renderer, vec2(0.f, 0.f), level1pos);
-//	std::cout << "i wanna make sure this is not being run on a loop or else that would be bad" << std::endl;
-//}
 
 void OverworldSystem::handle_player_movement(int key, int action, float player_speed) {
 
@@ -114,42 +103,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 				}
 			}
 
-			
-			//// Go through all levelNodes:
-			//vec2 nearest_levelNode_pos = vec2(0.f, 0.f);
-			//float curr_best_dist = 9999.f;
-			//LevelNode nearest_left_node = LevelNode();
-			//LevelNode nearest_right_node = LevelNode();
-			//for (LevelNode levelnode : registry.levelNode.components) {
-			//	
-			//	// if find closer node, replace nearest_levelNode_pos with new best
-			//	vec2 nodePos = levelnode.position;
-			//	
-			//	// find nearest_left_node means that we check if levelnode.position.x is less than the player.position.x
-			//	if (levelnode.position.x > player_motion.position.x) {
-			//		
-			//		// dist to left calculation
-			//		float dist = sqrt(pow((levelnode.position.x - player_motion.position.x), 2) + pow(levelnode.position.y - player_motion.position.y, 2));
-			//		if (dist < curr_best_dist) {
-			//			curr_best_dist = dist;
-			//			nearest_levelNode_pos = levelnode.position;
-			//			nearest_right_node = levelnode;
-			//			std::cout << "THIS IS THE POSITION OF THE nearest_right_node: (x, y): " << levelnode.position.x << " " << levelnode.position.y << std::endl;
-			//		}
-			//	} 
-			//	
-			//	if (levelnode.position.x < player_motion.position.x) {
-			//		// dist to left calculation
-			//		float dist = sqrt(pow((levelnode.position.x - player_motion.position.x), 2) + pow(levelnode.position.y - player_motion.position.y, 2));
-			//		if (dist < curr_best_dist) {
-			//			curr_best_dist = dist;
-			//			nearest_levelNode_pos = levelnode.position;
-			//			nearest_left_node = levelnode;
-			//			std::cout << "THIS IS THE POSITION OF THE nearest_left_node: (x, y): " << levelnode.position.x << " " << levelnode.position.y << std::endl;
-			//		}
-			//	}
-			//	
-			//}
 			if (key == GLFW_KEY_UP) {
 				//player_motion.velocity.y = -player_speed;
 			}
@@ -163,8 +116,6 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 					// Move player to the nearest left node if not already at the leftmost node.
 					/*player_motion.position.x = nearest_left_node.position.x;
 					current_level = nearest_left_node.level_number;*/
-
-					// std::cout << "THIS IS left: " << nearest_left_node.level_number << std::endl;
 
 					// This next line actually just handles the animation because the movement is just an assignment of position 
 					// values, not the velocity thing anymore. This is very hacky and should be fixed at some point. 
@@ -223,43 +174,8 @@ void OverworldSystem::handle_player_movement(int key, int action, float player_s
 			}
 
 		}
-
-		/*if (remaining_distance_x == 0) {
-			player_motion.velocity.x = 0;
-		}
-		else {
-			remaining_distance_x = player_motion.position.x - 
-			std::cout << "This value should go down: " << nearest_left_dist << std::endl;
-		}*/
-
-
-		/*else if (action == GLFW_RELEASE) {
-			if (key == GLFW_KEY_UP) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_LEFT) {
-				player_motion.velocity.x = 0.0f;
-			}
-			else if (key == GLFW_KEY_DOWN) {
-				player_motion.velocity.y = 0.0f;
-			}
-			else if (key == GLFW_KEY_RIGHT) {
-				player_motion.velocity.x = 0.0f;
-			}
-		}*/
 	}
 }
-
-/*
-void OverworldSystem::player_attack() {
-	for (uint i = 0; i < registry.players.size(); i++) {
-		Entity entity = registry.players.entities[i];
-		if (!registry.attackTimers.has(entity)) {
-			registry.attackTimers.emplace(registry.players.entities[i]);
-		}
-	}
-}
-*/
 
 int my_test_it = 1;
 void OverworldSystem::handle_level_selection() {
@@ -267,8 +183,6 @@ void OverworldSystem::handle_level_selection() {
 	for (Entity entity : registry.levelNode.entities) {
 		registry.remove_all_components_of(entity);
 	}
-
-	
 
 	std::cout << " handle level selection " << my_test_it++ << std::endl;
 	stage_system->set_stage(StageSystem::Stage::cutscene, current_level);
@@ -345,35 +259,6 @@ void OverworldSystem::updatePlayerVelocityTowardsTarget(float elapsed_ms) {
 		else {
 			// std::cout << "REACHED ELSE CASE" << std::endl;
 		}
-
-		//if (0 > registry.motions.get(registry.players.entities[0]).velocity.x) {
-		//	// check using nearest_node from the overworld_system
-		//	float x_pos_near_left = this->nearest_left_node.position.x;
-
-		//	// move the player based on bezier:
-		//	float step_seconds = elapsed_ms / 1000.f;
-		//	// registry.motions.get(registry.players.entities[0]).position.x = getBezierPath()
-
-		//	if (0 == abs((int)x_pos_near_left - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-
-
-		//		registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-		//		registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_left;
-
-		//	}
-		//}
-		//else if (0 < registry.motions.get(registry.players.entities[0]).velocity.x) {
-		//	// check using nearest_node from the overworld_system
-		//	float x_pos_near_right = this->nearest_right_node.position.x;
-		//	if (0 ==  abs((int)x_pos_near_right - (int)registry.motions.get(registry.players.entities[0]).position.x)) {
-		//		registry.motions.get(registry.players.entities[0]).velocity.x = 0;
-		//		registry.motions.get(registry.players.entities[0]).position.x = x_pos_near_right;
-
-		//	}
-		//}
-		//else {
-		//	// std::cout << "REACHED ELSE CASE" << std::endl;
-		//}
 }
 
 // This function takes in 2 points and a float time in range [0, 1] and returns the position in a path  
