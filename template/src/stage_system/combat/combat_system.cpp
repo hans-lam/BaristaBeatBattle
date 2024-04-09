@@ -368,6 +368,15 @@ void CombatSystem::handle_turn_rendering() {
 				if (registry.renderRequests.has(pourIt)) {
 					registry.renderRequests.remove(pourIt);
 				}
+				if (registry.textRenderRequests.has(attack_text)) {
+					registry.textRenderRequests.get(attack_text).shown = false;
+				}
+				if (registry.textRenderRequests.has(rest_text)) {
+					registry.textRenderRequests.get(rest_text).shown = false;
+				}
+				if (registry.textRenderRequests.has(pourit_text)) {
+					registry.textRenderRequests.get(pourit_text).shown = false;
+				}
 			}
 
 			// handle color change of option 
