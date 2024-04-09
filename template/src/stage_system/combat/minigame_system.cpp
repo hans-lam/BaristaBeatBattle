@@ -201,8 +201,10 @@ void MinigameSystem::set_current_text_and_desc(vec3 color, bool shown) {
 }
 
 void MinigameSystem::set_milk_color(vec3 color) {
-	TextRenderRequest& text_trr = registry.textRenderRequests.get(render_text_map[options_arr[chosen_answer]]);
-	text_trr.color = color; 
+	Entity current_answer = render_text_map[options_arr[chosen_answer]];
+	if (registry.textRenderRequests.has(current_answer)) {
+		registry.textRenderRequests.get(current_answer).color = color;
+	}
 }
 
 void MinigameSystem::minigame_step(float elapsed_ms_since_last_update) {
@@ -587,27 +589,29 @@ minigame_state MinigameSystem::calc_modded_beats() const {
 
 	// For every second beat, the perfect value of modded is beat_duration
 		// So then beat_duration - beat_error <= modded <= beat_duration + beat_error for a hit
+	// Change this to beat_duration <= modded <= beat_duration + beat_error * 2?
 	if (modded == beat_duration) {
 		return minigame_state::perfect;
 	}
-	else if (modded > (beat_duration - beat_error) && modded < beat_duration) {
+	else if (modded < (beat_duration + beat_error * 2) && modded >= beat_duration) {
 		return minigame_state::good;
 	}
-	else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
+	/*else if (modded < (beat_duration + beat_error) && modded > beat_duration) {
 		return minigame_state::good;
-	}
+	}*/
 
 	// For every fourth beat, the perfect value of modded is beat_duration * 3
 		// So then (beat_duration * 3) - beat_error <= modded <= (beat_duration * 3) + beat_error for a hit
+	// Change this to beat_duration * 3 <= modded <= beat_duration * 3 + beat_error * 2
 	if (modded == beat_duration * 3) {
 		return minigame_state::perfect;
 	}
-	else if (modded > (beat_duration * 3 - beat_error) && modded < beat_duration * 3) {
+	else if (modded < (beat_duration * 3 + beat_error * 2) && modded >= beat_duration * 3) {
 		return minigame_state::good;
 	}
-	else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
+	/*else if (modded < (beat_duration * 3 + beat_error) && modded > beat_duration * 3) {
 		return minigame_state::good;
-	}
+	}*/
 
 	return minigame_state::fail;
 }
@@ -743,18 +747,25 @@ void MinigameSystem::handle_milk() {
 		registry.remove_all_components_of(x.second);
 	}
 
+	// remove all of the "milk" entities
+	for (Entity entity : registry.miniGame.entities) {
+		if (!(registry.miniGameTimer.has(entity))) {
+			registry.remove_all_components_of(entity);
+		}
+	}
+
 	for (Entity entity : registry.miniGameTimer.entities) {
 		MiniGameTimer& mgt = registry.miniGameTimer.get(entity);
 		mgt.inter_timer = 2000.f;
 		mgt.cup_state = minigame_state::dead;
 
 		if (current_riddle.answer == options_arr[chosen_answer]) {
-			render_text_map["result"] = createText("YOU WIN!", { x_center - 50, y_center},
+			render_text_map["result"] = createText("CORRECT!", { x_center - 50, y_center},
 				2.5f, selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 			score = 3;
 		}
 		else {
-			render_text_map["result"] = createText("YOU LOSE", { x_center - 50, y_center},
+			render_text_map["result"] = createText("INCORRECT", { x_center - 50, y_center},
 				2.5f, milk_result_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 			score = 0;
 		}
@@ -844,18 +855,24 @@ void MinigameSystem::start_minigame() {
 		registry.textRenderRequests.get(render_text_map["question"]).shown = true;
 
 		// add answers text
-		render_text_map["A"] = createText("A: " + current_riddle.options[0], {x_center/2 + 100, y_center},
+		render_text_map["A"] = createText("A: " + current_riddle.options[0], {x_center/2 - 100, y_center},
 			1.0f, milk_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 		registry.textRenderRequests.get(render_text_map["A"]).shown = true;
-		render_text_map["B"] = createText("B: " + current_riddle.options[1], { x_center/2 + 300, y_center },
+		render_text_map["B"] = createText("B: " + current_riddle.options[1], { x_center/2 + 200, y_center },
 			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 		registry.textRenderRequests.get(render_text_map["B"]).shown = true;
 		render_text_map["C"] = createText("C: " + current_riddle.options[2], { x_center/2 + 500, y_center},
 			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
 		registry.textRenderRequests.get(render_text_map["C"]).shown = true;
-		render_text_map["D"] = createText("D: " + current_riddle.options[3], { x_center/2 + 700, y_center},
+		render_text_map["D"] = createText("D: " + current_riddle.options[3], { x_center/2 + 800, y_center},
 			1.0f, not_selected_color, glm::mat4(1.0f), StageSystem::Stage::minigame, false);
-		registry.textRenderRequests.get(render_text_map["D"]).shown = true;
+		registry.textRenderRequests.get(render_text_map["D"]).shown = true; 
+
+		// create milk entities for each MC option; x offset is 50
+		createMilk(renderer, { x_center / 2 - 50, y_center + 200 }, "A");
+		createMilk(renderer, { x_center / 2 + 250, y_center + 200 }, "B");
+		createMilk(renderer, { x_center / 2 + 550, y_center + 200 }, "C");
+		createMilk(renderer, { x_center / 2 + 850, y_center + 200 }, "D");
 
 		// add timer text
 		render_text_map["timer"] = createText("Time: 15.00s", { window_width_px - 175, window_height_px - 25 },

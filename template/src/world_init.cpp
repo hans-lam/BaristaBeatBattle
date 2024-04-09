@@ -197,13 +197,73 @@ Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini
 			entity,
 			{ TEXTURE_ASSET_ID::MINIGAMECOOLPERFECT,
 			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE }
+			GEOMETRY_BUFFER_ID::SPRITE } 
 		);
 	}
 
 	return entity;
 }
 
+// create milk option that attaches to a mc option
+Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = pos;
+
+	motion.scale = vec2({ EAGLE_BB_WIDTH, -EAGLE_BB_HEIGHT });
+
+	// add entity to minigame component
+	registry.miniGame.emplace(entity);
+
+	switch (milk_type[0]) {
+	case 'A': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::AMERICANO,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'B': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::AMERICANO,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'C': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::AMERICANO,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	case 'D': {
+		registry.renderRequests.insert(
+			entity,
+			{ TEXTURE_ASSET_ID::AMERICANO,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE }
+		);
+		break;
+	}
+	}
+
+	registry.renderRequests.get(entity).shown = true;
+
+	return entity;
+}
 
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position)
 {

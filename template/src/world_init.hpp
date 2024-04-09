@@ -41,6 +41,8 @@ Entity createSpeech(RenderSystem* renderer, vec2 pos);
 Entity createMiniResult(RenderSystem* renderer, vec2 pos, float inter_timer, minigame_state mini_res);
 // Cool It: minigame hit indicator 
 Entity createMiniIndicator(RenderSystem* renderer, vec2 pos, minigame_state mini_res);
+// Milk It: milk option
+Entity createMilk(RenderSystem* renderer, vec2 pos, std::string milk_type);
 // the real enemy
 Entity createEnemyDrink(RenderSystem* renderer, vec2 velocity, vec2 position);
 // the background scroller
